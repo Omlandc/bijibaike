@@ -3,14 +3,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router';
 import { siteSEO } from '@/seo.config';
+import { useTranslation } from '@/i18n';
 
 export default function Privacy() {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <header className="space-y-3">
         <div className="flex items-center gap-2">
           <Shield className="size-6 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight text-fg">隐私政策</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-fg">{t('privacy.title')}</h1>
         </div>
         <p className="text-fg-muted">
           最后更新: {new Date().toISOString().slice(0, 10)} · 适用站点:{' '}

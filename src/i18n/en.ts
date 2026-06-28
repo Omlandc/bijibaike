@@ -1,0 +1,131 @@
+/**
+ * English translations.
+ *
+ * Add a key here and in zh.ts (and any other languages) and the site
+ * renders it. Missing keys fall back to the Chinese version so partial
+ * translations never show empty strings.
+ */
+
+import type { TranslationKey } from './zh';
+
+export const en: Partial<Record<TranslationKey, string>> = {
+  // Navigation
+  'nav.home': 'Home',
+  'nav.posts': 'Posts',
+  'nav.topics': 'Topics',
+  'nav.tags': 'Tags',
+  'nav.graph': 'Graph',
+  'nav.resources': 'Resources',
+
+  // Site meta
+  'site.search': 'Search',
+  'site.searchPlaceholder': 'Search posts, tags...',
+  'site.postsAndTags': '{posts} posts · {tags} tags',
+  'site.toggleTheme': 'Toggle theme',
+
+  // Theme names (shown in dropdown)
+  'theme.light': 'Light',
+  'theme.dark': 'Dark',
+  'theme.sepia': 'Sepia',
+  'theme.cyberpunk': 'Cyber',
+
+  // Language switcher
+  'lang.switch': 'Language',
+  'lang.zh': '中文',
+  'lang.en': 'English',
+
+  // Home
+  'home.heading': 'Write once, blog everywhere',
+  'home.browseAll': 'Browse all posts',
+  'home.viewGraph': 'View graph',
+  'home.stats': '{posts} posts · {tags} tags · {links} wiki links',
+  'home.searchPosts': 'Search posts...',
+  'home.filter.latest': 'Latest',
+  'home.filter.popular': 'Popular',
+  'home.filter.all': 'All',
+  'home.featured': 'Featured',
+
+  // Blog list
+  'blog.title': 'All posts',
+  'blog.subtitle': 'Browse every Obsidian-style post',
+  'blog.empty': 'No posts yet — add a .md file in your vault.',
+
+  // Post
+  'post.backToList': 'Back to list',
+  'post.minutes': 'min',
+  'post.tagsCount': '{count} tags',
+  'post.toc': 'Outline',
+  'post.tocMobile': 'Outline ({count})',
+  'post.readingProgress': 'Reading progress',
+  'post.backlinks': 'Referenced by ({count})',
+  'post.prev': 'Previous',
+  'post.next': 'Next',
+  'post.copyLink': 'Copy link',
+  'post.linkCopied': 'Copied',
+
+  // Topics
+  'topics.title': 'Topics',
+  'topics.subtitle': 'An Obsidian-folder-shaped portal: each top-level directory is a {pillar}, broken down into {cluster}s.',
+  'topics.pillar': 'Pillar',
+  'topics.cluster': 'Cluster',
+  'topics.empty': 'No topics yet — create a sub-directory in your vault.',
+  'topics.posts': '{count} posts',
+  'topics.browse': 'Browse',
+  'topics.postsInCluster': 'Posts in {cluster}',
+
+  // Tags
+  'tags.title': 'Tags',
+  'tags.subtitle': 'Browse posts by tag',
+  'tags.allTag': 'All',
+  'tags.empty': 'No tags yet',
+  'tags.countOne': '{count} post',
+  'tags.countMany': '{count} posts',
+  'tags.postsWith': 'Posts tagged "{tag}" ({count})',
+
+  // Graph
+  'graph.title': 'Graph',
+  'graph.subtitle': 'Visualize wiki-link relationships between posts',
+  'graph.search': 'Search nodes...',
+  'graph.fullscreen': 'Fullscreen',
+  'graph.exitFullscreen': 'Exit fullscreen',
+  'graph.reset': 'Reset view',
+  'graph.hideOrphans': 'Hide orphans',
+  'graph.showOrphans': 'Show orphans',
+  'graph.empty': 'No wiki-links yet — add [[double-bracket]] links to connect posts.',
+  'graph.openPost': 'Open post (double-click)',
+
+  // Resources
+  'resources.title': 'Resources',
+  'resources.subtitle': 'Tools, references, and external links I use for writing, note-taking, and Obsidian.',
+  'resources.configNote': 'Configured in',
+  'resources.configNoteOf': 'under the',
+  'resources.configNoteSection': 'section.',
+  'resources.empty': 'No resources yet. Open {file} in your vault root and add the {section} section:',
+  'resources.backHome': 'Back to home',
+
+  // About / Privacy / Contact
+  'about.title': 'About',
+  'privacy.title': 'Privacy',
+  'contact.title': 'Contact',
+
+  // Cookie consent
+  'cookie.title': 'Cookies & advertising',
+  'cookie.description': 'We use essential cookies to remember your preferences. With your consent, Google AdSense will set advertising cookies for personalized content. See our {policy}.',
+  'cookie.essential': 'Essential only',
+  'cookie.acceptAll': 'Accept all',
+  'cookie.policy': 'privacy policy',
+
+  // 404 / misc
+  'notFound.title': 'Page not found',
+  'notFound.goHome': 'Go home',
+  'loading': 'Loading...',
+
+  // Footer
+  'footer.poweredBy': 'Built on blog-system design + an Obsidian-compatible layer',
+
+  // Time
+  'time.justNow': 'just now',
+  'time.minutesAgo': '{n}m ago',
+  'time.hoursAgo': '{n}h ago',
+  'time.daysAgo': '{n}d ago',
+};

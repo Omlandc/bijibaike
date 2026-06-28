@@ -3,9 +3,11 @@ import { BookOpen, ExternalLink, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { siteConfig } from '@/config/site-config';
+import { useTranslation } from '@/i18n';
 
 export default function Resources() {
   const { sections } = siteConfig.resources;
+  const { t } = useTranslation();
 
   return (
     <div className="mx-auto max-w-3xl space-y-10">
@@ -13,25 +15,30 @@ export default function Resources() {
         <Button asChild variant="ghost" size="sm">
           <Link to="/">
             <ArrowLeft className="mr-1 size-3.5" />
-            返回首页
+            {t('resources.backHome')}
           </Link>
         </Button>
         <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-fg">
           <BookOpen className="size-7 text-primary" />
-          资源
+          {t('resources.title')}
         </h1>
         <p className="text-fg-muted">
-          我在写博客、做笔记、用 Obsidian 的过程中用到的工具、参考与有意思的链接。
-          内容在 <code className="rounded bg-bg-subtle px-1 text-fg">vault/_config.md</code>{' '}
-          的 <code className="rounded bg-bg-subtle px-1 text-fg">resources</code> 段配置。
+          {t('resources.subtitle')} {t('resources.configNote')}{' '}
+          <code className="rounded bg-bg-subtle px-1 text-fg">vault/_config.md</code>{' '}
+          {t('resources.configNoteOf')}{' '}
+          <code className="rounded bg-bg-subtle px-1 text-fg">resources</code>{' '}
+          {t('resources.configNoteSection')}
         </p>
       </header>
 
       {sections.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border bg-bg-elevated p-8 text-center">
           <p className="text-fg-muted">
-            还没配置任何资源。打开你 vault 根目录的 <code className="rounded bg-bg-subtle px-1 text-fg">_config.md</code>，
-            在 frontmatter 里加 <code className="rounded bg-bg-subtle px-1 text-fg">resources.sections</code>：
+            {t('lang.en') === 'English' ? (
+              <>No resources yet. Open <code className="rounded bg-bg-subtle px-1 text-fg">_config.md</code> in your vault root and add the <code className="rounded bg-bg-subtle px-1 text-fg">resources.sections</code> section:</>
+            ) : (
+              <>还没配置任何资源。打开你 vault 根目录的 <code className="rounded bg-bg-subtle px-1 text-fg">_config.md</code>，在 frontmatter 里加 <code className="rounded bg-bg-subtle px-1 text-fg">resources.sections</code>：</>
+            )}
           </p>
           <pre className="mx-auto mt-4 max-w-md overflow-auto rounded-md bg-bg p-3 text-left text-xs">
 {`resources:

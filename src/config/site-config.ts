@@ -18,6 +18,11 @@ export const siteConfig: SiteConfig = {
       "cyberpunk"
     ],
     "locale": "zh_CN",
+    "defaultLanguage": "zh",
+    "languages": [
+      "zh",
+      "en"
+    ],
     "author": {
       "name": "Omlandc",
       "url": "https://github.com/Omlandc"

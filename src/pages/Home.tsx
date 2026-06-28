@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { getAllPosts, getAllTags } from '@/lib/content';
+import { useTranslation } from '@/i18n';
 
 type SortKey = 'latest' | 'hot';
 
@@ -45,10 +46,19 @@ export default function Home() {
 
   const featured = sorted.find((p) => p.frontmatter.pinned) ?? sorted[0];
   const rest = sorted.filter((p) => p !== featured);
+  const { t } = useTranslation();
+  // Hero title is split on the first comma so the part after the
+  // comma can be highlighted with the primary color.
+  const heroHeading = t('home.heading');
   const heroTitleLead = 'Obsidian 兼容';
-  const heroTitleAccent = '即开即用博客';
-  const heroSubtitle =
-    '基于 webapp-building (0-origin) + 一层 Obsidian 兼容层。把你的 vault 直接放进 content/ 目录,所有 `[[双链]]`、`> [!callout]`、frontmatter、inline #tag 都被正确渲染。';
+  const heroTitleAccent = heroHeading.includes(',')
+    ? heroHeading.split(',').pop()?.trim() ?? heroHeading
+    : heroHeading;
+  // Subtitle: explain what this site does. The Chinese copy is a
+  // hand-written blurb; for English we surface a shorter blurb.
+  const heroSubtitle = t('lang.zh') === '中文'
+    ? '基于 webapp-building (0-origin) + 一层 Obsidian 兼容层。把你的 vault 直接放进 content/ 目录,所有 `[[双链]]`、`> [!callout]`、frontmatter、inline #tag 都被正确渲染。'
+    : 'A static React blog that reads your Obsidian vault directly. Wiki-links, callouts, frontmatter, inline #tags, force-directed relationship graph, Pillar/Cluster topic pages — all rendered faithfully.';
 
   return (
     <div className="space-y-12">
@@ -60,8 +70,8 @@ export default function Home() {
             <span>{heroTitleLead}</span>
           </div>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-fg sm:text-4xl md:text-5xl">
-            写一次,{' '}
-            <br className="sm:hidden" />
+            {heroHeading.split(',')[0]},
+            <br className="sm:hidden" />{' '}
             <span className="text-primary">{heroTitleAccent}</span>
           </h1>
           <p className="mt-3 max-w-2xl text-base text-fg-muted sm:text-lg">
@@ -70,16 +80,19 @@ export default function Home() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild>
               <Link to="/blog">
-                浏览全部文章 <ArrowRight className="size-4" />
+                {t('home.browseAll')} <ArrowRight className="size-4" />
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/graph">查看关系图</Link>
+              <Link to="/graph">{t('home.viewGraph')}</Link>
             </Button>
           </div>
           <div className="mt-6 text-xs text-fg-muted">
-            共 {allPosts.length} 篇文章 · {allTags.length} 个标签 ·{' '}
-            {allPosts.reduce((acc, p) => acc + p.links.length, 0)} 条 wiki 链接
+            {t('home.stats', {
+              posts: allPosts.length,
+              tags: allTags.length,
+              links: allPosts.reduce((acc, p) => acc + p.links.length, 0),
+            })}
           </div>
         </div>
       </section>
@@ -89,7 +102,7 @@ export default function Home() {
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-fg-muted" />
           <Input
-            placeholder="搜索文章..."
+            placeholder={t('home.searchPosts')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -107,7 +120,7 @@ export default function Home() {
             )}
           >
             <Calendar className="size-3" />
-            最新
+            {t('home.filter.latest')}
           </button>
           <button
             type="button"
@@ -120,7 +133,7 @@ export default function Home() {
             )}
           >
             <TrendingUp className="size-3" />
-            热门
+            {t('home.filter.popular')}
           </button>
         </div>
       </div>
@@ -139,7 +152,7 @@ export default function Home() {
                 : 'border-border text-fg-muted hover:text-fg',
             )}
           >
-            全部
+            {t('home.filter.all')}
           </button>
           {allTags.map((t) => (
             <button

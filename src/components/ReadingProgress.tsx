@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 
 export interface ReadingProgressProps {
   /** 颜色变体：primary / accent */
@@ -22,6 +23,7 @@ export function ReadingProgress({
   className,
 }: ReadingProgressProps): React.ReactElement {
   const fillRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     let rafId = 0;
@@ -54,7 +56,7 @@ export function ReadingProgress({
   return (
     <div
       role="progressbar"
-      aria-label="阅读进度"
+      aria-label={t('post.readingProgress')}
       aria-valuemin={0}
       aria-valuemax={100}
       className={cn(

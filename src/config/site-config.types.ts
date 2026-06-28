@@ -24,6 +24,9 @@ export interface SiteSection {
   defaultTheme: 'light' | 'dark' | 'sepia' | 'cyberpunk' | string;
   themes: string[];
   locale: string;
+  /** BCP-47 locale (e.g. "zh-CN") for the OG locale tag. */
+  defaultLanguage: 'zh' | 'en' | string;
+  languages: ('zh' | 'en' | string)[];
   author: SiteAuthor;
   social: SiteSocial;
 }

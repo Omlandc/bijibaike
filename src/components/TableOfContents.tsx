@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BookText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 
 export interface TocItem {
   /** DOM id */
@@ -48,6 +49,7 @@ export function TableOfContents({
   const [items, setItems] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslation();
 
   // Extract headings after the article DOM is in place
   useEffect(() => {
@@ -136,7 +138,7 @@ export function TableOfContents({
       >
         <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">
           <BookText className="size-3.5" />
-          目录
+          {t('post.toc')}
         </div>
         <ul className="space-y-0.5 border-l border-border">
           {items.map((item) => {
@@ -173,7 +175,7 @@ export function TableOfContents({
             aria-expanded={mobileOpen}
           >
             <BookText className="size-3.5" />
-            目录 ({items.length})
+            {t('post.tocMobile', { count: items.length })}
           </button>
           {mobileOpen ? (
             <ul className="mb-3 max-h-64 overflow-auto rounded-md border border-border bg-bg-elevated p-2 text-sm">

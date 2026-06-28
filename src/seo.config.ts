@@ -27,6 +27,10 @@ export const siteSEO = defineSEO({
   locale: siteInfo.locale,
   defaultOgImage: seo.ogImage,
   author: siteInfo.author.name || undefined,
+  // Default keywords shown on every page; pages can append their own
+  // (e.g. post tags) via pageSEO({ keywords: [...] }).
+  keywords: seo.keywords,
+  twitterHandle: seo.twitter || undefined,
   aiPolicy: 'open', // AI 搜索可以引用,有助于扩散
 
   organization: {

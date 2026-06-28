@@ -13,15 +13,17 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { useEffect, useMemo, useState } from 'react';
-import { getAllPosts, getAllTags } from '@/lib/content';
+import { getAllPosts, getAllTags, getPostsByTag, getPostsByPillar } from '@/lib/content';
 import { cn } from '@/lib/utils';
 import { SEOHead, pageSEO, AdsHead } from 'seo-kit';
 import { siteSEO, SITE_FOOTER_COPYRIGHT, SITE_FOOTER_LINKS, SITE_SOCIAL } from '@/seo.config';
 import { siteAds } from '@/ads.config';
 import { CookieConsent, useConsent } from './CookieConsent';
+import { useTranslation, type TranslationKey } from '@/i18n';
 import { siteConfig } from '@/config/site-config';
 
 const ICONS: Record<string, LucideIcon> = {
@@ -35,11 +37,25 @@ const ICONS: Record<string, LucideIcon> = {
   FolderTree,
 };
 
+/**
+ * Map nav icon-string → i18n key. The siteConfig.nav.label is the
+ * fallback Chinese label so the build still works if a key is missing.
+ */
+const NAV_LABEL_KEYS: Record<string, TranslationKey> = {
+  '/': 'nav.home',
+  '/blog': 'nav.posts',
+  '/topics': 'nav.topics',
+  '/tags': 'nav.tags',
+  '/graph': 'nav.graph',
+  '/resources': 'nav.resources',
+};
+
 // Build the nav array from siteConfig.nav, resolving each icon string
 // against the ICONS map. Defaults to FileText when icon is unknown.
 const NAV = siteConfig.nav.map((n) => ({
   to: n.to,
-  label: n.label,
+  labelKey: NAV_LABEL_KEYS[n.to],
+  fallbackLabel: n.label,
   icon: ICONS[n.icon] ?? FileText,
   end: n.to === '/',
 }));
@@ -54,6 +70,7 @@ const NAV = siteConfig.nav.map((n) => ({
 function RouteSeo() {
   const { pathname } = useLocation();
   const posts = useMemo(() => getAllPosts(), []);
+  const { t } = useTranslation();
 
   // Resolve the current page's SEO from the pathname.
   // Pattern matches the HashRouter routes in App.tsx.
@@ -81,8 +98,18 @@ function RouteSeo() {
           author: post.frontmatter.author
             ? String(post.frontmatter.author)
             : undefined,
+          // Post tags become `<meta name="keywords">` (seo-kit's merge
+          // appends page keywords to site.keywords, dedupes, and emits
+          // the meta tag). They also flow into the JSON-LD Article.keywords
+          // below. Capped at 10 to keep the meta tag within sensible length.
+          keywords: post.tags.slice(0, 10),
           tags: post.tags,
-          section: post.tags[0],
+          // Pillar = top-level vault dir. Read from sourcePath (the original
+          // vault-relative filename) because slugify strips "/" from slugs.
+          section: (() => {
+            const parts = post.sourcePath.replace(/\.md$/i, '').split('/');
+            return parts.length > 1 ? parts[0]! : post.tags[0];
+          })(),
           jsonLd: [
             {
               '@context': 'https://schema.org',
@@ -97,6 +124,10 @@ function RouteSeo() {
                 ? String(post.frontmatter.description)
                 : post.excerpt,
               keywords: post.tags.join(', '),
+              articleSection: (() => {
+                const parts = post.sourcePath.replace(/\.md$/i, '').split('/');
+                return parts.length > 1 ? parts[0]! : undefined;
+              })(),
             },
           ],
         })}
@@ -107,13 +138,19 @@ function RouteSeo() {
   // Pillar detail page: /topics/:slug (no further segment)
   if (segs[0] === 'topics' && segs.length === 2) {
     const pillarName = segs[1]!;
+    // Pillar page's keywords = pillar name + most common tags in pillar
+    const pillarPosts = getPostsByPillar(pillarName);
+    const tagCounts = new Map<string, number>();
+    pillarPosts.forEach((p) => p.tags.forEach((tag) => tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1)));
+    const topTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map((e) => e[0]);
     return (
       <SEOHead
         config={siteSEO}
         path={pathname}
         page={pageSEO({
           title: pillarName,
-          description: `${pillarName} 主题下的所有文章与子主题`,
+          description: t('topics.postsInCluster', { cluster: pillarName }) + ` (${pillarPosts.length})`,
+          keywords: [pillarName, ...topTags],
         })}
       />
     );
@@ -128,7 +165,28 @@ function RouteSeo() {
         path={pathname}
         page={pageSEO({
           title: `${clusterName} · ${pillarName}`,
-          description: `${pillarName} 主题下的子主题 ${clusterName}`,
+          description: t('topics.postsInCluster', { cluster: clusterName }),
+          keywords: [clusterName, pillarName],
+        })}
+      />
+    );
+  }
+  // Tag detail page: /tags/:tag
+  if (segs[0] === 'tags' && segs.length === 2) {
+    const tag = decodeURIComponent(segs[1]!);
+    const tagPosts = getPostsByTag(tag);
+    // Co-occurring tags are useful SEO keywords for tag landing pages
+    const coTags = new Map<string, number>();
+    tagPosts.forEach((p) => p.tags.filter((tt) => tt !== tag).forEach((tt) => coTags.set(tt, (coTags.get(tt) ?? 0) + 1)));
+    const topCo = [...coTags.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map((e) => e[0]);
+    return (
+      <SEOHead
+        config={siteSEO}
+        path={pathname}
+        page={pageSEO({
+          title: tag,
+          description: t('tags.postsWith', { tag, count: tagPosts.length }),
+          keywords: [tag, ...topCo],
         })}
       />
     );
@@ -137,40 +195,42 @@ function RouteSeo() {
   // Per-route static meta
   const staticMeta: Record<string, { title: string; description: string }> = {
     '/': {
-      title: siteConfig.site.tagline || siteConfig.site.shortName,
+      // Use translated hero as the home title; fall back to the
+      // configured tagline / short name when no translation exists.
+      title: t('home.heading') || siteConfig.site.tagline || siteConfig.site.shortName,
       description: siteSEO.description ?? '',
     },
     '/blog': {
-      title: '所有文章',
-      description: '浏览所有 Obsidian 风格的博客文章',
+      title: t('blog.title'),
+      description: t('blog.subtitle'),
     },
     '/topics': {
-      title: '主题簇',
-      description: '按 Obsidian 文件夹结构组织的主题门户:每个顶层目录是 Pillar,往下细分 Cluster',
+      title: t('topics.title'),
+      description: t('topics.subtitle', { concepts: '' }),
     },
     '/tags': {
-      title: '标签',
-      description: '按标签浏览所有文章',
+      title: t('tags.title'),
+      description: t('tags.subtitle'),
     },
     '/graph': {
-      title: '关系图',
-      description: '文章之间的 wiki-link 关系可视化',
+      title: t('graph.title'),
+      description: t('graph.subtitle'),
     },
     '/resources': {
-      title: '资源',
-      description: `${siteConfig.site.shortName} 推荐的工具、参考与外部链接`,
+      title: t('resources.title'),
+      description: t('resources.subtitle'),
     },
     '/about': {
-      title: '关于本站',
-      description: '本站的技术栈、理念与开源地址',
+      title: t('about.title'),
+      description: '',
     },
     '/privacy': {
-      title: '隐私政策',
-      description: '本站如何处理 Cookie、广告与个人数据',
+      title: t('privacy.title'),
+      description: '',
     },
     '/contact': {
-      title: '联系我们',
-      description: '反馈 bug、提建议、申请数据删除',
+      title: t('contact.title'),
+      description: '',
     },
   };
   // pathname is URL-encoded by HashRouter — decode once so it matches the
@@ -206,6 +266,7 @@ export function SiteLayout() {
   void useLoc.pathname;
   const [searchOpen, setSearchOpen] = useState(false);
   const consent = useConsent();
+  const { t } = useTranslation();
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -227,12 +288,13 @@ export function SiteLayout() {
               <FileText className="size-3.5" />
             </span>
             <span className="hidden font-semibold tracking-tight sm:inline">
-              Obsidian Blog
+              {siteConfig.site.shortName}
             </span>
           </Link>
           <nav className="flex items-center gap-0.5 sm:gap-1">
             {NAV.map((n) => {
               const Icon = n.icon;
+              const label = n.labelKey ? t(n.labelKey) : n.fallbackLabel;
               return (
                 <NavLink
                   key={n.to}
@@ -246,10 +308,10 @@ export function SiteLayout() {
                         : 'text-fg-muted hover:bg-bg-subtle hover:text-fg',
                     )
                   }
-                  title={n.label}
+                  title={label}
                 >
                   <Icon className="size-4 sm:size-3.5" />
-                  <span className="hidden sm:inline">{n.label}</span>
+                  <span className="hidden sm:inline">{label}</span>
                 </NavLink>
               );
             })}
@@ -261,14 +323,15 @@ export function SiteLayout() {
               className="hidden items-center gap-2 rounded-md border border-border bg-bg-elevated px-2.5 py-1.5 text-xs text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg md:inline-flex"
             >
               <Search className="size-3.5" />
-              <span>搜索</span>
+              <span>{t('site.search')}</span>
               <kbd className="rounded border border-border bg-bg px-1 text-[10px] text-fg-subtle">
                 ⌘K
               </kbd>
             </button>
             <span className="hidden text-xs text-fg-muted lg:inline">
-              {stats.posts} 篇 · {stats.tags} 标签
+              {t('site.postsAndTags', { posts: stats.posts, tags: stats.tags })}
             </span>
+            <LanguageSwitcher />
             <ThemeSwitcher />
           </div>
         </div>
@@ -319,6 +382,7 @@ export function SiteLayout() {
 
 function SearchBar({ onClose }: { onClose: () => void }) {
   const [q, setQ] = useState('');
+  const { t } = useTranslation();
   const posts = getAllPosts();
   const results = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -328,7 +392,7 @@ function SearchBar({ onClose }: { onClose: () => void }) {
         (p) =>
           p.title.toLowerCase().includes(query) ||
           p.excerpt.toLowerCase().includes(query) ||
-          p.tags.some((t) => t.toLowerCase().includes(query)),
+          p.tags.some((tag) => tag.toLowerCase().includes(query)),
       )
       .slice(0, 8);
   }, [q, posts]);
@@ -338,7 +402,7 @@ function SearchBar({ onClose }: { onClose: () => void }) {
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-fg-muted" />
         <Input
           autoFocus
-          placeholder="搜索文章、标签..."
+          placeholder={t('site.searchPlaceholder')}
           className="pl-9 pr-9"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -350,7 +414,7 @@ function SearchBar({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={onClose}
           className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-fg-muted hover:bg-bg-subtle"
-          aria-label="关闭"
+          aria-label={t('site.search')}
         >
           <X className="size-3.5" />
         </button>

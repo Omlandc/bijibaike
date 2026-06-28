@@ -5,6 +5,7 @@ import { Buffer } from 'buffer'
 import './index.css'
 import App from './App.tsx'
 import { siteConfig } from '@/config/site-config'
+import { I18nProvider, detectLanguage } from '@/i18n'
 
 // Polyfill Node globals that gray-matter and friends need in the browser.
 if (typeof window !== 'undefined' && !(window as unknown as { Buffer?: unknown }).Buffer) {
@@ -30,16 +31,20 @@ const THEME_STORAGE_KEY = 'obsidian-blog-theme'
   if (chosen) document.documentElement.setAttribute('data-theme', chosen)
 })()
 
-// Set <title> from config so first paint already has the right name.
-;(function setBootTitle() {
+// Set <html lang> + initial title before paint.
+;(function setBootLang() {
   if (typeof document === 'undefined') return
+  const lang = detectLanguage()
+  document.documentElement.lang = lang
   document.title = siteConfig.site.name
 })()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <I18nProvider>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </I18nProvider>
   </StrictMode>,
 )

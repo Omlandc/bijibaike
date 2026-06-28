@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 
 interface SimNode {
   id: string;
@@ -57,6 +58,7 @@ function colorForTag(tag: string | undefined, title: string): string {
 }
 
 export default function Graph() {
+  const { t } = useTranslation();
   const posts = getAllPosts();
   const allTags = getAllTags();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -518,7 +520,7 @@ export default function Graph() {
         <div>
           <div className="flex items-center gap-2">
             <Network className="size-6 text-primary" />
-            <h1 className="text-3xl font-bold tracking-tight text-fg">关系图</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-fg">{t('graph.title')}</h1>
           </div>
           <p className="text-fg-muted">
             {stats.nodes} 节点 · {stats.edges} 条 wikilink 引用 · 节点大小 = 引用度 ·
@@ -552,7 +554,7 @@ export default function Graph() {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="聚焦一个节点(标题/标签/路径)…"
+              placeholder={t('graph.search')}
               className="h-8 pl-8 text-sm"
             />
             {query ? (
@@ -587,13 +589,13 @@ export default function Graph() {
             ) : (
               <Eye className="mr-1 size-3.5" />
             )}
-            {showOrphans ? '隐藏孤立' : '显示孤立'}
+            {showOrphans ? t('graph.hideOrphans') : t('graph.showOrphans')}
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={resetZoom}
-            title="重置视图"
+            title={t('graph.reset')}
           >
             <RotateCcw className="size-4" />
           </Button>
@@ -601,7 +603,7 @@ export default function Graph() {
             variant="ghost"
             size="icon"
             onClick={toggleFullscreen}
-            title={isFullscreen ? '退出全屏' : '全屏'}
+            title={isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen')}
           >
             <Maximize2 className="size-4" />
           </Button>

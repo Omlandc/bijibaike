@@ -2,6 +2,7 @@ import { Mail, Github, MessageCircle, ExternalLink, Send } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router';
+import { useTranslation } from '@/i18n';
 
 const CHANNELS = [
   {
@@ -31,12 +32,13 @@ const CHANNELS = [
 ];
 
 export default function Contact() {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <header className="space-y-3">
         <div className="flex items-center gap-2">
           <Send className="size-6 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight text-fg">联系我们</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-fg">{t('contact.title')}</h1>
         </div>
         <p className="text-fg-muted">
           想反馈 bug、提建议、报告版权问题、申请数据删除?挑一个顺手的渠道就行。

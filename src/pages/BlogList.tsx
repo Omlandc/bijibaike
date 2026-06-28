@@ -5,48 +5,50 @@ import { Button } from '@/components/ui/button';
 import { Search, X, Clock, Tag as TagIcon, Calendar } from 'lucide-react';
 import { getAllPosts, getAllTags } from '@/lib/content';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 
 export default function BlogList() {
   const posts = getAllPosts();
   const tags = getAllTags();
   const [query, setQuery] = useState('');
   const [activeTags, setActiveTags] = useState<string[]>([]);
+  const { t } = useTranslation();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return posts.filter((p) => {
       if (
         activeTags.length > 0 &&
-        !activeTags.every((t) => p.tags.includes(t))
+        !activeTags.every((tag) => p.tags.includes(tag))
       )
         return false;
       if (!q) return true;
       return (
         p.title.toLowerCase().includes(q) ||
         p.excerpt.toLowerCase().includes(q) ||
-        p.tags.some((t) => t.toLowerCase().includes(q)) ||
+        p.tags.some((tag) => tag.toLowerCase().includes(q)) ||
         p.raw.toLowerCase().includes(q)
       );
     });
   }, [posts, query, activeTags]);
 
-  const toggleTag = (t: string) =>
+  const toggleTag = (tag: string) =>
     setActiveTags((prev) =>
-      prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t],
+      prev.includes(tag) ? prev.filter((x) => x !== tag) : [...prev, tag],
     );
 
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-fg">所有文章</h1>
-        <p className="text-fg-muted">共 {posts.length} 篇 · 按日期倒序</p>
+        <h1 className="text-3xl font-bold tracking-tight text-fg">{t('blog.title')}</h1>
+        <p className="text-fg-muted">{t('blog.subtitle')} · 共 {posts.length} 篇</p>
       </header>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-fg-muted" />
           <Input
-            placeholder="搜索标题、内容、标签…"
+            placeholder={t('site.searchPlaceholder')}
             className="pl-9 pr-9"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -56,7 +58,7 @@ export default function BlogList() {
               type="button"
               onClick={() => setQuery('')}
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-fg-muted hover:bg-bg-subtle"
-              aria-label="清空"
+              aria-label="Clear"
             >
               <X className="size-3.5" />
             </button>
@@ -64,7 +66,7 @@ export default function BlogList() {
         </div>
         {activeTags.length > 0 ? (
           <Button variant="ghost" size="sm" onClick={() => setActiveTags([])}>
-            清除筛选
+            {t('tags.allTag')}
           </Button>
         ) : null}
       </div>

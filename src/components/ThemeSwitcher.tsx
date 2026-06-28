@@ -8,39 +8,40 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { siteConfig } from '@/config/site-config';
+import { useTranslation, type TranslationKey } from '@/i18n';
 
 type ThemeId = string;
 
 /**
- * 内置主题的展示信息（图标 / 中文标签 / 预览色）。
+ * 内置主题的展示信息（图标 / 标签 / 预览色）。
  * 颜色不存进 CSS 变量——实际生效的是 index.css 里的 [data-theme=...] 块，
- * 这里只是为了下拉里能展示小色块。
+ * 这里只是为了下拉里能展示小色块。标签走 i18n。
  */
 const THEME_META: Record<
   string,
   {
-    label: string;
+    labelKey: TranslationKey;
     icon: typeof Sun;
     preview: { bg: string; fg: string; primary: string };
   }
 > = {
   light: {
-    label: '明亮',
+    labelKey: 'theme.light',
     icon: Sun,
     preview: { bg: '#ffffff', fg: '#0a0a0a', primary: '#6366f1' },
   },
   dark: {
-    label: '暗夜',
+    labelKey: 'theme.dark',
     icon: Moon,
     preview: { bg: '#0a0e1a', fg: '#f0f6fc', primary: '#818cf8' },
   },
   sepia: {
-    label: '护眼',
+    labelKey: 'theme.sepia',
     icon: BookOpen,
     preview: { bg: '#f4ecd8', fg: '#3d2f1f', primary: '#b45309' },
   },
   cyberpunk: {
-    label: '赛博',
+    labelKey: 'theme.cyberpunk',
     icon: Zap,
     preview: { bg: '#050514', fg: '#e8e8ff', primary: '#00f0ff' },
   },
@@ -82,6 +83,7 @@ function readInitialTheme(): ThemeId {
 
 export function ThemeSwitcher() {
   const [theme, setTheme] = useState<ThemeId>(() => readInitialTheme());
+  const { t } = useTranslation();
 
   useEffect(() => {
     applyTheme(theme);
@@ -91,6 +93,7 @@ export function ThemeSwitcher() {
     ? { id: theme, ...THEME_META[theme]! }
     : { id: DEFAULT_THEME, ...THEME_META[DEFAULT_THEME]! };
   const CurrentIcon = current.icon;
+  const currentLabel = t(current.labelKey);
 
   return (
     <DropdownMenu>
@@ -99,10 +102,10 @@ export function ThemeSwitcher() {
           variant="ghost"
           size="sm"
           className="gap-1.5"
-          aria-label="切换主题"
+          aria-label={t('site.toggleTheme')}
         >
           <CurrentIcon className="size-3.5" />
-          <span className="hidden sm:inline">{current.label}</span>
+          <span className="hidden sm:inline">{currentLabel}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
@@ -110,6 +113,7 @@ export function ThemeSwitcher() {
           const meta = THEME_META[id];
           if (!meta) return null;
           const Icon = meta.icon;
+          const label = t(meta.labelKey);
           return (
             <DropdownMenuItem
               key={id}
@@ -126,7 +130,7 @@ export function ThemeSwitcher() {
               >
                 <Icon className="size-3" style={{ color: meta.preview.primary }} />
               </span>
-              <span className="flex-1 text-sm">{meta.label}</span>
+              <span className="flex-1 text-sm">{label}</span>
               {theme === id ? (
                 <Check className="size-3.5 text-primary" />
               ) : null}

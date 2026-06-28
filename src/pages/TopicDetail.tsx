@@ -10,10 +10,12 @@ import {
   getPostsByPillar,
   type Post,
 } from '@/lib/content';
+import { useTranslation } from '@/i18n';
 
 export default function TopicDetail() {
   const { slug } = useParams<{ slug: string }>();
   const pillar = slug ? getPillarBySlug(slug) : undefined;
+  const { t } = useTranslation();
 
   const allPosts = useMemo(() => (pillar ? getPostsByPillar(pillar.slug) : []), [pillar]);
 
@@ -21,10 +23,10 @@ export default function TopicDetail() {
   if (!pillar) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-fg">主题不存在</h1>
-        <p className="mt-2 text-fg-muted">找不到 slug 为 "{decodeURIComponent(slug)}" 的主题</p>
+        <h1 className="text-2xl font-bold text-fg">{t('notFound.title')}</h1>
+        <p className="mt-2 text-fg-muted">No pillar with slug "{decodeURIComponent(slug)}"</p>
         <Button className="mt-4" asChild>
-          <Link to="/topics">浏览全部主题</Link>
+          <Link to="/topics">{t('topics.title')}</Link>
         </Button>
       </div>
     );
@@ -129,13 +131,14 @@ export function ClusterDetail() {
   // The route is `/topics/:slug/*` — `:slug` is the pillar, the
   // splat captures the cluster path (e.g. "其他/子文件夹").
   const { slug, '*': clusterPath } = useParams<{ slug: string; '*': string }>();
+  const { t } = useTranslation();
   if (!slug || !clusterPath) return <Navigate to="/topics" replace />;
   const clusterPathDecoded = decodeURIComponent(clusterPath);
   const cluster = getClusterBySlug(slug, clusterPathDecoded);
   if (!cluster) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-fg">子主题不存在</h1>
+        <h1 className="text-2xl font-bold text-fg">{t('notFound.title')}</h1>
         <p className="mt-2 text-fg-muted">找不到 slug 为 "{decodeURIComponent(slug)}" 的子主题</p>
         <Button className="mt-4" asChild>
           <Link to="/topics">浏览全部主题</Link>
@@ -154,7 +157,7 @@ export function ClusterDetail() {
         >
           <Link to={`/topics/${encodeURIComponent(cluster.pillarSlug)}`}>
             <ArrowLeft className="mr-1 size-3.5" />
-            返回 {cluster.pillarSlug}
+            {t('notFound.goHome')} {cluster.pillarSlug}
           </Link>
         </Button>
 

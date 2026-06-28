@@ -4,8 +4,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getAllPillars, type Pillar } from '@/lib/content';
 import { siteConfig } from '@/config/site-config';
+import { useTranslation } from '@/i18n';
 
 export default function Topics() {
+  const { t } = useTranslation();
   // Auto-discovered from vault folder structure, then re-ordered to
   // match `pillars` in vault/_config.md. Any pillar in config that
   // doesn't exist on disk is silently dropped. Pillars NOT in config
@@ -31,12 +33,10 @@ export default function Topics() {
       <header className="space-y-2">
         <div className="flex items-center gap-2">
           <Layers className="size-6 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight text-fg">主题簇</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-fg">{t('topics.title')}</h1>
         </div>
         <p className="text-fg-muted">
-          按 Obsidian 文件夹结构组织的<strong className="text-fg">主题门户</strong>。
-          每个顶层目录是一个 <Badge variant="secondary" className="rounded-full">Pillar</Badge>,
-          往下细分 <Badge variant="secondary" className="rounded-full">Cluster</Badge> 与具体文章。
+          {t('topics.subtitle', { concepts: '' })}
         </p>
       </header>
 
@@ -58,6 +58,7 @@ export default function Topics() {
 }
 
 function PillarCard({ pillar }: { pillar: Pillar }) {
+  const { t } = useTranslation();
   return (
     <Link
       to={`/topics/${encodeURIComponent(pillar.slug)}`}
@@ -114,7 +115,7 @@ function PillarCard({ pillar }: { pillar: Pillar }) {
             </div>
           ) : null}
           <div className="flex items-center justify-end text-xs text-primary opacity-0 transition-opacity group-hover:opacity-100">
-            浏览 <ArrowRight className="ml-1 size-3" />
+            {t('topics.browse')} <ArrowRight className="ml-1 size-3" />
           </div>
         </CardContent>
       </Card>

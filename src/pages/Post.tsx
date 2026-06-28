@@ -13,6 +13,7 @@ import {
   Clock,
   Tag as TagIcon,
 } from 'lucide-react';
+import { useTranslation } from '@/i18n';
 
 export default function Post() {
   // With the splat route `/blog/*`, the full slug is in the `*` key.
@@ -20,6 +21,7 @@ export default function Post() {
   const { '*': slugSplat } = useParams<{ '*': string }>();
   const slug = slugSplat ? decodeURIComponent(slugSplat) : null;
   const post = slug ? getPostBySlug(slug) : undefined;
+  const { t } = useTranslation();
   if (!post) {
     return <Navigate to="/blog" replace />;
   }
@@ -40,12 +42,14 @@ export default function Post() {
           <Button asChild variant="ghost" size="sm">
             <Link to="/blog">
               <ArrowLeft className="mr-1 size-3.5" />
-              返回列表
+              {t('post.backToList')}
             </Link>
           </Button>
           <span className="inline-flex items-center gap-1">
             <CalendarDays className="size-3.5" />
-            {new Date(post.date).toLocaleDateString('zh-CN', {
+            {new Date(post.date).toLocaleDateString(
+              t('lang.zh') === '中文' ? 'zh-CN' : 'en-US',
+              {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
@@ -63,12 +67,12 @@ export default function Post() {
         <div className="flex flex-wrap items-center gap-3 text-xs text-fg-muted">
           <span className="inline-flex items-center gap-1">
             <Clock className="size-3" />
-            {readingMinutes} 分钟
+            {readingMinutes} {t('post.minutes')}
           </span>
           {post.tags.length > 0 ? (
             <span className="inline-flex items-center gap-1">
               <TagIcon className="size-3" />
-              {post.tags.length} 个标签
+              {t('post.tagsCount', { count: post.tags.length })}
             </span>
           ) : null}
         </div>
@@ -98,7 +102,7 @@ export default function Post() {
         <section className="space-y-3">
           <h2 className="inline-flex items-center gap-2 text-lg font-semibold text-fg">
             <Link2 className="size-4 text-primary" />
-            引用了这篇文章 ({backlinks.length})
+            {t('post.backlinks', { count: backlinks.length })}
           </h2>
           <ul className="space-y-2">
             {backlinks.map((bl) => (
@@ -127,7 +131,7 @@ export default function Post() {
             to={`/blog/${encodeURIComponent(prev.slug)}`}
             className="group flex flex-1 flex-col rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
           >
-            <div className="text-xs text-fg-muted">← 上一篇</div>
+            <div className="text-xs text-fg-muted">← {t('post.prev')}</div>
             <div className="line-clamp-1 font-medium text-fg group-hover:text-primary">
               {prev.title}
             </div>
@@ -140,7 +144,7 @@ export default function Post() {
             to={`/blog/${encodeURIComponent(next.slug)}`}
             className="group flex flex-1 flex-col rounded-lg border border-border p-3 text-right transition-colors hover:border-primary/40"
           >
-            <div className="text-xs text-fg-muted">下一篇 →</div>
+            <div className="text-xs text-fg-muted">{t('post.next')} →</div>
             <div className="line-clamp-1 font-medium text-fg group-hover:text-primary">
               {next.title}
             </div>

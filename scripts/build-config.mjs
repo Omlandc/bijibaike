@@ -53,6 +53,10 @@ const siteConfig = {
       ? site.themes
       : ['light', 'dark'],
     locale: site.locale ?? 'zh_CN',
+    defaultLanguage: site.defaultLanguage ?? 'zh',
+    languages: Array.isArray(site.languages) && site.languages.length > 0
+      ? site.languages
+      : ['zh', 'en'],
     author: {
       name: site.author?.name ?? '',
       url: site.author?.url ?? '',

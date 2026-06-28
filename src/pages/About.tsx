@@ -2,17 +2,19 @@ import { Sparkles, Github, Heart, BookOpen, Tag, Network, Code2, Layers } from '
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router';
 import { getAllPosts, getAllTags } from '@/lib/content';
+import { useTranslation } from '@/i18n';
 
 export default function About() {
   const posts = getAllPosts();
   const tags = getAllTags();
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-6">
       <header className="space-y-3">
         <div className="flex items-center gap-2">
           <Sparkles className="size-6 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight text-fg">关于本站</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-fg">{t('about.title')}</h1>
         </div>
         <p className="text-fg-muted">
           一个<strong className="text-fg">写一次、在两个地方读</strong>
