@@ -7,21 +7,24 @@ Obsidian's special syntax.
 
 ## ✨ What works out of the box
 
-- **Vault swap** — point the build at any git-hosted Obsidian vault via a single config file. No code changes needed.
+- **Single-vault config** — `vault/_config.md` is the only config you need to edit. Site name, default theme, SEO, AdSense, nav menu, footer, pillar order, and resources page all live in one frontmatter block.
+- **Vault swap** — point the build at any git-hosted Obsidian vault via that same config file. No code changes needed.
 - `[[双链]]` / `[[alias|target]]` / `[[file#heading]]` — wiki-links resolved to internal routes, with broken-link detection (dashed underline, like Obsidian)
 - `![[image]]` / `![[note]]` — embeds rendered as inline images, attachment links, or chips
 - `> [!note] / [!tip] / [!warning] / [!danger] / [!quote] / [!info] / [!example]` — callouts with matching colored boxes
 - YAML frontmatter (`title`, `date`, `tags`, `description`, `cover`, `pinned`, `draft`, …)
 - Auto cover detection: `frontmatter.cover` → first body image → gradient fallback
 - Auto backlinks — every post shows which posts link to it
+- **Reading progress bar** + **right-side table of contents** on every post (sticky on desktop, collapsible drawer on mobile)
 - **Pillar/Cluster topic pages** — top-level vault dir = Pillar, subdir = Cluster. `/topics` lists all pillars; `/topics/<pillar>` shows a pillar's posts + clusters; `/topics/<pillar>/<cluster>` drills into a cluster.
 - **Git-aware article dates** — file first-commit timestamp is used as a fallback when frontmatter has no `date`.
 - D3 force-directed **relationship graph** — pan, zoom, drag, click to highlight neighbors, search-focus, orphan toggle, fullscreen.
-- 4 themes: **明亮 / 暗夜 / 护眼 / 赛博朋克** with smooth crossfade switching
+- **Resources page** (`/resources`) — external links grouped by section, fully configurable in `_config.md`.
+- Configurable themes: list any of `light / dark / sepia / cyberpunk` in `_config.md`; default applies synchronously before paint to avoid FOUC.
 - ⌘K / Ctrl+K global search
 - **AdSense-ready** with config-driven Auto Ads and GDPR cookie consent.
 - **SEO**: `<title>` + meta + Open Graph + Twitter + canonical + JSON-LD, with `sitemap.xml` / `robots.txt` / `ads.txt` generated at build time.
-- Mobile-friendly: graph, nav, and cards all adapt down to 375px viewport.
+- Mobile-friendly: graph, nav, cards, TOC, and reading progress all adapt down to 375px viewport.
 
 ## 🏗️ Stack
 
@@ -48,40 +51,51 @@ npm run preview           # preview the build
 
 Open <http://localhost:3000>.
 
-## 🔁 Swap your vault
+## 🔁 Swap your vault & configure the site (one MD file)
 
-The vault is **a separate git repo** cloned into `vault/` at build time. To point at
-your own vault:
+**All site configuration lives in `vault/_config.md`** — a single Obsidian
+note in your vault root. Edit it, commit, push, rebuild. Done.
 
-1. Edit `src/vault.config.ts`:
+### `vault/_config.md`
 
-   ```ts
-   export const vaultConfig = {
-     repo: 'your-org/your-vault',
-     branch: 'main',
-     // Optional: pin to a commit for reproducible builds
-     // ref: 'abc123',
-     publicAttachmentsPath: '/attachments',
-   };
-   ```
+The frontmatter holds all the knobs:
 
-2. Make the token available (any of these env vars work):
+| 段落 | 控制什么 |
+|------|---------|
+| `site` | 站点名称、标语、默认主题、可用主题列表、社交链接 |
+| `seo` | 站点 URL、OG image、keywords、Twitter handle |
+| `ads` | AdSense 发布商 ID、自动广告开关、cookie consent |
+| `vault` | vault 仓库 URL / 分支（构建用） |
+| `nav` | 顶部导航菜单的项、图标、顺序 |
+| `footer` | 页脚链接与版权 |
+| `pillars` | 主题簇的手动顺序（不填则自动从目录发现） |
+| `resources` | `/resources` 页面的分组与条目 |
 
-   ```bash
-   export VAULT_TOKEN=ghp_xxx    # preferred
-   # or
-   export GITHUB_TOKEN=ghp_xxx
-   export GH_TOKEN=ghp_xxx
-   ```
+A complete reference is in [`docs/_config.example.md`](./docs/_config.example.md).
 
-   The token is injected per-invocation via `git -c url.<auth>.insteadOf=...`
-   so it never lands in `.git/config`.
+```bash
+# After editing vault/_config.md:
+npm run build:config        # regenerate src/config/site-config.{ts,json}
+npm run build               # full build
+```
 
-3. Run `npm run vault:pull`. If the network blip fails, `vault:offline` will
-   reuse whatever is already in `vault/` — so the build always succeeds.
+### Which vault repo?
 
-The vault repo is gitignored. Slugs encode the full vault-relative path so two
-posts in different folders can share a basename without clashing.
+`vault._config.md` also carries the `vault.repo` / `vault.branch` fields.
+The build script `scripts/setup-vault.mjs` clones that repo into `vault/`
+gitignored locally. To point at a private repo, expose the token via env:
+
+```bash
+export VAULT_TOKEN=ghp_xxx    # preferred
+# or GITHUB_TOKEN / GH_TOKEN
+```
+
+The token is injected per-invocation via `git -c url.<auth>.insteadOf=...`
+so it never lands in `.git/config`. If the network blip fails, `vault:offline`
+reuses whatever's already in `vault/` — the build always succeeds.
+
+Slugs encode the full vault-relative path so two posts in different folders
+can share a basename without clashing.
 
 ### Pillar / Cluster authoring
 
