@@ -6,3 +6,4 @@ dist
 .env.local
 vault/
 public/attachments/
+vault-meta
