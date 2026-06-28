@@ -3,7 +3,7 @@
     "name": "Obsidian Blog",
     "shortName": "Obsidian Blog",
     "tagline": "写一次，在两个地方读",
-    "description": "把 Obsidian Vault 直接渲染成静态博客，支持 wiki-link、callout、自动封面、力导向关系图、Pillar/Cluster 主题架构与 AdSense 合规。",
+    "description": "把 Obsidian Vault 直接渲染成静态博客,支持 wiki-link、callout、自动封面、力导向关系图、Pillar/Cluster 主题架构与 AdSense 合规。",
     "defaultTheme": "light",
     "themes": [
       "light",
