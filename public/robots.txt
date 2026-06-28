@@ -1,0 +1,94 @@
+# All well-behaved crawlers
+User-agent: *
+Disallow: /admin
+Disallow: /login
+Allow: /
+
+# AI training crawlers — explicitly allowed
+# Helps with citation in ChatGPT / Perplexity / Claude etc.
+User-agent: GPTBot
+Allow: /
+# owner: OpenAI
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: DeepSeekBot
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: cohere-training-data-crawler
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: ImgBot
+Allow: /
+
+User-agent: Kangaroo Bot
+Allow: /
+
+User-agent: Webzio
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: SemrushBot-OCOB
+Allow: /
+
+User-agent: SemrushBot-SI
+Allow: /
+
+User-agent: TurnitinBot
+Allow: /
+
+Sitemap: https://obsidian-blog-webapp.example.com/sitemap.xml

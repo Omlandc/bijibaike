@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { useEffect, useMemo, useState } from 'react';
 import { getAllPosts, getAllTags } from '@/lib/content';
 import { cn } from '@/lib/utils';
+import { SEOHead, pageSEO } from 'seo-kit';
+import { siteSEO } from '@/seo.config';
 
 const NAV = [
   { to: '/', label: '首页', icon: Home, end: true },
@@ -13,6 +15,94 @@ const NAV = [
   { to: '/tags', label: '标签', icon: Tags },
   { to: '/graph', label: '关系图', icon: Network },
 ];
+
+/**
+ * Per-route SEO meta. Reads the current location and produces the right
+ * page config — title, description, ogType, JSON-LD, etc.
+ *
+ * Lives in SiteLayout (the shared route shell) so it re-runs on every
+ * navigation and there's no duplicate SEOHead in the tree.
+ */
+function RouteSeo() {
+  const { pathname } = useLocation();
+  const posts = useMemo(() => getAllPosts(), []);
+
+  // Resolve the current page's SEO from the pathname.
+  // Pattern matches the HashRouter routes in App.tsx.
+  const segs = pathname.split('/').filter(Boolean);
+  const slug = segs[0] === 'blog' ? segs[1] : null;
+  const post = slug ? posts.find((p) => p.slug === slug) : null;
+
+  if (post) {
+    return (
+      <SEOHead
+        config={siteSEO}
+        path={pathname}
+        page={pageSEO({
+          title: post.title,
+          description: post.frontmatter.description
+            ? String(post.frontmatter.description)
+            : post.excerpt,
+          ogType: 'article',
+          publishedTime: post.date,
+          author: post.frontmatter.author
+            ? String(post.frontmatter.author)
+            : undefined,
+          tags: post.tags,
+          section: post.tags[0],
+          jsonLd: [
+            {
+              '@context': 'https://schema.org',
+              '@type': 'Article',
+              headline: post.title,
+              url: `${siteSEO.siteUrl}/#/blog/${post.slug}`,
+              datePublished: post.date,
+              author: post.frontmatter.author
+                ? String(post.frontmatter.author)
+                : siteSEO.author,
+              description: post.frontmatter.description
+                ? String(post.frontmatter.description)
+                : post.excerpt,
+              keywords: post.tags.join(', '),
+            },
+          ],
+        })}
+      />
+    );
+  }
+
+  // Per-route static meta
+  const staticMeta: Record<string, { title: string; description: string }> = {
+    '/': {
+      title: '写一次,在两个地方读',
+      description: siteSEO.description ?? '',
+    },
+    '/blog': {
+      title: '所有文章',
+      description: '浏览所有 Obsidian 风格的博客文章',
+    },
+    '/tags': {
+      title: '标签',
+      description: '按标签浏览所有文章',
+    },
+    '/graph': {
+      title: '关系图',
+      description: '文章之间的 wiki-link 关系可视化',
+    },
+  };
+  const routeMeta = staticMeta[pathname] ?? { title: '', description: '' };
+  return (
+    <SEOHead
+      config={siteSEO}
+      path={pathname}
+      page={pageSEO({
+        title: routeMeta.title,
+        description: routeMeta.description,
+        ogType: 'website',
+      })}
+    />
+  );
+}
 
 export function SiteLayout() {
   const stats = useMemo(
@@ -94,6 +184,7 @@ export function SiteLayout() {
         ) : null}
       </header>
 
+        <RouteSeo />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:py-12">
         <Outlet />
       </main>
