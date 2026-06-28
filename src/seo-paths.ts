@@ -2,14 +2,54 @@
  * Sitemap dynamic paths — kept separate from seo.config.ts so the config
  * file can be loaded by plain Node (without Vite's import.meta.glob).
  *
- * Uses Node's fs to read the content/ directory directly.
+ * Uses Node's fs to read the vault directory directly. The vault path
+ * is read from src/vault.config.ts; if the vault isn't cloned yet
+ * (e.g. in a fresh checkout before `npm run vault:pull`), we return
+ * an empty list rather than crashing the build.
  */
 import { readdir, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, resolve as pathResolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import matter from 'gray-matter';
 import type { SitemapEntry } from 'seo-kit';
 
-const CONTENT_DIR = join(process.cwd(), 'content');
+async function loadVaultConfig(): Promise<{ localPath: string }> {
+  // Load via strip-types so we don't need a TS toolchain.
+  const file = pathResolve(
+    pathResolve(fileURLToPath(import.meta.url), '..'),
+    'vault.config.ts',
+  );
+  return new Promise((resolveP, rejectP) => {
+    const code = `
+      const mod = await import(${JSON.stringify(pathToFileURL(file).href)});
+      process.stdout.write(JSON.stringify(mod.vaultConfig));
+    `;
+    const child = spawn(
+      process.execPath,
+      ['--experimental-strip-types', '--no-warnings', '--input-type=module', '-e', code],
+      { stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    let out = '';
+    let err = '';
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (err += d));
+    child.on('close', (code) =>
+      code === 0
+        ? resolveP(JSON.parse(out))
+        : rejectP(new Error(`vault.config loader failed: ${err}`)),
+    );
+  });
+}
+
+let cached: string | null = null;
+async function getVaultDir(): Promise<string> {
+  if (cached) return cached;
+  const cfg = await loadVaultConfig();
+  cached = cfg.localPath;
+  return cached;
+}
 
 async function listMdFiles(dir: string, base = ''): Promise<string[]> {
   const out: string[] = [];
@@ -41,10 +81,18 @@ function slugify(input: string): string {
 }
 
 export async function blogSitemapPaths(): Promise<SitemapEntry[]> {
-  const files = await listMdFiles(CONTENT_DIR);
+  const vaultDir = await getVaultDir();
+  if (!existsSync(vaultDir)) {
+    console.warn(
+      `[seo-paths] vault not found at ${vaultDir} — run \`npm run vault:pull\` first. ` +
+        'Returning empty sitemap for blog posts.',
+    );
+    return [];
+  }
+  const files = await listMdFiles(vaultDir);
   const entries: SitemapEntry[] = [];
   for (const rel of files) {
-    const fullPath = join(CONTENT_DIR, rel);
+    const fullPath = join(vaultDir, rel);
     const raw = await readFile(fullPath, 'utf-8');
     const { data } = matter(raw);
     const slug = slugify(rel.split('/').pop() ?? rel);

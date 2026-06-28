@@ -45,11 +45,17 @@ const schema: typeof defaultSchema = {
     ...defaultSchema.attributes,
     a: [
       ...(defaultSchema.attributes?.a ?? []),
-      ['className', 'wiki-link', 'wiki-link--embed', 'wiki-link--broken'],
+      ['className', 'wiki-link', 'wiki-link--embed', 'wiki-link--broken', 'wiki-link--attachment'],
       'data-wikilink',
       'data-wiki-slug',
       'data-wiki-heading',
       'data-wiki-alias',
+      'data-wiki-embed',
+      'data-wiki-target',
+    ],
+    img: [
+      ...(defaultSchema.attributes?.img ?? []),
+      ['className', 'wiki-embed', 'wiki-embed--attachment'],
       'data-wiki-embed',
       'data-wiki-target',
     ],

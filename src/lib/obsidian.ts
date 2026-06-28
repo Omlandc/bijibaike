@@ -20,6 +20,19 @@ export type CalloutType =
   | 'quote'
   | 'example';
 
+/** File extensions treated as attachments (not posts). */
+const ATTACHMENT_EXT = /\.(png|jpe?g|gif|webp|svg|bmp|ico|pdf|mp4|webm|mov|mp3|wav|ogg|zip|tar|gz|tgz)$/i;
+
+/**
+ * Returns true if a wiki-link target points to a binary attachment
+ * rather than a markdown note. Used to:
+ *   - skip attachments when building the backlinks graph
+ *   - resolve `![[logo.svg]]` embeds to a public URL instead of a slug
+ */
+export function isAttachmentPath(file: string): boolean {
+  return ATTACHMENT_EXT.test(file);
+}
+
 export interface PostFrontmatter {
   title?: string;
   date?: string;

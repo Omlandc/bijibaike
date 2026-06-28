@@ -1,7 +1,12 @@
 /**
- * Content loader — reads all .md files under /content at build time,
- * runs the Obsidian-compatible frontmatter + transform pipeline,
- * and exposes typed Post records + indexes (by tag, by slug, backlinks).
+ * Content loader — reads all .md files under the configured vault at
+ * build time, runs the Obsidian-compatible frontmatter + transform
+ * pipeline, and exposes typed Post records + indexes (by tag, by
+ * slug, backlinks).
+ *
+ * The vault is a separate git repository, cloned into ./vault by
+ * scripts/setup-vault.mjs (or `npm run vault:pull`). To swap the
+ * vault, edit src/vault.config.ts and re-pull.
  *
  * Uses Vite's import.meta.glob with query=raw and eager=true to inline
  * every markdown file as a string. This is the simplest path for an
@@ -16,12 +21,15 @@ import {
   transformCallouts,
   findWikiLinks,
   slugify,
+  isAttachmentPath,
 } from './obsidian';
+// vaultConfig is intentionally not imported here — the vault path is
+// a build-time concern enforced by Vite's static glob below.
 
 export interface Post {
   /** URL slug derived from filename or frontmatter id */
   slug: string;
-  /** Original filename relative to /content, e.g. "notes/hello.md" */
+  /** Original filename relative to the vault root, e.g. "notes/hello.md" */
   sourcePath: string;
   /** Frontmatter */
   frontmatter: PostFrontmatter;
@@ -55,10 +63,11 @@ export interface ContentIndex {
   tags: { name: string; count: number }[];
 }
 
-// Vite-specific: this glob is replaced at build time.
-// Path is relative to project root because Vite resolves from the
-// config root, and /content lives at the project root.
-const modules = import.meta.glob<string>('/content/**/*.md', {
+// Vite-specific: this glob is replaced at build time. The pattern must
+// be a string literal (Vite scans the source), so the vault root is
+// hardcoded to match `vaultConfig.localPath`. If you change the path
+// in src/vault.config.ts, update this glob too.
+const modules = import.meta.glob<string>('/vault/**/*.md', {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -119,7 +128,11 @@ function buildPost(sourcePath: string, raw: string): Post | null {
   const fmTags = Array.isArray(data.tags) ? data.tags.map(String) : [];
   const inlineTags = extractInlineTags(content);
   const tags = Array.from(new Set([...fmTags, ...inlineTags]));
-  const links = findWikiLinks(content).map((l) => l.slug);
+  const links = findWikiLinks(content)
+    .map((l) => l.slug)
+    // Drop attachment targets (logos, PDFs, etc.) from the link graph.
+    // They shouldn't show up as "outgoing wiki-links" for a post.
+    .filter((slug) => !isAttachmentPath(slug));
   // Slug is always the filename basename (without directory or .md)
   // so it matches what remark-wikilink generates from `[[basename]]`
   // or `[[dir/basename]]` references. This keeps wiki-links stable
@@ -178,7 +191,7 @@ function loadAll(): ContentIndex {
   const posts: Post[] = [];
   for (const [path, raw] of Object.entries(modules)) {
     if (typeof raw !== 'string') continue;
-    const post = buildPost(path.replace(/^\/content\//, ''), raw);
+    const post = buildPost(path.replace(/^\/vault\//, ''), raw);
     if (post) posts.push(post);
   }
   posts.sort((a, b) => b.date.localeCompare(a.date));

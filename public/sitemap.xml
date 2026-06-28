@@ -43,32 +43,26 @@
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/draft-test</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/getting-started</loc>
-    <lastmod>2026-06-25</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/remark-design</loc>
-    <lastmod>2026-06-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/welcome</loc>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/黄帝内经素问遗篇-1</loc>
     <lastmod>2026-06-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/roadmap</loc>
-    <lastmod>2026-06-20</lastmod>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/子文件夹测试</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/独家不再耗费几代人的时间用编程复现栾巨庆的长期天文灾害预测</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/顶层文件夹测试</loc>
+    <lastmod>2026-06-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
