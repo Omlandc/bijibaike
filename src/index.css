@@ -227,3 +227,69 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none;
   z-index: 0;
 }
+
+/* ============================================================
+ * Graph (force-directed) — D3-rendered node + link states.
+ * ============================================================ */
+.graph-container {
+  background:
+    radial-gradient(circle at 30% 20%, color-mix(in oklab, var(--color-primary) 5%, transparent) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, color-mix(in oklab, var(--color-accent) 5%, transparent) 0%, transparent 60%),
+    var(--color-bg);
+}
+
+.graph-svg .graph-node circle {
+  stroke: var(--color-bg-elevated);
+  stroke-width: 2;
+  cursor: pointer;
+  transition:
+    r 0.12s ease,
+    stroke-width 0.12s ease,
+    stroke 0.12s ease,
+    opacity 0.18s ease;
+}
+
+.graph-svg .graph-node text {
+  font-size: 11px;
+  fill: currentColor;
+  pointer-events: none;
+  transition: opacity 0.18s ease, font-weight 0.12s ease;
+}
+
+.graph-svg .graph-link {
+  stroke: currentColor;
+  stroke-opacity: 0.4;
+  pointer-events: none;
+  transition: stroke-opacity 0.18s ease, stroke-width 0.12s ease;
+}
+
+.graph-svg .graph-node.dim {
+  opacity: 0.1;
+}
+
+.graph-svg .graph-link.dim {
+  stroke-opacity: 0.04;
+}
+
+.graph-svg .graph-node.active circle {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-primary) 50%, transparent));
+}
+
+.graph-svg .graph-node.active text {
+  font-weight: 600;
+}
+
+.graph-svg .graph-node.neighbor circle {
+  stroke: var(--color-primary);
+  stroke-width: 2.5;
+}
+
+.graph-svg .graph-node.neighbor text {
+  opacity: 1;
+}
+
+.graph-svg .graph-node text {
+  opacity: 0.85;
+}
