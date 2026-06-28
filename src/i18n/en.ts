@@ -34,6 +34,11 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'lang.zh': '中文',
   'lang.en': 'English',
 
+  // Mobile menu
+  'mobileMenu.menu': 'Menu',
+  'mobileMenu.open': 'Open menu',
+  'mobileMenu.close': 'Close menu',
+
   // Home
   'home.heading': 'Write once, blog everywhere',
   'home.browseAll': 'Browse all posts',
@@ -62,6 +67,8 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'post.next': 'Next',
   'post.copyLink': 'Copy link',
   'post.linkCopied': 'Copied',
+  'contentTheme.pickerLabel': 'Reading theme',
+  'contentTheme.toggleHint': 'Theme only affects your device; nothing is saved on the server',
 
   // Topics
   'topics.title': 'Topics',

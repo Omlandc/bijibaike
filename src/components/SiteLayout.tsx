@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { MobileMenu } from './MobileMenu';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { useEffect, useMemo, useState } from 'react';
@@ -291,7 +292,8 @@ export function SiteLayout() {
               {siteConfig.site.shortName}
             </span>
           </Link>
-          <nav className="flex items-center gap-0.5 sm:gap-1">
+          {/* Desktop nav: hidden on mobile (the hamburger menu takes over) */}
+          <nav className="hidden items-center gap-0.5 lg:flex lg:gap-1">
             {NAV.map((n) => {
               const Icon = n.icon;
               const label = n.labelKey ? t(n.labelKey) : n.fallbackLabel;
@@ -333,6 +335,7 @@ export function SiteLayout() {
             </span>
             <LanguageSwitcher />
             <ThemeSwitcher />
+            <MobileMenu />
           </div>
         </div>
         {searchOpen ? (

@@ -33,6 +33,11 @@ export const zh = {
   'lang.zh': '中文',
   'lang.en': 'English',
 
+  // Mobile menu
+  'mobileMenu.menu': '菜单',
+  'mobileMenu.open': '打开菜单',
+  'mobileMenu.close': '关闭菜单',
+
   // Home
   'home.heading': '写一次, 即开即用博客',
   'home.browseAll': '浏览全部文章',
@@ -61,6 +66,8 @@ export const zh = {
   'post.next': '下一篇',
   'post.copyLink': '复制链接',
   'post.linkCopied': '已复制',
+  'contentTheme.pickerLabel': '正文排版主题',
+  'contentTheme.toggleHint': '主题只影响你这台设备的阅读效果,不会保存到服务器',
 
   // Topics
   'topics.title': '主题簇',

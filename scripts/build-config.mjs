@@ -172,6 +172,7 @@ const siteConfig = {
     languages: Array.isArray(site.languages) && site.languages.length > 0
       ? site.languages
       : ['zh', 'en'],
+    contentTheme: site.contentTheme ?? 'default',
     author: {
       name: site.author?.name ?? '',
       url: site.author?.url ?? '',

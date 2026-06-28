@@ -6,6 +6,7 @@ import './index.css'
 import App from './App.tsx'
 import { siteConfig } from '@/config/site-config'
 import { I18nProvider, detectLanguage } from '@/i18n'
+import { applyContentTheme, getStoredArticleTheme } from '@/lib/content-themes'
 
 // Polyfill Node globals that gray-matter and friends need in the browser.
 if (typeof window !== 'undefined' && !(window as unknown as { Buffer?: unknown }).Buffer) {
@@ -37,6 +38,14 @@ const THEME_STORAGE_KEY = 'obsidian-blog-theme'
   const lang = detectLanguage()
   document.documentElement.lang = lang
   document.title = siteConfig.site.name
+})()
+
+// Apply the article content theme synchronously before paint so the
+// first frame already uses the configured theme (or the user's stored
+// override). localStorage choice wins over the site default.
+;(function applyBootArticleTheme() {
+  if (typeof document === 'undefined') return
+  applyContentTheme(getStoredArticleTheme() ?? siteConfig.site.contentTheme ?? 'default')
 })()
 
 createRoot(document.getElementById('root')!).render(

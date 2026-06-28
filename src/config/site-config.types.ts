@@ -27,6 +27,8 @@ export interface SiteSection {
   /** BCP-47 locale (e.g. "zh-CN") for the OG locale tag. */
   defaultLanguage: 'zh' | 'en' | string;
   languages: ('zh' | 'en' | string)[];
+  /** Default article-content theme (see lib/content-themes.ts). */
+  contentTheme: string;
   author: SiteAuthor;
   social: SiteSocial;
 }

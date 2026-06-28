@@ -23,6 +23,7 @@ export const siteConfig: SiteConfig = {
       "zh",
       "en"
     ],
+    "contentTheme": "default",
     "author": {
       "name": "Omlandc",
       "url": "https://github.com/Omlandc"

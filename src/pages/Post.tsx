@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router';
 import { getPostBySlug, getBacklinks, getAllPosts } from '@/lib/content';
+import { cn } from '@/lib/utils';
 import { MarkdownView } from '@/components/MarkdownView';
 import { ReadingProgress } from '@/components/ReadingProgress';
 import { TableOfContents } from '@/components/TableOfContents';
@@ -12,8 +14,16 @@ import {
   Link2,
   Clock,
   Tag as TagIcon,
+  Palette,
 } from 'lucide-react';
 import { useTranslation } from '@/i18n';
+import { siteConfig } from '@/config/site-config';
+import {
+  CONTENT_THEMES,
+  applyContentTheme,
+  getStoredArticleTheme,
+  setStoredArticleTheme,
+} from '@/lib/content-themes';
 
 export default function Post() {
   // With the splat route `/blog/*`, the full slug is in the `*` key.
@@ -22,6 +32,21 @@ export default function Post() {
   const slug = slugSplat ? decodeURIComponent(slugSplat) : null;
   const post = slug ? getPostBySlug(slug) : undefined;
   const { t } = useTranslation();
+  // Active article-content theme for this post. localStorage override
+  // beats the site default so readers can pick their preferred style.
+  const [articleTheme, setArticleTheme] = useState<string>(
+    () => getStoredArticleTheme() ?? siteConfig.site.contentTheme ?? 'default',
+  );
+
+  // Apply the active theme's CSS variables to <html> when it changes.
+  useEffect(() => {
+    applyContentTheme(articleTheme);
+  }, [articleTheme]);
+
+  function pickTheme(slug: string) {
+    setArticleTheme(slug);
+    setStoredArticleTheme(slug);
+  }
   if (!post) {
     return <Navigate to="/blog" replace />;
   }
@@ -35,8 +60,23 @@ export default function Post() {
   return (
     <>
       <ReadingProgress />
-      <div className="mx-auto flex max-w-6xl gap-8">
-        <article className="mx-auto w-full max-w-3xl flex-1 space-y-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 lg:flex-row lg:gap-8">
+        <article
+          data-article-theme={articleTheme}
+          className={cn(
+            'blog-article order-2 w-full min-w-0 flex-1 space-y-8 lg:order-1',
+            // Add the active theme class on the article itself so the
+            // compound selector `.blog-article.blog-article--<slug>`
+            // in the injected stylesheet matches.
+            articleTheme !== 'default' && `blog-article--${articleTheme}`,
+          )}
+        >
+          {/* Mobile TOC — sits at the top of the article so it never
+              steals horizontal space from the reading column. Hidden
+              on lg+ where the sticky right sidebar takes over. */}
+          <div className="lg:hidden">
+            <TableOfContents scope="[data-md-root]" />
+          </div>
           <header className="space-y-4">
         <div className="flex items-center justify-between text-sm text-fg-muted">
           <Button asChild variant="ghost" size="sm">
@@ -153,8 +193,53 @@ export default function Post() {
           <div className="flex-1" />
         )}
       </nav>
+
+      {/* Article content theme picker */}
+      <section
+        aria-label={t('contentTheme.pickerLabel')}
+        className="mt-12 space-y-3 rounded-lg border border-border bg-bg-elevated p-4"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-sm text-fg-muted">
+            <Palette className="size-4" />
+            <span>{t('contentTheme.pickerLabel')}</span>
+          </div>
+          <p className="text-xs text-fg-subtle">{t('contentTheme.toggleHint')}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {CONTENT_THEMES.map((theme) => {
+            const active = theme.slug === articleTheme;
+            return (
+              <button
+                key={theme.slug}
+                type="button"
+                onClick={() => pickTheme(theme.slug)}
+                aria-pressed={active}
+                className={
+                  'group inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors ' +
+                  (active
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border text-fg-muted hover:border-primary/40 hover:text-fg')
+                }
+                title={theme.description}
+              >
+                <span
+                  className="inline-block size-3 rounded-full border border-current/30"
+                  style={{ background: theme.preview.bg, borderColor: theme.preview.accent }}
+                />
+                <span>{theme.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
         </article>
-        <TableOfContents scope="[data-md-root]" />
+        {/* Desktop TOC — sticky right sidebar. order-1 on lg so it
+            appears after the article on mobile (which renders at
+            order-2). */}
+        <div className="order-1 lg:order-2">
+          <TableOfContents scope="[data-md-root]" />
+        </div>
       </div>
     </>
   );
