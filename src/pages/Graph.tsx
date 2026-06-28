@@ -64,7 +64,7 @@ export default function Graph() {
   const simRef = useRef<d3.Simulation<SimNode, SimEdge> | null>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
   const [query, setQuery] = useState('');
-  const [showOrphans, setShowOrphans] = useState(false);
+  const [showOrphans, setShowOrphans] = useState(true); // default ON: a fresh vault usually has no links, hiding orphans would give an empty graph
   const [stats, setStats] = useState({ nodes: 0, edges: 0, total: posts.length });
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -610,7 +610,7 @@ export default function Graph() {
         <CardContent
           ref={containerRef}
           className={cn(
-            'graph-container relative h-[60vh] min-h-[380px] overflow-hidden p-0 text-fg-muted sm:h-[640px]',
+            'graph-container relative h-[70vh] min-h-[420px] overflow-hidden p-0 text-fg-muted sm:h-[640px]',
             isFullscreen && 'fixed inset-0 z-50 h-screen rounded-none border-0',
           )}
         >
@@ -632,7 +632,7 @@ export default function Graph() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="hidden sm:block">
         <CardContent className="space-y-2 p-4 text-sm text-fg-muted">
           <p>
             💡 在文章中用 <code className="rounded bg-bg-subtle px-1 text-fg">[[双链]]</code>{' '}

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="50%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <!-- decorative dot grid -->
+  <g opacity="0.08" fill="white">
+    <circle cx="60" cy="60" r="2"/><circle cx="120" cy="60" r="2"/><circle cx="180" cy="60" r="2"/><circle cx="60" cy="120" r="2"/><circle cx="120" cy="120" r="2"/><circle cx="180" cy="120" r="2"/><circle cx="60" cy="180" r="2"/><circle cx="120" cy="180" r="2"/><circle cx="180" cy="180" r="2"/>
+    <circle cx="1020" cy="450" r="2"/><circle cx="1080" cy="450" r="2"/><circle cx="1140" cy="450" r="2"/><circle cx="1020" cy="510" r="2"/><circle cx="1080" cy="510" r="2"/><circle cx="1140" cy="510" r="2"/><circle cx="1020" cy="570" r="2"/><circle cx="1080" cy="570" r="2"/><circle cx="1140" cy="570" r="2"/>
+  </g>
+  <!-- accent circles (right side) -->
+  <circle cx="950" cy="180" r="180" fill="url(#accent)" opacity="0.15"/>
+  <circle cx="1050" cy="120" r="80" fill="url(#accent)" opacity="0.25"/>
+  <!-- logo block -->
+  <g transform="translate(80, 100)">
+    <rect width="80" height="80" rx="18" fill="url(#accent)"/>
+    <text x="40" y="56" font-family="ui-sans-serif,system-ui,-apple-system" font-size="40" font-weight="800" text-anchor="middle" fill="white">OB</text>
+  </g>
+  <!-- main title -->
+  <text x="80" y="280" font-family="ui-sans-serif,system-ui,-apple-system" font-size="76" font-weight="800" fill="white" letter-spacing="-2">Obsidian Blog</text>
+  <text x="80" y="360" font-family="ui-sans-serif,system-ui,-apple-system" font-size="32" font-weight="500" fill="#a1a1aa">写一次，在两个地方读</text>
+  <!-- tagline -->
+  <text x="80" y="540" font-family="ui-monospace,ui-monospace,monospace" font-size="22" fill="#71717a">[[双链]] · > [!callout] · frontmatter · inline #tag</text>
+  <text x="80" y="580" font-family="ui-monospace,ui-monospace,monospace" font-size="22" fill="#52525b">A vault-driven, statically-rendered Obsidian-compatible blog</text>
+</svg>

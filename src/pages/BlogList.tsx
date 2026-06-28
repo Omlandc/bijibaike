@@ -102,38 +102,34 @@ export default function BlogList() {
           {filtered.map((p) => (
             <Link
               key={p.slug}
-              to={`/blog/${p.slug}`}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
+              to={`/blog/${encodeURIComponent(p.slug)}`}
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
             >
-              <div
-                className="relative aspect-[16/9] w-full overflow-hidden"
-                style={{
-                  background: `linear-gradient(135deg, hsl(${
-                    p.slug
-                      .split('')
-                      .reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) & 0xffff, 7) %
-                    360
-                  } 70% 60%) 0%, hsl(${
-                    p.slug
-                      .split('')
-                      .reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) & 0xffff, 7) *
-                      7 %
-                    360
-                  } 70% 50%) 100%)`,
-                }}
-              >
-                <div className="absolute inset-0 bg-dot-grid opacity-30" />
-              </div>
-              <div className="flex flex-1 flex-col p-4">
+              {p.cover ? (
+                <div className="relative aspect-[16/9] w-full overflow-hidden">
+                  <img
+                    src={p.cover}
+                    alt=""
+                    loading="lazy"
+                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              ) : null}
+              <div className="flex flex-1 flex-col gap-2 p-4">
+                {p.tags[0] ? (
+                  <span className="inline-flex w-fit items-center rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[10px] font-medium text-fg-muted">
+                    {p.tags[0]}
+                  </span>
+                ) : null}
                 <h3 className="line-clamp-2 text-base font-semibold text-fg group-hover:text-primary">
                   {p.title}
                 </h3>
-                <p className="mt-2 line-clamp-2 text-sm text-fg-muted">
+                <p className="line-clamp-2 text-sm text-fg-muted">
                   {p.frontmatter.description
                     ? String(p.frontmatter.description)
                     : p.excerpt}
                 </p>
-                <div className="mt-3 flex items-center justify-between text-xs text-fg-subtle">
+                <div className="mt-auto flex items-center justify-between pt-2 text-xs text-fg-subtle">
                   <span className="inline-flex items-center gap-1">
                     <Calendar className="size-3" />
                     {new Date(p.date).toLocaleDateString('zh-CN', {
@@ -146,14 +142,14 @@ export default function BlogList() {
                     {Math.max(1, Math.round(p.raw.length / 600))} 分钟
                   </span>
                 </div>
-                {p.tags.length > 0 ? (
+                {p.tags.length > 1 ? (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {p.tags.slice(0, 2).map((t) => (
                       <span
                         key={t}
                         className="rounded-full border border-border bg-bg px-1.5 py-0 text-[10px] text-fg-muted"
                       >
-                        #{t}
+                        {t}
                       </span>
                     ))}
                   </div>

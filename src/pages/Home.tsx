@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
-import { ArrowRight, Sparkles, Search, Calendar, TrendingUp, Tag as TagIcon, Clock, Pin } from 'lucide-react';
+import { ArrowRight, Sparkles, Search, Calendar, TrendingUp, Tag as TagIcon, Clock, Pin, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -162,7 +162,7 @@ export default function Home() {
       {/* Featured post (cover-style) */}
       {featured ? (
         <Link
-          to={`/blog/${featured.slug}`}
+          to={`/blog/${encodeURIComponent(featured.slug)}`}
           className="group block overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
         >
           <div className="grid gap-6 p-6 sm:grid-cols-[1fr_2fr] sm:p-8">
@@ -233,51 +233,32 @@ export default function Home() {
 }
 
 function FeaturedCover({ post }: { post: ReturnType<typeof getAllPosts>[number] }) {
-  // Subtle, editorial-style fallback. Tinted with primary at low
-  // saturation so it works across all 4 themes without screaming.
-  const hash = post.slug
-    .split('')
-    .reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) & 0xffff, 7);
-  const hueA = hash % 360;
-  const hueB = (hash * 7) % 360;
-  const initial =
-    post.title
-      .replace(/^#+\s*/, '')
-      .trim()
-      .charAt(0)
-      .toUpperCase() || 'N';
+  // Cover image if the post has one (frontmatter or first body
+  // image). Otherwise show a clean editorial-style block with a
+  // centered icon and the first tag — no hue-based gradient, no
+  // dot-grid. Mirrors blog-system's "if you have an image show it,
+  // otherwise don't fake it" approach.
   const cover = post.cover;
-  return (
-    <div
-      className="relative aspect-[4/3] w-full overflow-hidden rounded-xl sm:aspect-square"
-      style={
-        cover
-          ? undefined
-          : {
-              // Same hue family, low saturation, gentle dark wash on
-              // top so white type stays legible. Works in light +
-              // dark themes because the gradient uses theme vars.
-              background: `linear-gradient(135deg, hsl(${hueA} 35% 38%) 0%, hsl(${hueB} 45% 22%) 100%)`,
-            }
-      }
-    >
-      {cover ? (
+  if (cover) {
+    return (
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl sm:aspect-square">
         <img
           src={cover}
           alt=""
           loading="lazy"
           className="absolute inset-0 size-full object-cover"
         />
-      ) : (
-        <>
-          <div className="absolute inset-0 bg-dot-grid opacity-25" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-7xl font-black text-white/95 drop-shadow-lg sm:text-8xl">
-              {initial}
-            </span>
-          </div>
-        </>
-      )}
+      </div>
+    );
+  }
+  return (
+    <div className="relative flex aspect-[4/3] w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-gradient-to-br from-bg-elevated to-bg-subtle p-6 sm:aspect-square">
+      <FileText className="size-10 text-fg-subtle/50" strokeWidth={1.5} />
+      {post.tags[0] ? (
+        <span className="rounded-full border border-border bg-bg/60 px-3 py-1 text-xs text-fg-muted">
+          {post.tags[0]}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -287,61 +268,43 @@ function PostGridCard({
 }: {
   post: ReturnType<typeof getAllPosts>[number];
 }) {
-  const hash = post.slug
-    .split('')
-    .reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) & 0xffff, 7);
-  const hueA = hash % 360;
-  const hueB = (hash * 7) % 360;
   const cover = post.cover;
+  const readingMinutes = Math.max(1, Math.round(post.raw.length / 600));
+  const description =
+    typeof post.frontmatter.description === 'string'
+      ? post.frontmatter.description
+      : post.excerpt;
   return (
     <Link
-      to={`/blog/${post.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
+      to={`/blog/${encodeURIComponent(post.slug)}`}
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
     >
-      <div
-        className="relative aspect-[16/9] w-full overflow-hidden"
-        style={
-          cover
-            ? undefined
-            : {
-                background: `linear-gradient(135deg, hsl(${hueA} 35% 38%) 0%, hsl(${hueB} 45% 22%) 100%)`,
-              }
-        }
-      >
-        {cover ? (
+      {cover ? (
+        <div className="relative aspect-[16/9] w-full overflow-hidden">
           <img
             src={cover}
             alt=""
             loading="lazy"
             className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-        ) : (
-          <>
-            <div className="absolute inset-0 bg-dot-grid opacity-30" />
-            <div className="absolute right-3 top-3 rounded-full border border-white/30 bg-black/20 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur">
-              {post.tags[0] ?? '笔记'}
-            </div>
-          </>
-        )}
-        {cover && post.tags[0] ? (
-          <div className="absolute right-3 top-3 rounded-full border border-white/30 bg-black/40 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur">
+        </div>
+      ) : null}
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        {post.tags[0] ? (
+          <span className="inline-flex w-fit items-center rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[10px] font-medium text-fg-muted">
             {post.tags[0]}
-          </div>
+          </span>
         ) : null}
-      </div>
-      <div className="flex flex-1 flex-col p-4">
         <h3 className="line-clamp-2 text-base font-semibold text-fg group-hover:text-primary">
           {post.title}
         </h3>
-        <p className="mt-2 line-clamp-2 text-sm text-fg-muted">
-          {post.frontmatter.description
-            ? String(post.frontmatter.description)
-            : post.excerpt}
-        </p>
-        <div className="mt-3 flex items-center justify-between text-xs text-fg-subtle">
+        {description ? (
+          <p className="line-clamp-2 text-sm text-fg-muted">{description}</p>
+        ) : null}
+        <div className="mt-auto flex items-center justify-between pt-2 text-xs text-fg-subtle">
           <span className="inline-flex items-center gap-1">
             <Clock className="size-3" />
-            {Math.max(1, Math.round(post.raw.length / 600))} 分钟
+            {readingMinutes} 分钟
           </span>
           <span>
             {new Date(post.date).toLocaleDateString('zh-CN', {

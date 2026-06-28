@@ -94,7 +94,7 @@ export function CookieConsent({ value: controlled, onChange }: CookieConsentProp
       aria-live="polite"
       aria-label="Cookie 同意"
       className={cn(
-        'fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-lg rounded-xl border border-border bg-bg-elevated/95 p-4 shadow-xl backdrop-blur-md transition-all',
+        'fixed bottom-3 left-3 right-3 z-40 mx-auto max-w-lg rounded-xl border border-border bg-bg-elevated/95 p-3.5 shadow-xl backdrop-blur-md transition-all sm:bottom-4 sm:left-4 sm:right-4 sm:p-4',
         'sm:right-auto sm:left-4',
       )}
     >

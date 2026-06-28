@@ -17,12 +17,12 @@ export default function App() {
       <Route element={<SiteLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<BlogList />} />
-        <Route path="/blog/:slug" element={<Post />} />
+        <Route path="/blog/*" element={<Post />} />
         <Route path="/tags" element={<TagsIndex />} />
         <Route path="/tags/:tag" element={<TagDetail />} />
         <Route path="/topics" element={<Topics />} />
         <Route path="/topics/:slug" element={<TopicDetail />} />
-        <Route path="/topics/:slug/:clusterSlug" element={<ClusterDetail />} />
+        <Route path="/topics/:slug/*" element={<ClusterDetail />} />
         <Route path="/graph" element={<Graph />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />

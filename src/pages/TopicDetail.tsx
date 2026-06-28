@@ -126,9 +126,12 @@ export default function TopicDetail() {
 }
 
 export function ClusterDetail() {
-  const { slug } = useParams<{ slug: string }>();
-  if (!slug) return <Navigate to="/topics" replace />;
-  const cluster = getClusterBySlug(slug);
+  // The route is `/topics/:slug/*` — `:slug` is the pillar, the
+  // splat captures the cluster path (e.g. "其他/子文件夹").
+  const { slug, '*': clusterPath } = useParams<{ slug: string; '*': string }>();
+  if (!slug || !clusterPath) return <Navigate to="/topics" replace />;
+  const clusterPathDecoded = decodeURIComponent(clusterPath);
+  const cluster = getClusterBySlug(slug, clusterPathDecoded);
   if (!cluster) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">

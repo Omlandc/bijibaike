@@ -32,8 +32,13 @@ function RouteSeo() {
 
   // Resolve the current page's SEO from the pathname.
   // Pattern matches the HashRouter routes in App.tsx.
-  const segs = pathname.split('/').filter(Boolean);
-  const slug = segs[0] === 'blog' ? segs[1] : null;
+  // useLocation().pathname returns the raw path with % escapes for
+  // non-ASCII characters; we decode each segment so it matches the
+  // decoded post.slug we build in content.ts.
+  const segs = pathname.split('/').filter(Boolean).map(decodeURIComponent);
+  // Slug can span multiple segments (e.g. "中医/黄帝内经素问遗篇-1")
+  // because the post slug encodes the full vault-relative path.
+  const slug = segs[0] === 'blog' ? segs.slice(1).join('/') : null;
   const post = slug ? posts.find((p) => p.slug === slug) : null;
 
   if (post) {
@@ -74,6 +79,36 @@ function RouteSeo() {
     );
   }
 
+  // Pillar detail page: /topics/:slug (no further segment)
+  if (segs[0] === 'topics' && segs.length === 2) {
+    const pillarName = segs[1]!;
+    return (
+      <SEOHead
+        config={siteSEO}
+        path={pathname}
+        page={pageSEO({
+          title: pillarName,
+          description: `${pillarName} 主题下的所有文章与子主题`,
+        })}
+      />
+    );
+  }
+  // Cluster detail page: /topics/:pillar/:cluster
+  if (segs[0] === 'topics' && segs.length >= 3) {
+    const pillarName = segs[1]!;
+    const clusterName = segs.slice(2).join('/');
+    return (
+      <SEOHead
+        config={siteSEO}
+        path={pathname}
+        page={pageSEO({
+          title: `${clusterName} · ${pillarName}`,
+          description: `${pillarName} 主题下的子主题 ${clusterName}`,
+        })}
+      />
+    );
+  }
+
   // Per-route static meta
   const staticMeta: Record<string, { title: string; description: string }> = {
     '/': {
@@ -109,7 +144,12 @@ function RouteSeo() {
       description: '反馈 bug、提建议、申请数据删除',
     },
   };
-  const routeMeta = staticMeta[pathname] ?? { title: '', description: '' };
+  // pathname is URL-encoded by HashRouter — decode once so it matches the
+  // unescaped keys we declared in staticMeta (e.g. '/topics/中医').
+  const decodedPath = (() => {
+    try { return decodeURI(pathname); } catch { return pathname; }
+  })();
+  const routeMeta = staticMeta[decodedPath] ?? { title: '', description: '' };
   return (
     <SEOHead
       config={siteSEO}
@@ -287,7 +327,7 @@ function SearchBar({ onClose }: { onClose: () => void }) {
           {results.map((p) => (
             <li key={p.slug}>
               <Link
-                to={`/blog/${p.slug}`}
+                to={`/blog/${encodeURIComponent(p.slug)}`}
                 onClick={onClose}
                 className="flex items-center justify-between gap-4 px-3 py-2 transition-colors hover:bg-bg-subtle"
               >

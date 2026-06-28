@@ -13,7 +13,10 @@ import {
 } from 'lucide-react';
 
 export default function Post() {
-  const { slug } = useParams<{ slug: string }>();
+  // With the splat route `/blog/*`, the full slug is in the `*` key.
+  // It may span multiple path segments (e.g. "中医/黄帝内经素问遗篇-1").
+  const { '*': slugSplat } = useParams<{ '*': string }>();
+  const slug = slugSplat ? decodeURIComponent(slugSplat) : null;
   const post = slug ? getPostBySlug(slug) : undefined;
   if (!post) {
     return <Navigate to="/blog" replace />;
@@ -99,7 +102,7 @@ export default function Post() {
                 className="rounded-md border border-border bg-bg-elevated p-3 transition-colors hover:border-primary/40"
               >
                 <Link
-                  to={`/blog/${bl.fromSlug}`}
+                  to={`/blog/${encodeURIComponent(bl.fromSlug)}`}
                   className="font-medium text-fg hover:text-primary"
                 >
                   {bl.fromTitle}
@@ -116,7 +119,7 @@ export default function Post() {
       <nav className="flex items-center justify-between gap-4 pt-2">
         {prev ? (
           <Link
-            to={`/blog/${prev.slug}`}
+            to={`/blog/${encodeURIComponent(prev.slug)}`}
             className="group flex flex-1 flex-col rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
           >
             <div className="text-xs text-fg-muted">← 上一篇</div>
@@ -129,7 +132,7 @@ export default function Post() {
         )}
         {next ? (
           <Link
-            to={`/blog/${next.slug}`}
+            to={`/blog/${encodeURIComponent(next.slug)}`}
             className="group flex flex-1 flex-col rounded-lg border border-border p-3 text-right transition-colors hover:border-primary/40"
           >
             <div className="text-xs text-fg-muted">下一篇 →</div>

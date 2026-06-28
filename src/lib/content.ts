@@ -85,7 +85,7 @@ export interface ContentIndex {
   tags: { name: string; count: number }[];
   /** Pillar (top-level dir) + Cluster (sub-dir) structure. */
   pillars: Pillar[];
-  byCluster: Record<string, Cluster>; // clusterSlug -> Cluster
+  byCluster: Record<string, Cluster>; // "<pillar>/<cluster>" -> Cluster (legacy composite key)
 }
 
 /**
@@ -333,7 +333,10 @@ function buildIndex(posts: Post[]): ContentIndex {
       );
       const c = indexCluster ?? cposts[0];
       clusters.push({
-        slug: `${pillarName}/${clusterName}`,
+        // Slug is just the cluster folder name (basename). The route
+        // /topics/:pillar/* gives us both pieces, so we look up by
+        // (pillar, name) pair via getClusterBySlug(pillar, name).
+        slug: clusterName,
         pillarSlug: pillarName,
         name: clusterName,
         description:
@@ -362,7 +365,7 @@ function buildIndex(posts: Post[]): ContentIndex {
   pillars.sort((a, b) => b.postCount - a.postCount || a.name.localeCompare(b.name));
 
   const byCluster: Record<string, Cluster> = {};
-  for (const c of pillars.flatMap((p) => p.clusters)) byCluster[c.slug] = c;
+  for (const c of pillars.flatMap((p) => p.clusters)) byCluster[`${c.pillarSlug}/${c.slug}`] = c;
 
   return { posts, bySlug, byTag, backlinks, tags, pillars, byCluster };
 }
@@ -410,8 +413,12 @@ export function getPillarBySlug(slug: string): Pillar | undefined {
   return loadAll().pillars.find((p) => p.slug === slug);
 }
 
-export function getClusterBySlug(slug: string): Cluster | undefined {
-  return loadAll().byCluster[slug];
+export function getClusterBySlug(
+  pillarSlug: string,
+  clusterSlug: string,
+): Cluster | undefined {
+  const pillar = getPillarBySlug(pillarSlug);
+  return pillar?.clusters.find((c) => c.slug === clusterSlug);
 }
 
 /**

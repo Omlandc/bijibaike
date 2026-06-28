@@ -23,7 +23,7 @@ export function PostCard({ post, featured, className }: PostCardProps) {
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="line-clamp-2 text-lg group-hover:text-primary">
-            <Link to={`/blog/${post.slug}`} className="after:absolute after:inset-0">
+            <Link to={`/blog/${encodeURIComponent(post.slug)}`} className="after:absolute after:inset-0">
               {post.frontmatter.pinned ? (
                 <Pin className="mr-1 inline size-4 align-text-bottom text-primary" />
               ) : null}

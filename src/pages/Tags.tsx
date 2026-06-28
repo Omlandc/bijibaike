@@ -84,7 +84,7 @@ export function TagDetail() {
         {posts.map((p) => (
           <Link
             key={p.slug}
-            to={`/blog/${p.slug}`}
+            to={`/blog/${encodeURIComponent(p.slug)}`}
             className="rounded-2xl border border-border bg-bg-elevated p-4 transition-colors hover:border-primary/40"
           >
             <h2 className="font-semibold text-fg">{p.title}</h2>

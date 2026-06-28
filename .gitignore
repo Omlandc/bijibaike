@@ -7,3 +7,4 @@ dist
 vault/
 public/attachments/
 vault-meta
+.vault-meta.json
