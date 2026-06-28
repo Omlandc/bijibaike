@@ -43,6 +43,18 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/cover-demo</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/explicit-cover</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://obsidian-blog-webapp.example.com/#/blog/黄帝内经素问遗篇-1</loc>
     <lastmod>2026-06-28</lastmod>
     <changefreq>monthly</changefreq>

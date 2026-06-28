@@ -153,6 +153,35 @@ export function extractInlineTags(body: string): string[] {
   return Array.from(tags);
 }
 
+/**
+ * First image reference found in a post body, in document order.
+ * Handles two syntaxes:
+ *   - Obsidian embed:   ![[logo.png]]  or  ![[attachments/photo.jpg]]
+ *   - Standard image:   ![alt](path-or-url)
+ *
+ * Returns the raw target string as written in the markdown — the caller
+ * resolves it to a public URL (vault attachments get rewritten to
+ * /<publicAttachmentsPath>/...).
+ *
+ * Code fences are stripped first so images in code samples don't leak
+ * through as the cover.
+ */
+export function extractFirstImage(body: string): { target: string; embed: boolean } | null {
+  const stripped = body.replace(/```[\s\S]*?```/g, '');
+  // 1) Obsidian embeds — they take priority because they survive copy/paste
+  //    from Obsidian and are the most common syntax in our vault.
+  const embed = stripped.match(/!\[\[([^\[\]\n|]+?)(?:\|[^\]]*)?\]\]/);
+  if (embed && embed[1]) {
+    return { target: embed[1].trim(), embed: true };
+  }
+  // 2) Standard markdown image
+  const std = stripped.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
+  if (std && std[1]) {
+    return { target: std[1].trim(), embed: false };
+  }
+  return null;
+}
+
 /** Detect and split an Obsidian callout blockquote. */
 export function parseCallout(lines: string[]): ParsedCallout | null {
   if (lines.length === 0) return null;

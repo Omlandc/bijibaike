@@ -246,19 +246,35 @@ function FeaturedCover({ post }: { post: ReturnType<typeof getAllPosts>[number] 
       .trim()
       .charAt(0)
       .toUpperCase() || 'N';
+  const cover = post.cover;
   return (
     <div
       className="relative aspect-[4/3] w-full overflow-hidden rounded-xl sm:aspect-square"
-      style={{
-        background: `linear-gradient(135deg, hsl(${hueA} 70% 60%) 0%, hsl(${hueB} 70% 50%) 100%)`,
-      }}
+      style={
+        cover
+          ? undefined
+          : {
+              background: `linear-gradient(135deg, hsl(${hueA} 70% 60%) 0%, hsl(${hueB} 70% 50%) 100%)`,
+            }
+      }
     >
-      <div className="absolute inset-0 bg-dot-grid opacity-30" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-7xl font-black text-white/90 drop-shadow-lg sm:text-8xl">
-          {initial}
-        </span>
-      </div>
+      {cover ? (
+        <img
+          src={cover}
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 size-full object-cover"
+        />
+      ) : (
+        <>
+          <div className="absolute inset-0 bg-dot-grid opacity-30" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-7xl font-black text-white/90 drop-shadow-lg sm:text-8xl">
+              {initial}
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -273,6 +289,7 @@ function PostGridCard({
     .reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) & 0xffff, 7);
   const hueA = hash % 360;
   const hueB = (hash * 7) % 360;
+  const cover = post.cover;
   return (
     <Link
       to={`/blog/${post.slug}`}
@@ -280,14 +297,34 @@ function PostGridCard({
     >
       <div
         className="relative aspect-[16/9] w-full overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, hsl(${hueA} 70% 60%) 0%, hsl(${hueB} 70% 50%) 100%)`,
-        }}
+        style={
+          cover
+            ? undefined
+            : {
+                background: `linear-gradient(135deg, hsl(${hueA} 70% 60%) 0%, hsl(${hueB} 70% 50%) 100%)`,
+              }
+        }
       >
-        <div className="absolute inset-0 bg-dot-grid opacity-30" />
-        <div className="absolute right-3 top-3 rounded-full border border-white/30 bg-black/20 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur">
-          #{post.tags[0] ?? '笔记'}
-        </div>
+        {cover ? (
+          <img
+            src={cover}
+            alt=""
+            loading="lazy"
+            className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-dot-grid opacity-30" />
+            <div className="absolute right-3 top-3 rounded-full border border-white/30 bg-black/20 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur">
+              #{post.tags[0] ?? '笔记'}
+            </div>
+          </>
+        )}
+        {cover && post.tags[0] ? (
+          <div className="absolute right-3 top-3 rounded-full border border-white/30 bg-black/40 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur">
+            #{post.tags[0]}
+          </div>
+        ) : null}
       </div>
       <div className="flex flex-1 flex-col p-4">
         <h3 className="line-clamp-2 text-base font-semibold text-fg group-hover:text-primary">

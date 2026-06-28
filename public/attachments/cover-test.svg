@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="50%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#g)"/>
+  <g fill="white" font-family="ui-sans-serif,system-ui" text-anchor="middle">
+    <text x="300" y="160" font-size="56" font-weight="800">封面测试</text>
+    <text x="300" y="220" font-size="22" opacity="0.9">这张图应该自动成为</text>
+    <text x="300" y="250" font-size="22" opacity="0.9">文章的封面</text>
+    <text x="300" y="320" font-size="14" opacity="0.7">cover-test.svg</text>
+  </g>
+  <circle cx="500" cy="80" r="40" fill="white" opacity="0.2"/>
+  <circle cx="80" cy="340" r="60" fill="white" opacity="0.15"/>
+</svg>

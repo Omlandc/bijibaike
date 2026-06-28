@@ -22,7 +22,9 @@ import {
   findWikiLinks,
   slugify,
   isAttachmentPath,
+  extractFirstImage,
 } from './obsidian';
+import { vaultPublicConfig } from '@/vault.public';
 // vaultConfig is intentionally not imported here — the vault path is
 // a build-time concern enforced by Vite's static glob below.
 
@@ -47,6 +49,13 @@ export interface Post {
   date: string;
   /** Title for display */
   title: string;
+  /**
+   * Resolved cover image URL. Priority:
+   *   1. `cover` from frontmatter (absolute URL, /path, or attachment path)
+   *   2. First image found in the body (Obsidian embed or markdown image)
+   *   3. undefined — caller falls back to a deterministic gradient
+   */
+  cover?: string;
 }
 
 export interface Backlink {
@@ -150,7 +159,44 @@ function buildPost(sourcePath: string, raw: string): Post | null {
     excerpt: makeExcerpt(content),
     date: deriveDate(data, sourcePath),
     title: deriveTitle(data, sourcePath),
+    cover: resolveCover(data, content),
   };
+}
+
+/**
+ * Resolve a Post's cover image. Priority:
+ *   1. frontmatter `cover` (if string and non-empty)
+ *   2. first image in the body — Obsidian embed or markdown image
+ *
+ * The result is always a URL that's safe to drop into an <img src>.
+ * Attachment references get rewritten to /<publicAttachmentsPath>/...
+ * so Vite's static handler can serve them.
+ */
+function resolveCover(fm: PostFrontmatter, content: string): string | undefined {
+  const fmCover = typeof fm.cover === 'string' ? fm.cover.trim() : '';
+  if (fmCover) return normalizeCoverUrl(fmCover);
+
+  const first = extractFirstImage(content);
+  if (!first) return undefined;
+  return normalizeCoverUrl(first.target);
+}
+
+/**
+ * Normalize a cover image target into a URL.
+ *   - absolute http(s)  → kept as-is
+ *   - starts with /     → kept as-is (already a public URL)
+ *   - attachment path   → rewritten to /<publicAttachmentsPath>/<file>
+ *   - anything else     → left to the browser (rare; usually a relative path)
+ */
+function normalizeCoverUrl(target: string): string {
+  if (/^https?:\/\//i.test(target)) return target;
+  if (target.startsWith('/')) return target;
+  if (isAttachmentPath(target)) {
+    const base = vaultPublicConfig.publicAttachmentsPath.replace(/\/+$/, '');
+    const cleaned = target.replace(/^attachments\//, '');
+    return `/${base}/${cleaned}`.replace(/\/+/g, '/');
+  }
+  return target;
 }
 
 function buildIndex(posts: Post[]): ContentIndex {
