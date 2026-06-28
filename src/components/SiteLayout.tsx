@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { useEffect, useMemo, useState } from 'react';
 import { getAllPosts, getAllTags } from '@/lib/content';
 import { cn } from '@/lib/utils';
-import { SEOHead, pageSEO } from 'seo-kit';
+import { SEOHead, pageSEO, AdsHead } from 'seo-kit';
 import { siteSEO } from '@/seo.config';
+import { siteAds } from '@/ads.config';
+import { CookieConsent, useConsent } from './CookieConsent';
 
 const NAV = [
   { to: '/', label: '首页', icon: Home, end: true },
@@ -89,6 +91,18 @@ function RouteSeo() {
       title: '关系图',
       description: '文章之间的 wiki-link 关系可视化',
     },
+    '/about': {
+      title: '关于本站',
+      description: '本站的技术栈、理念与开源地址',
+    },
+    '/privacy': {
+      title: '隐私政策',
+      description: '本站如何处理 Cookie、广告与个人数据',
+    },
+    '/contact': {
+      title: '联系我们',
+      description: '反馈 bug、提建议、申请数据删除',
+    },
   };
   const routeMeta = staticMeta[pathname] ?? { title: '', description: '' };
   return (
@@ -114,6 +128,7 @@ export function SiteLayout() {
   );
   const { pathname } = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
+  const consent = useConsent();
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -134,9 +149,11 @@ export function SiteLayout() {
             <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <FileText className="size-3.5" />
             </span>
-            <span className="font-semibold tracking-tight">Obsidian Blog</span>
+            <span className="hidden font-semibold tracking-tight sm:inline">
+              Obsidian Blog
+            </span>
           </Link>
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-0.5 sm:gap-1">
             {NAV.map((n) => {
               const Icon = n.icon;
               return (
@@ -146,15 +163,16 @@ export function SiteLayout() {
                   end={n.end}
                   className={({ isActive }) =>
                     cn(
-                      'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm transition-colors',
+                      'inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors sm:gap-1.5 sm:px-2.5',
                       isActive
                         ? 'bg-primary/10 text-primary'
                         : 'text-fg-muted hover:bg-bg-subtle hover:text-fg',
                     )
                   }
+                  title={n.label}
                 >
-                  <Icon className="size-3.5" />
-                  {n.label}
+                  <Icon className="size-4 sm:size-3.5" />
+                  <span className="hidden sm:inline">{n.label}</span>
                 </NavLink>
               );
             })}
@@ -185,12 +203,13 @@ export function SiteLayout() {
       </header>
 
         <RouteSeo />
+      <AdsHead config={siteAds} consented={consent === 'all'} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:py-12">
         <Outlet />
       </main>
 
       <footer className="mt-12 border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-fg-muted md:flex-row">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-fg-muted sm:flex-row">
           <span>
             由{' '}
             <a
@@ -204,12 +223,18 @@ export function SiteLayout() {
             的设计语言 + Obsidian 兼容层驱动 · 路径:{' '}
             <code className="rounded bg-bg-subtle px-1 text-fg">{pathname}</code>
           </span>
-          <span className="text-fg-subtle">
-            © {new Date().getFullYear()} · 静态部署 · 内容即仓库
-          </span>
+          <nav className="flex flex-wrap items-center gap-3">
+            <Link to="/about" className="hover:text-fg">关于</Link>
+            <Link to="/privacy" className="hover:text-fg">隐私</Link>
+            <Link to="/contact" className="hover:text-fg">联系</Link>
+            <span className="text-fg-subtle">
+              © {new Date().getFullYear()} · 静态部署
+            </span>
+          </nav>
         </div>
         <Separator className="opacity-0" />
       </footer>
+      <CookieConsent value={consent} onChange={() => { /* re-render via useConsent */ }} />
     </div>
   );
 }

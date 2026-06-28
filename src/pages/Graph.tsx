@@ -172,13 +172,25 @@ export default function Graph() {
       const zoom = (zoomRef.current = d3
         .zoom<SVGSVGElement, unknown>())
         .scaleExtent([0.2, 5])
+        // Allow wheel + two-finger pinch; the zoom filter only blocks
+        // button-clicks on nodes (mousedown). Touch is handled by d3
+        // natively: single finger = pan, two fingers = pinch.
         .filter((event) => {
           const t = event.target as Element | null;
           if (t && t.closest && t.closest('.graph-node')) return false;
           return !event.button || event.button === 0;
         })
-        .on('zoom', (e) => g.attr('transform', e.transform.toString()));
+        .on('zoom', (e) => {
+          g.attr('transform', e.transform.toString());
+          // Show / hide labels based on zoom level. Below scale=1 the
+          // labels overlap on small screens; above 1.4 they fit.
+          const k = e.transform.k;
+          g.selectAll('.graph-node text')
+            .attr('display', k >= 1.05 ? null : 'none');
+        });
       svg.call(zoom);
+      // Disable the built-in dblclick-to-zoom — we use dblclick to
+      // navigate, and the sim already settles naturally.
       svg.on('dblclick.zoom', null);
 
       // Sim
@@ -216,21 +228,35 @@ export default function Graph() {
         .attr('data-id', (d) => d.id)
         .style('cursor', 'pointer');
 
+      // Smaller nodes on small screens so 4–6 of them fit in 320px width.
+      const isCompact = width < 480;
+      const baseR = isCompact ? 4 : 5;
+      const maxR = isCompact ? 12 : 18;
+      const labelMax = isCompact ? 80 : 160;
+
       node
         .append('circle')
-        .attr('r', (d) => 5 + Math.min(18, Math.sqrt(d.degree) * 3))
+        .attr('r', (d) => baseR + Math.min(maxR, Math.sqrt(d.degree) * (isCompact ? 2 : 3)))
         .attr('fill', (d) => colorForTag(d.level, d.title))
         .attr('stroke', 'var(--color-bg-elevated)')
         .attr('stroke-width', 2);
 
       node
         .append('text')
-        .text((d) => d.title)
+        .text((d) => {
+          // Truncate long titles so they don't run off the right edge.
+          const t = d.title;
+          return t.length > (isCompact ? 8 : 14) ? t.slice(0, (isCompact ? 8 : 14)) + '…' : t;
+        })
         .attr('x', 12)
         .attr('y', 4)
-        .attr('font-size', 11)
+        .attr('font-size', isCompact ? 10 : 11)
         .attr('fill', 'currentColor')
-        .attr('class', 'graph-label');
+        .attr('class', 'graph-label')
+        // SVG text doesn't get a hard cap; we use a CSS width constraint
+        // via the .graph-label class so it ellipsises cleanly.
+        .attr('textLength', (d) => Math.min(labelMax, d.title.length * (isCompact ? 7 : 8)))
+        .attr('lengthAdjust', 'spacingAndGlyphs');
 
       const sim = d3
         .forceSimulation<SimNode>(simNodes)
@@ -239,13 +265,13 @@ export default function Graph() {
           d3
             .forceLink<SimNode, SimEdge>(simEdges)
             .id((d) => d.id)
-            .distance(80)
+            .distance(isCompact ? 50 : 80)
             .strength(0.5),
         )
-        .force('charge', d3.forceManyBody().strength(-380))
+        .force('charge', d3.forceManyBody().strength(isCompact ? -200 : -380))
         .alpha(0.6).alphaDecay(0.02)
         .force('center', d3.forceCenter(width / 2, height / 2))
-        .force('collide', d3.forceCollide(40))
+        .force('collide', d3.forceCollide(isCompact ? 28 : 40))
         .on('tick', () => {
           link
             .attr('x1', (d) => (d.source as SimNode).x!)
@@ -542,9 +568,18 @@ export default function Graph() {
           </div>
           <Button
             variant="ghost"
+            size="icon"
+            onClick={() => setShowOrphans((o) => !o)}
+            className="size-8 sm:hidden"
+            title={showOrphans ? '隐藏无连接的孤立节点' : '显示所有节点(包括孤立的)'}
+          >
+            {showOrphans ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </Button>
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => setShowOrphans((o) => !o)}
-            className="text-xs"
+            className="hidden text-xs sm:inline-flex"
             title={showOrphans ? '隐藏无连接的孤立节点' : '显示所有节点(包括孤立的)'}
           >
             {showOrphans ? (
@@ -575,17 +610,22 @@ export default function Graph() {
         <CardContent
           ref={containerRef}
           className={cn(
-            'graph-container relative h-[640px] overflow-hidden p-0 text-fg-muted',
+            'graph-container relative h-[60vh] min-h-[380px] overflow-hidden p-0 text-fg-muted sm:h-[640px]',
             isFullscreen && 'fixed inset-0 z-50 h-screen rounded-none border-0',
           )}
         >
           <svg ref={svgRef} className="graph-svg absolute inset-0 h-full w-full" />
 
-          <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-md border border-border bg-bg-elevated/85 px-3 py-1.5 text-xs text-fg-muted backdrop-blur">
-            拖动节点 · 背景平移 · 滚轮缩放 · 单击高亮邻居 · 双击打开
+          <div className="pointer-events-none absolute bottom-3 left-1/2 max-w-[90%] -translate-x-1/2 rounded-md border border-border bg-bg-elevated/85 px-3 py-1.5 text-center text-xs text-fg-muted backdrop-blur">
+            <span className="hidden sm:inline">
+              拖动节点 · 背景平移 · 滚轮/双指缩放 · 单击高亮 · 双击打开
+            </span>
+            <span className="sm:hidden">
+              拖动平移 · 双指缩放 · 单击高亮 · 双击打开
+            </span>
           </div>
 
-          <div className="pointer-events-none absolute right-3 bottom-3 rounded-md border border-border bg-bg-elevated/85 px-2 py-1 text-[10px] text-fg-muted backdrop-blur">
+          <div className="pointer-events-none absolute right-3 bottom-3 hidden rounded-md border border-border bg-bg-elevated/85 px-2 py-1 text-[10px] text-fg-muted backdrop-blur sm:block">
             <kbd className="rounded border border-border bg-bg px-1 font-mono text-[10px]">D3.js</kbd>{' '}
             force-directed
           </div>

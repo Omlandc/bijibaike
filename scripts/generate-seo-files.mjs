@@ -50,11 +50,32 @@ async function loadConfig() {
 
 async function main() {
   const siteSEO = await loadConfig();
+  // Load ads config too — written to public/ads.txt below.
+  const siteAds = await new Promise((resolveP, rejectP) => {
+    const adsFile = resolve(root, 'src/ads.config.ts');
+    const code = `
+      const mod = await import(${JSON.stringify(pathToFileURL(adsFile).href)});
+      process.stdout.write(JSON.stringify(mod.siteAds ?? null));
+    `;
+    const child = spawn(
+      process.execPath,
+      ['--experimental-strip-types', '--no-warnings', '--input-type=module', '-e', code],
+      { stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    let out = '';
+    let err = '';
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (err += d));
+    child.on('close', (code) =>
+      code === 0
+        ? resolveP(out.trim() ? JSON.parse(out) : null)
+        : rejectP(new Error('ads loader failed: ' + err)),
+    );
+  });
 
   const { resolveSitemap, buildSitemapEntries } = await import('seo-kit/sitemap');
   const { generateRobotsTxt } = await import('seo-kit/robots');
   // Use a subprocess with strip-types to load the .ts paths file.
-  const { spawn } = await import('node:child_process');
   const blogSitemapPaths = await new Promise((resolveP, rejectP) => {
     const pathsFile = resolve(root, 'src/seo-paths.ts');
     const code = `
@@ -122,6 +143,16 @@ ${entries
   });
   await writeFile(resolve(distDir, 'robots.txt'), robots, 'utf-8');
   console.log(`[generate-seo-files] wrote robots.txt (${robots.length} bytes)`);
+
+  // ── ads.txt (Google AdSense verification) ──────────────────────
+  if (siteAds) {
+    const { generateAdsTxt } = await import('seo-kit/ads');
+    const adsTxt = generateAdsTxt(siteAds);
+    if (adsTxt) {
+      await writeFile(resolve(distDir, 'ads.txt'), adsTxt, 'utf-8');
+      console.log(`[generate-seo-files] wrote ads.txt (${adsTxt.length} bytes)`);
+    }
+  }
 
   // ── Cleanup temp cache ───────────────────────────────────────────
   await rm(cachePath, { force: true });

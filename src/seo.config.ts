@@ -52,6 +52,10 @@ export const siteSEO = defineSEO({
       { loc: '/#/blog', priority: 0.9, changefreq: 'daily' },
       { loc: '/#/tags', priority: 0.7, changefreq: 'weekly' },
       { loc: '/#/graph', priority: 0.5, changefreq: 'weekly' },
+      // Required by Google AdSense for site-credibility review
+      { loc: '/#/about', priority: 0.5, changefreq: 'monthly' },
+      { loc: '/#/privacy', priority: 0.4, changefreq: 'monthly' },
+      { loc: '/#/contact', priority: 0.4, changefreq: 'monthly' },
     ],
     // Dynamic paths (blog posts etc.) are computed at build time by
     // scripts/generate-seo-files.mjs — NOT here, so the browser bundle

@@ -25,6 +25,24 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/about</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/privacy</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/contact</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://obsidian-blog-webapp.example.com/#/blog/draft-test</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
