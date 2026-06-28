@@ -1,6 +1,10 @@
 /**
  * Single source of truth for the site's SEO.
  *
+ * All values are derived from `siteConfig` (which is generated from
+ * `vault/_config.md` by scripts/build-config.mjs). Edit that file —
+ * not this one — to change SEO behavior.
+ *
  * Imported by:
  *  - main.tsx (root <SEOHead /> for site-wide defaults + Organization JSON-LD)
  *  - pages/Post.tsx (per-page overrides via pageSEO(...))
@@ -8,37 +12,38 @@
  */
 import { defineSEO, jsonld, pageSEO } from 'seo-kit';
 import type { SitemapConfig } from 'seo-kit';
+import { siteConfig } from '@/config/site-config';
 
-const SITE_URL = 'https://obsidian-blog-webapp.example.com';
+const { site: siteInfo, seo, footer } = siteConfig;
+const SITE_URL = seo.siteUrl;
+const SITE_NAME = siteInfo.name;
 
 export const siteSEO = defineSEO({
   siteUrl: SITE_URL,
-  siteName: 'Obsidian Blog',
-  description:
-    '把 Obsidian vault 直接喂给 React 博客。支持 [[双链]]、callout、frontmatter、inline #tag、自动 backlinks 与 4 套主题切换。',
-  defaultTitle: 'Obsidian Blog',
+  siteName: SITE_NAME,
+  description: siteInfo.description,
+  defaultTitle: SITE_NAME,
   titleTemplate: '{title} · {site}',
-  locale: 'zh_CN',
-  defaultOgImage: '/og-image.jpg',
-  author: 'Omlandc',
+  locale: siteInfo.locale,
+  defaultOgImage: seo.ogImage,
+  author: siteInfo.author.name || undefined,
   aiPolicy: 'open', // AI 搜索可以引用,有助于扩散
 
   organization: {
-    name: 'Obsidian Blog',
+    name: SITE_NAME,
     url: SITE_URL,
   },
 
   defaultJsonLd: [
     jsonld.organization({
-      name: 'Obsidian Blog',
+      name: SITE_NAME,
       url: SITE_URL,
-      sameAs: ['https://github.com/Omlandc/obsidian-blog-webapp'],
+      sameAs: siteInfo.social.github ? [siteInfo.social.github] : [],
     }),
     jsonld.website({
-      name: 'Obsidian Blog',
+      name: SITE_NAME,
       url: SITE_URL,
-      description:
-        '把 Obsidian vault 直接喂给 React 博客。支持 [[双链]]、callout、frontmatter。',
+      description: siteInfo.description,
       enableSearch: true,
     }),
   ],
@@ -53,6 +58,8 @@ export const siteSEO = defineSEO({
       { loc: '/#/topics', priority: 0.85, changefreq: 'weekly' },
       { loc: '/#/tags', priority: 0.7, changefreq: 'weekly' },
       { loc: '/#/graph', priority: 0.5, changefreq: 'weekly' },
+      // Resources page
+      { loc: '/#/resources', priority: 0.5, changefreq: 'weekly' },
       // Required by Google AdSense for site-credibility review
       { loc: '/#/about', priority: 0.5, changefreq: 'monthly' },
       { loc: '/#/privacy', priority: 0.4, changefreq: 'monthly' },
@@ -67,3 +74,9 @@ export const siteSEO = defineSEO({
 });
 
 export { pageSEO };
+
+// Re-export footer copyright so layouts can show it.
+export const SITE_FOOTER_COPYRIGHT = footer.copyright;
+export const SITE_FOOTER_LINKS = footer.links;
+export const SITE_TAGLINE = siteInfo.tagline;
+export const SITE_SOCIAL = siteInfo.social;

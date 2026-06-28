@@ -1,0 +1,163 @@
+{
+  "site": {
+    "name": "Obsidian Blog",
+    "shortName": "Obsidian Blog",
+    "tagline": "写一次，在两个地方读",
+    "description": "把 Obsidian Vault 直接渲染成静态博客，支持 wiki-link、callout、自动封面、力导向关系图、Pillar/Cluster 主题架构与 AdSense 合规。",
+    "defaultTheme": "light",
+    "themes": [
+      "light",
+      "dark",
+      "sepia",
+      "cyberpunk"
+    ],
+    "locale": "zh_CN",
+    "author": {
+      "name": "Omlandc",
+      "url": "https://github.com/Omlandc"
+    },
+    "social": {
+      "github": "https://github.com/Omlandc",
+      "twitter": "",
+      "email": ""
+    }
+  },
+  "seo": {
+    "siteUrl": "https://obsidian-blog-webapp.example.com",
+    "ogImage": "/og-image.svg",
+    "keywords": [
+      "Obsidian",
+      "blog",
+      "wiki-link",
+      "callout",
+      "知识管理",
+      "Pillar",
+      "Cluster"
+    ],
+    "twitter": ""
+  },
+  "ads": {
+    "enabled": false,
+    "publisherId": "ca-pub-0000000000000000",
+    "verification": true,
+    "autoAds": true,
+    "consent": {
+      "required": true,
+      "categories": [
+        "necessary",
+        "marketing"
+      ]
+    }
+  },
+  "vault": {
+    "repo": "Omlandc/obsidian-test-article",
+    "branch": "main",
+    "ref": "",
+    "publicAttachmentsPath": "/attachments"
+  },
+  "nav": [
+    {
+      "label": "首页",
+      "to": "/",
+      "icon": "Home"
+    },
+    {
+      "label": "文章",
+      "to": "/blog",
+      "icon": "FileText"
+    },
+    {
+      "label": "主题",
+      "to": "/topics",
+      "icon": "FolderTree"
+    },
+    {
+      "label": "标签",
+      "to": "/tags",
+      "icon": "Tag"
+    },
+    {
+      "label": "关系图",
+      "to": "/graph",
+      "icon": "Network"
+    },
+    {
+      "label": "资源",
+      "to": "/resources",
+      "icon": "BookOpen"
+    }
+  ],
+  "footer": {
+    "copyright": "© Omlandc · Obsidian-compatible blog",
+    "links": [
+      {
+        "label": "关于",
+        "to": "/about"
+      },
+      {
+        "label": "隐私",
+        "to": "/privacy"
+      },
+      {
+        "label": "联系",
+        "to": "/contact"
+      }
+    ]
+  },
+  "pillars": [
+    {
+      "name": "中医",
+      "description": "中医养生、经典与临床实践"
+    },
+    {
+      "name": "其他",
+      "description": "其他主题笔记"
+    }
+  ],
+  "resources": {
+    "sections": [
+      {
+        "title": "工具",
+        "description": "写这个博客用到的工具与库",
+        "items": [
+          {
+            "title": "Obsidian",
+            "url": "https://obsidian.md",
+            "description": "知识管理的 Markdown 编辑器"
+          },
+          {
+            "title": "D3.js",
+            "url": "https://d3js.org",
+            "description": "关系图所用的力导向图库"
+          },
+          {
+            "title": "React",
+            "url": "https://react.dev",
+            "description": "UI 框架"
+          }
+        ]
+      },
+      {
+        "title": "参考",
+        "description": "设计 / 实现参考",
+        "items": [
+          {
+            "title": "blog-system",
+            "url": "https://github.com/Omlandc/blog-system",
+            "description": "同作者的早期博客系统"
+          },
+          {
+            "title": "seo-kit",
+            "url": "https://github.com/Omlandc/seo-kit",
+            "description": "本仓库配套的 SEO 工具包"
+          },
+          {
+            "title": "ai-dev-framework",
+            "url": "https://github.com/Omlandc/ai-dev-framework",
+            "description": "webapp-building 模板仓库"
+          }
+        ]
+      }
+    ]
+  }
+}

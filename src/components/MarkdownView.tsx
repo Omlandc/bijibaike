@@ -166,6 +166,7 @@ const components: Components = {
 export function MarkdownView({ body, className }: MarkdownViewProps) {
   return (
     <article
+      data-md-root
       className={cn(
         'prose prose-slate dark:prose-invert max-w-none',
         'prose-headings:scroll-mt-20 prose-headings:font-semibold',

@@ -3,9 +3,29 @@ import { FolderTree, BookOpen, Layers, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getAllPillars, type Pillar } from '@/lib/content';
+import { siteConfig } from '@/config/site-config';
 
 export default function Topics() {
-  const pillars = getAllPillars();
+  // Auto-discovered from vault folder structure, then re-ordered to
+  // match `pillars` in vault/_config.md. Any pillar in config that
+  // doesn't exist on disk is silently dropped. Pillars NOT in config
+  // still show up after the configured ones (so adding a new vault
+  // folder never produces a blank /topics page).
+  const discovered = getAllPillars();
+  const cfgPillars = siteConfig.pillars;
+  const byName = new Map(discovered.map((p) => [p.name, p]));
+  const ordered: Pillar[] = [
+    ...cfgPillars
+      .map((c) => byName.get(c.name))
+      .filter((p): p is Pillar => p !== undefined)
+      .map((p, i) => {
+        const cfg = cfgPillars[i];
+        return cfg?.description
+          ? { ...p, description: cfg.description }
+          : p;
+      }),
+    ...discovered.filter((p) => !cfgPillars.some((c) => c.name === p.name)),
+  ];
   return (
     <div className="space-y-6">
       <header className="space-y-2">
@@ -21,12 +41,12 @@ export default function Topics() {
       </header>
 
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {pillars.map((pillar) => (
+        {ordered.map((pillar) => (
           <PillarCard key={pillar.slug} pillar={pillar} />
         ))}
       </div>
 
-      {pillars.length === 0 ? (
+      {ordered.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center text-fg-muted">
             vault 里还没有任何带子文件夹的文章 —— 创建一个子目录试试。

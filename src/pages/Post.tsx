@@ -1,6 +1,8 @@
 import { useParams, Link, Navigate } from 'react-router';
 import { getPostBySlug, getBacklinks, getAllPosts } from '@/lib/content';
 import { MarkdownView } from '@/components/MarkdownView';
+import { ReadingProgress } from '@/components/ReadingProgress';
+import { TableOfContents } from '@/components/TableOfContents';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -29,8 +31,11 @@ export default function Post() {
   const readingMinutes = Math.max(1, Math.round(post.raw.length / 600));
 
   return (
-    <article className="mx-auto max-w-3xl space-y-8">
-      <header className="space-y-4">
+    <>
+      <ReadingProgress />
+      <div className="mx-auto flex max-w-6xl gap-8">
+        <article className="mx-auto w-full max-w-3xl flex-1 space-y-8">
+          <header className="space-y-4">
         <div className="flex items-center justify-between text-sm text-fg-muted">
           <Button asChild variant="ghost" size="sm">
             <Link to="/blog">
@@ -144,6 +149,9 @@ export default function Post() {
           <div className="flex-1" />
         )}
       </nav>
-    </article>
+        </article>
+        <TableOfContents scope="[data-md-root]" />
+      </div>
+    </>
   );
 }

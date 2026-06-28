@@ -1,5 +1,17 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
-import { Home, BookOpen, Tags, Network, FileText, Search, X, Layers } from 'lucide-react';
+import {
+  Home,
+  BookOpen,
+  Tags,
+  Network,
+  FileText,
+  Search,
+  X,
+  Layers,
+  FolderTree,
+  Tag as TagIcon,
+  type LucideIcon,
+} from 'lucide-react';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -7,17 +19,30 @@ import { useEffect, useMemo, useState } from 'react';
 import { getAllPosts, getAllTags } from '@/lib/content';
 import { cn } from '@/lib/utils';
 import { SEOHead, pageSEO, AdsHead } from 'seo-kit';
-import { siteSEO } from '@/seo.config';
+import { siteSEO, SITE_FOOTER_COPYRIGHT, SITE_FOOTER_LINKS, SITE_SOCIAL } from '@/seo.config';
 import { siteAds } from '@/ads.config';
 import { CookieConsent, useConsent } from './CookieConsent';
+import { siteConfig } from '@/config/site-config';
 
-const NAV = [
-  { to: '/', label: '首页', icon: Home, end: true },
-  { to: '/blog', label: '文章', icon: BookOpen },
-  { to: '/topics', label: '主题', icon: Layers },
-  { to: '/tags', label: '标签', icon: Tags },
-  { to: '/graph', label: '关系图', icon: Network },
-];
+const ICONS: Record<string, LucideIcon> = {
+  Home,
+  BookOpen,
+  Tags,
+  Tag: TagIcon,
+  Network,
+  FileText,
+  Layers,
+  FolderTree,
+};
+
+// Build the nav array from siteConfig.nav, resolving each icon string
+// against the ICONS map. Defaults to FileText when icon is unknown.
+const NAV = siteConfig.nav.map((n) => ({
+  to: n.to,
+  label: n.label,
+  icon: ICONS[n.icon] ?? FileText,
+  end: n.to === '/',
+}));
 
 /**
  * Per-route SEO meta. Reads the current location and produces the right
@@ -112,7 +137,7 @@ function RouteSeo() {
   // Per-route static meta
   const staticMeta: Record<string, { title: string; description: string }> = {
     '/': {
-      title: '写一次,在两个地方读',
+      title: siteConfig.site.tagline || siteConfig.site.shortName,
       description: siteSEO.description ?? '',
     },
     '/blog': {
@@ -130,6 +155,10 @@ function RouteSeo() {
     '/graph': {
       title: '关系图',
       description: '文章之间的 wiki-link 关系可视化',
+    },
+    '/resources': {
+      title: '资源',
+      description: `${siteConfig.site.shortName} 推荐的工具、参考与外部链接`,
     },
     '/about': {
       title: '关于本站',
@@ -171,7 +200,10 @@ export function SiteLayout() {
     }),
     [],
   );
-  const { pathname } = useLocation();
+  const useLoc = useLocation();
+  // pathname is intentionally unused at this level — the per-route SEO
+  // lives in <RouteSeo /> below.
+  void useLoc.pathname;
   const [searchOpen, setSearchOpen] = useState(false);
   const consent = useConsent();
 
@@ -256,25 +288,26 @@ export function SiteLayout() {
       <footer className="mt-12 border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-fg-muted sm:flex-row">
           <span>
-            由{' '}
-            <a
-              href="https://github.com/Omlandc/blog-system"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-fg-muted hover:text-fg"
-            >
-              blog-system
-            </a>{' '}
-            的设计语言 + Obsidian 兼容层驱动 · 路径:{' '}
-            <code className="rounded bg-bg-subtle px-1 text-fg">{pathname}</code>
+            {SITE_FOOTER_COPYRIGHT || (
+              <>© {new Date().getFullYear()} · 静态部署</>
+            )}
           </span>
           <nav className="flex flex-wrap items-center gap-3">
-            <Link to="/about" className="hover:text-fg">关于</Link>
-            <Link to="/privacy" className="hover:text-fg">隐私</Link>
-            <Link to="/contact" className="hover:text-fg">联系</Link>
-            <span className="text-fg-subtle">
-              © {new Date().getFullYear()} · 静态部署
-            </span>
+            {SITE_FOOTER_LINKS.map((l) => (
+              <Link key={l.to} to={l.to} className="hover:text-fg">
+                {l.label}
+              </Link>
+            ))}
+            {SITE_SOCIAL.github ? (
+              <a
+                href={SITE_SOCIAL.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-fg"
+              >
+                GitHub
+              </a>
+            ) : null}
           </nav>
         </div>
         <Separator className="opacity-0" />

@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run vault:pull || npm run vault:offline && vite",
-    "build": "(npm run vault:pull || npm run vault:offline) && node scripts/copy-attachments.mjs && node scripts/generate-seo-files.mjs && tsc -b && vite build",
+    "dev": "npm run vault:pull || npm run vault:offline && npm run build:config && vite",
+    "build": "(npm run vault:pull || npm run vault:offline) && npm run build:config && node scripts/copy-attachments.mjs && node scripts/generate-seo-files.mjs && tsc -b && vite build",
+    "build:config": "node scripts/build-config.mjs",
     "vault:pull": "node scripts/setup-vault.mjs pull",
     "vault:clone": "node scripts/setup-vault.mjs clone",
     "vault:status": "node scripts/setup-vault.mjs status",
