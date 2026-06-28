@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
-import { Home, BookOpen, Tags, Network, FileText, Search, X } from 'lucide-react';
+import { Home, BookOpen, Tags, Network, FileText, Search, X, Layers } from 'lucide-react';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { CookieConsent, useConsent } from './CookieConsent';
 const NAV = [
   { to: '/', label: '首页', icon: Home, end: true },
   { to: '/blog', label: '文章', icon: BookOpen },
+  { to: '/topics', label: '主题', icon: Layers },
   { to: '/tags', label: '标签', icon: Tags },
   { to: '/graph', label: '关系图', icon: Network },
 ];
@@ -82,6 +83,10 @@ function RouteSeo() {
     '/blog': {
       title: '所有文章',
       description: '浏览所有 Obsidian 风格的博客文章',
+    },
+    '/topics': {
+      title: '主题簇',
+      description: '按 Obsidian 文件夹结构组织的主题门户:每个顶层目录是 Pillar,往下细分 Cluster',
     },
     '/tags': {
       title: '标签',

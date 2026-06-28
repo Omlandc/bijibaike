@@ -50,8 +50,12 @@ export function PostCard({ post, featured, className }: PostCardProps) {
           })}
         </span>
         {post.tags.slice(0, 3).map((t) => (
-          <Badge key={t} variant="secondary" className="rounded-full px-2 py-0 text-[10px]">
-            #{t}
+          <Badge
+            key={t}
+            variant="secondary"
+            className="rounded-full px-2 py-0 text-[10px] font-normal"
+          >
+            {t}
           </Badge>
         ))}
       </CardFooter>

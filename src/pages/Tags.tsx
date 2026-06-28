@@ -1,38 +1,49 @@
 import { Link, useParams } from 'react-router';
 import { getAllTags, getPostsByTag } from '@/lib/content';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Hash } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft, Tag as TagIcon } from 'lucide-react';
 
 export function TagsIndex() {
   const tags = getAllTags();
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight text-fg">标签</h1>
-        <p className="text-fg-muted">共 {tags.length} 个标签</p>
+      <header className="space-y-2">
+        <div className="flex items-center gap-2">
+          <TagIcon className="size-6 text-primary" />
+          <h1 className="text-3xl font-bold tracking-tight text-fg">标签</h1>
+        </div>
+        <p className="text-fg-muted">共 {tags.length} 个标签 · 按出现次数排序</p>
       </header>
-      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {tags.map((t) => (
-          <Link key={t.name} to={`/tags/${encodeURIComponent(t.name)}`}>
-            <Card className="transition-colors hover:border-primary/40">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center justify-between text-base">
-                  <span className="inline-flex items-center gap-1">
-                    <Hash className="size-3.5 text-primary" />
-                    {t.name}
-                  </span>
-                  <Badge variant="secondary">{t.count}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-xs text-fg-muted">
-                {t.count} 篇文章
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {tags.length === 0 ? (
+        <Card>
+          <CardContent className="p-12 text-center text-fg-muted">
+            还没有任何标签。在文章里写 <code className="rounded bg-bg-subtle px-1 text-fg">#tag</code> 就会自动出现。
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {tags.map((t, idx) => (
+            <div
+              key={t.name}
+              className="animate-in fade-in"
+              style={{ animationDelay: `${idx * 15}ms` }}
+            >
+              <Link
+                to={`/tags/${encodeURIComponent(t.name)}`}
+                className="group inline-flex items-center gap-2 rounded-full border border-border bg-bg-elevated px-3.5 py-1.5 text-sm transition-all hover:border-primary/50 hover:bg-primary/5 hover:shadow-soft"
+              >
+                <span className="font-medium text-fg group-hover:text-primary">
+                  {t.name}
+                </span>
+                <span className="rounded-full bg-bg-subtle px-2 py-0.5 text-xs text-fg-muted group-hover:bg-primary/10 group-hover:text-primary">
+                  {t.count}
+                </span>
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -50,7 +61,7 @@ export function TagDetail() {
             所有标签
           </Link>
         </Button>
-        <p className="text-fg-muted">没有标签为 #{decoded} 的文章。</p>
+        <p className="text-fg-muted">没有标签为 {decoded} 的文章。</p>
       </div>
     );
   }
@@ -62,9 +73,9 @@ export function TagDetail() {
           所有标签
         </Link>
       </Button>
-      <header>
+      <header className="space-y-1.5">
         <h1 className="inline-flex items-center gap-2 text-3xl font-bold tracking-tight text-fg">
-          <Hash className="size-6 text-primary" />
+          <TagIcon className="size-6 text-primary" />
           {decoded}
         </h1>
         <p className="text-fg-muted">共 {posts.length} 篇</p>
@@ -77,9 +88,7 @@ export function TagDetail() {
             className="rounded-2xl border border-border bg-bg-elevated p-4 transition-colors hover:border-primary/40"
           >
             <h2 className="font-semibold text-fg">{p.title}</h2>
-            <p className="mt-1 line-clamp-2 text-sm text-fg-muted">
-              {p.excerpt}
-            </p>
+            <p className="mt-1 line-clamp-2 text-sm text-fg-muted">{p.excerpt}</p>
             <div className="mt-2 text-xs text-fg-subtle">
               {new Date(p.date).toLocaleDateString('zh-CN')}
             </div>

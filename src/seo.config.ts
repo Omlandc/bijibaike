@@ -50,6 +50,7 @@ export const siteSEO = defineSEO({
     staticPaths: [
       { loc: '/', priority: 1.0, changefreq: 'daily' },
       { loc: '/#/blog', priority: 0.9, changefreq: 'daily' },
+      { loc: '/#/topics', priority: 0.85, changefreq: 'weekly' },
       { loc: '/#/tags', priority: 0.7, changefreq: 'weekly' },
       { loc: '/#/graph', priority: 0.5, changefreq: 'weekly' },
       // Required by Google AdSense for site-credibility review

@@ -91,11 +91,14 @@ export async function blogSitemapPaths(): Promise<SitemapEntry[]> {
   }
   const files = await listMdFiles(vaultDir);
   const entries: SitemapEntry[] = [];
+  const pillarSet = new Set<string>();
   for (const rel of files) {
     const fullPath = join(vaultDir, rel);
     const raw = await readFile(fullPath, 'utf-8');
     const { data } = matter(raw);
-    const slug = slugify(rel.split('/').pop() ?? rel);
+    // Use the full path-based slug (matches the in-app derivation).
+    const noExt = rel.replace(/\.md$/i, '');
+    const slug = slugify(noExt);
     let lastmod: string | undefined;
     if (data.date instanceof Date && !Number.isNaN(data.date.valueOf())) {
       lastmod = data.date.toISOString().slice(0, 10);
@@ -108,6 +111,17 @@ export async function blogSitemapPaths(): Promise<SitemapEntry[]> {
       changefreq: 'monthly',
       priority: 0.7,
       ...(lastmod ? { lastmod } : {}),
+    });
+    // Track pillar slugs so we can add /topics/<pillar> entries too.
+    const parts = rel.split('/');
+    if (parts.length >= 2) pillarSet.add(parts[0]!);
+  }
+  // Add one entry per Pillar so the topic pages show up in the sitemap.
+  for (const p of pillarSet) {
+    entries.push({
+      loc: `/#/topics/${encodeURIComponent(p)}`,
+      changefreq: 'weekly',
+      priority: 0.75,
     });
   }
   return entries;

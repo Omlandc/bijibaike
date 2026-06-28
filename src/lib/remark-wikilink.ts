@@ -100,9 +100,12 @@ function transformText(node: Text): PhrasingContent[] | null {
       }
     } else {
       // ── Note path ──
-      const basename = parsed.file.split('/').pop() ?? parsed.file;
-      const slug = slugify(basename);
-      const label = parsed.alias ?? basename;
+      // Use the full vault-relative path so two files in different
+      // folders with the same basename stay distinct in the link
+      // graph. The matching slug for `[[dir/basename]]` is built
+      // the same way in lib/content.ts.
+      const slug = slugify(parsed.file);
+      const label = parsed.alias ?? (parsed.file.split('/').pop() ?? parsed.file);
       const link: Link = {
         type: 'link',
         url: parsed.heading

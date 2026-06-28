@@ -233,8 +233,8 @@ export default function Home() {
 }
 
 function FeaturedCover({ post }: { post: ReturnType<typeof getAllPosts>[number] }) {
-  // Use a deterministic gradient based on slug hash, with a large
-  // initial letter (similar to editorial designs).
+  // Subtle, editorial-style fallback. Tinted with primary at low
+  // saturation so it works across all 4 themes without screaming.
   const hash = post.slug
     .split('')
     .reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) & 0xffff, 7);
@@ -254,7 +254,10 @@ function FeaturedCover({ post }: { post: ReturnType<typeof getAllPosts>[number] 
         cover
           ? undefined
           : {
-              background: `linear-gradient(135deg, hsl(${hueA} 70% 60%) 0%, hsl(${hueB} 70% 50%) 100%)`,
+              // Same hue family, low saturation, gentle dark wash on
+              // top so white type stays legible. Works in light +
+              // dark themes because the gradient uses theme vars.
+              background: `linear-gradient(135deg, hsl(${hueA} 35% 38%) 0%, hsl(${hueB} 45% 22%) 100%)`,
             }
       }
     >
@@ -267,9 +270,9 @@ function FeaturedCover({ post }: { post: ReturnType<typeof getAllPosts>[number] 
         />
       ) : (
         <>
-          <div className="absolute inset-0 bg-dot-grid opacity-30" />
+          <div className="absolute inset-0 bg-dot-grid opacity-25" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-7xl font-black text-white/90 drop-shadow-lg sm:text-8xl">
+            <span className="text-7xl font-black text-white/95 drop-shadow-lg sm:text-8xl">
               {initial}
             </span>
           </div>
@@ -301,7 +304,7 @@ function PostGridCard({
           cover
             ? undefined
             : {
-                background: `linear-gradient(135deg, hsl(${hueA} 70% 60%) 0%, hsl(${hueB} 70% 50%) 100%)`,
+                background: `linear-gradient(135deg, hsl(${hueA} 35% 38%) 0%, hsl(${hueB} 45% 22%) 100%)`,
               }
         }
       >
@@ -316,13 +319,13 @@ function PostGridCard({
           <>
             <div className="absolute inset-0 bg-dot-grid opacity-30" />
             <div className="absolute right-3 top-3 rounded-full border border-white/30 bg-black/20 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur">
-              #{post.tags[0] ?? '笔记'}
+              {post.tags[0] ?? '笔记'}
             </div>
           </>
         )}
         {cover && post.tags[0] ? (
           <div className="absolute right-3 top-3 rounded-full border border-white/30 bg-black/40 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur">
-            #{post.tags[0]}
+            {post.tags[0]}
           </div>
         ) : null}
       </div>

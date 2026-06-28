@@ -8,6 +8,8 @@ import Graph from '@/pages/Graph';
 import About from '@/pages/About';
 import Privacy from '@/pages/Privacy';
 import Contact from '@/pages/Contact';
+import Topics from '@/pages/Topics';
+import TopicDetail, { ClusterDetail } from '@/pages/TopicDetail';
 
 export default function App() {
   return (
@@ -18,6 +20,9 @@ export default function App() {
         <Route path="/blog/:slug" element={<Post />} />
         <Route path="/tags" element={<TagsIndex />} />
         <Route path="/tags/:tag" element={<TagDetail />} />
+        <Route path="/topics" element={<Topics />} />
+        <Route path="/topics/:slug" element={<TopicDetail />} />
+        <Route path="/topics/:slug/:clusterSlug" element={<ClusterDetail />} />
         <Route path="/graph" element={<Graph />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />

@@ -70,9 +70,9 @@ export default function Post() {
               <Link key={t} to={`/tags/${encodeURIComponent(t)}`}>
                 <Badge
                   variant="secondary"
-                  className="rounded-full hover:bg-primary/20"
+                  className="rounded-full font-normal hover:bg-primary/15 hover:text-primary"
                 >
-                  #{t}
+                  {t}
                 </Badge>
               </Link>
             ))}
