@@ -113,6 +113,8 @@ export const zh = {
   'cookie.essential': '仅必需',
   'cookie.acceptAll': '同意全部',
   'cookie.policy': '隐私政策',
+  'cookie.settingsButton': 'Cookie 偏好设置',
+  'cookie.settingsHint': '本站默认不显示 Cookie 横幅,新访问者视为「仅必需」。需要修改你的偏好(开启个性化广告等)可以点这个按钮重新选择。',
 
   // 404 / misc
   'notFound.title': '页面不存在',

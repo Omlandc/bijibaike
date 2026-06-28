@@ -114,6 +114,8 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'cookie.essential': 'Essential only',
   'cookie.acceptAll': 'Accept all',
   'cookie.policy': 'privacy policy',
+  'cookie.settingsButton': 'Cookie preferences',
+  'cookie.settingsHint': 'By default we do not show the cookie banner — new visitors are treated as "essential only". Click this button if you want to change your preference (e.g. enable personalized ads).',
 
   // 404 / misc
   'notFound.title': 'Page not found',

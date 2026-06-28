@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { cn } from '@/lib/utils';
-import { getPostBySlug } from '@/lib/content';
+import { resolvePostBySlug } from '@/lib/content';
 
 interface WikiLinkProps {
   target: string;
@@ -27,8 +27,14 @@ export function WikiLink({
   className,
   children,
 }: WikiLinkProps) {
-  const exists = Boolean(getPostBySlug(slug));
-  const href = `/blog/${slug}${heading ? `#${heading.toLowerCase().replace(/\s+/g, '-')}` : ''}`;
+  // resolvePostBySlug handles both the exact slug and a basename
+  // fallback (so `[[黄帝内经素问遗篇 1]]` from any folder still finds
+  // the post whose slug includes its pillar prefix).
+  const post = resolvePostBySlug(slug);
+  const exists = Boolean(post);
+  const targetSlug = post?.slug ?? slug;
+  // URL-encode the slug so non-ASCII characters survive HashRouter
+  const href = `/blog/${encodeURIComponent(targetSlug)}${heading ? `#${heading.toLowerCase().replace(/\s+/g, '-')}` : ''}`;
   const label = children ?? alias ?? target;
   if (!exists) {
     return (

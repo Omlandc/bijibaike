@@ -77,18 +77,44 @@ export function CookieConsent({ value: controlled, onChange }: CookieConsentProp
       window.removeEventListener('cookie-consent-change', handler as EventListener);
   }, []);
 
+  // Banner is hidden by default. It only opens when the user explicitly
+  // requests it (via the "Cookie settings" button in the privacy page or
+  // a footer link). New visitors are silently treated as `essential`
+  // — no tracking cookies, no banner, no nag.
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    function onOpen() { setOpen(true); }
+    window.addEventListener('cookie-consent-open', onOpen as EventListener);
+    return () =>
+      window.removeEventListener('cookie-consent-open', onOpen as EventListener);
+  }, []);
+
   const current = controlled !== undefined ? controlled : internal;
 
-  // Only show if consent is required + we haven't decided yet.
-  const showBanner = hydrated && current === null && siteAds.consent?.required;
+  // Show only when: required + user explicitly opened it + still undecided
+  const showBanner = siteAds.consent?.required && open && current === null && hydrated;
   if (!showBanner) return null;
 
   function decide(v: ConsentValue) {
     writeConsent(v);
     setInternal(v);
+    setOpen(false);
     onChange?.(v);
     window.dispatchEvent(new CustomEvent<ConsentValue>('cookie-consent-change', { detail: v }));
   }
+
+  function reset() {
+    // (currently unused — kept for future "reset consent" hook exposed
+    // to the privacy page). Clears the cookie + localStorage so the
+    // banner can re-appear next page.
+    try {
+      document.cookie = `${COOKIE_NAME}=; max-age=0; path=/`;
+      window.localStorage.removeItem(COOKIE_NAME);
+    } catch { /* ignore */ }
+    setInternal(null);
+    setOpen(true);
+  }
+  void reset;
 
   return (
     <div

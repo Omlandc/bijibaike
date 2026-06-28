@@ -1,4 +1,4 @@
-import { Shield, Database, ExternalLink, Mail, Cookie } from 'lucide-react';
+import { Shield, Database, ExternalLink, Mail, Cookie, Settings2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router';
@@ -7,6 +7,17 @@ import { useTranslation } from '@/i18n';
 
 export default function Privacy() {
   const { t } = useTranslation();
+
+  /**
+   * Reopen the cookie consent banner so the user can change their choice.
+   * Fires a CustomEvent picked up by <CookieConsent />.
+   */
+  function openCookieSettings() {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cookie-consent-open'));
+    }
+  }
+
   return (
     <div className="space-y-6">
       <header className="space-y-3">
@@ -105,6 +116,12 @@ export default function Privacy() {
             <li>· <strong className="text-fg">删除</strong>: 申请清除留下的记录</li>
             <li>· <strong className="text-fg">导出</strong>: 导出可识别信息副本</li>
           </ul>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={openCookieSettings}>
+              <Settings2 className="mr-1.5 size-3.5" />
+              Cookie 偏好设置
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

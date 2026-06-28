@@ -44,6 +44,12 @@ const creationTimes: Record<string, string> = (vaultMeta as { creationTimes?: Re
 export interface Post {
   /** URL slug derived from filename or frontmatter id */
   slug: string;
+  /**
+   * Slugified filename only (no folder prefix). e.g. for
+   * "中医/黄帝内经素问遗篇 1.md" the basename is "黄帝内经素问遗篇-1".
+   * Used to resolve `[[basename]]` wiki-links from any folder.
+   */
+  basename: string;
   /** Original filename relative to the vault root, e.g. "notes/hello.md" */
   sourcePath: string;
   /** Frontmatter */
@@ -212,8 +218,13 @@ function buildPost(sourcePath: string, raw: string): Post | null {
   // remark-wikilink from the same path-based logic.
   const noExt = sourcePath.replace(/\.md$/i, '').replace(/^\/+/, '');
   const slug = slugify(noExt);
+  // Basename slug = slugified filename only (no folder prefix). Stored
+  // alongside the full slug so wiki-links written as `[[basename]]`
+  // from any folder still resolve.
+  const basename = slugify(sourcePath.split('/').pop()?.replace(/\.md$/i, '') ?? noExt);
   return {
     slug,
+    basename,
     sourcePath,
     frontmatter: data,
     raw: content,
@@ -275,11 +286,18 @@ function buildIndex(posts: Post[]): ContentIndex {
   }
 
   const backlinks: Record<string, Backlink[]> = {};
+  // Build a basename → post map for resolving wiki-link targets
+  // that point at just the filename (no folder prefix). When two
+  // posts share a basename across pillars, the first one wins.
+  const byBasename = new Map<string, Post>();
+  for (const p of posts) {
+    if (p.basename && !byBasename.has(p.basename)) byBasename.set(p.basename, p);
+  }
   for (const p of posts) {
     for (const target of p.links) {
-      const targetPost = bySlug[target];
+      const targetPost = bySlug[target] ?? byBasename.get(target);
       if (!targetPost) continue;
-      (backlinks[target] ??= []).push({
+      (backlinks[targetPost.slug] ??= []).push({
         fromSlug: p.slug,
         fromTitle: p.title,
         context: p.excerpt,
@@ -377,12 +395,33 @@ function loadAll(): ContentIndex {
   const posts: Post[] = [];
   for (const [path, raw] of Object.entries(modules)) {
     if (typeof raw !== 'string') continue;
-    const post = buildPost(path.replace(/^\/vault\//, ''), raw);
+    const rel = path.replace(/^\/vault\//, '');
+    // Skip vault-level config / pillar-metadata files. These are
+    // scaffolding, not blog posts, so they must not show up in
+    // /blog, /tags, /topics, or any backlink graph.
+    if (isMetaFile(rel)) continue;
+    const post = buildPost(rel, raw);
     if (post) posts.push(post);
   }
   posts.sort((a, b) => b.date.localeCompare(a.date));
   _index = buildIndex(posts);
   return _index;
+}
+
+/**
+ * Filenames that are vault-level / folder-level metadata, not posts:
+ *  - `_config.md`       — the single source of truth for site config
+ *  - `pillar.md`        — optional pillar description/cover
+ *  - `_index.md`        — optional folder index (Obsidian convention)
+ * Match is on the basename only, case-insensitive.
+ */
+function isMetaFile(vaultRelPath: string): boolean {
+  const base = vaultRelPath.split('/').pop()?.toLowerCase() ?? '';
+  return (
+    base === '_config.md' ||
+    base === 'pillar.md' ||
+    base === '_index.md'
+  );
 }
 
 export function getAllPosts(): Post[] {
@@ -391,6 +430,42 @@ export function getAllPosts(): Post[] {
 
 export function getPostBySlug(slug: string): Post | undefined {
   return loadAll().bySlug[slug];
+}
+
+/**
+ * Resolve a wiki-link target to a post. Accepts either the full slug
+ * (with pillar prefix, e.g. "中医黄帝内经素问遗篇-1") or just the basename
+ * (e.g. "黄帝内经素问遗篇-1", as typed in `[[...]]` without the folder).
+ *
+ * Lookup order:
+ *   1. Exact match on slug (fast path)
+ *   2. Match by basename: any post whose slug ends with `-<target>` or
+ *      equals `<target>` (handles cross-pillar collisions by picking the
+ *      first match)
+ *
+ * Returns undefined when nothing matches.
+ */
+/**
+ * Resolve a wiki-link target to a post. Accepts either the full slug
+ * (with pillar prefix, e.g. "中医黄帝内经素问遗篇-1") or just the basename
+ * (e.g. "黄帝内经素问遗篇-1", as typed in `[[...]]` without the folder).
+ *
+ * Lookup order:
+ *   1. Exact match on slug (fast path)
+ *   2. Match against any post's basename
+ *
+ * Returns undefined when nothing matches.
+ */
+export function resolvePostBySlug(slug: string): Post | undefined {
+  const idx = loadAll();
+  const direct = idx.bySlug[slug];
+  if (direct) return direct;
+  // Build a one-shot basename lookup from the cached post list.
+  const byBase = new Map<string, Post>();
+  for (const p of idx.posts) {
+    if (p.basename && !byBase.has(p.basename)) byBase.set(p.basename, p);
+  }
+  return byBase.get(slug);
 }
 
 export function getPostsByTag(tag: string): Post[] {
