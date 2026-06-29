@@ -55,6 +55,28 @@ export const zh = {
   'blog.title': '所有文章',
   'blog.subtitle': '浏览所有 Obsidian 风格的博客文章',
   'blog.empty': 'vault 里还没有任何文章 —— 在 vault 里加一篇 .md 试试。',
+  'blog.noMatch': '当前筛选下没有文章，试试调整筛选条件或清除全部。',
+
+  // Filter bar
+  'filter.postsUnit': '篇',
+  'filter.clearAll': '清除全部',
+  'filter.activeLabel': '当前筛选:',
+  'filter.sortLabel': '排序',
+  'filter.sortNewest': '最新创建',
+  'filter.sortOldest': '最早创建',
+  'filter.sortUpdated': '最近修改',
+  'filter.sortMostLinked': '引用最多',
+  'filter.sortLongest': '最长阅读',
+  'filter.sortTitle': '标题 A-Z',
+  'filter.tagsLabel': '标签',
+  'filter.tagPlaceholder': '选择标签（多选 = 包含全部）',
+  'filter.yearLabel': '年份',
+  'filter.yearPlaceholder': '选择年份（多选 = 任一）',
+  'filter.themeLabel': '正文主题',
+  'filter.themePlaceholder': '选择主题（多选 = 任一）',
+  'filter.themeDefault': '(默认)',
+  'filter.pinnedOnly': '只看置顶',
+  'filter.pinnedOnlyHint': '只显示 frontmatter 标了 pinned: true 的文章',
 
   // Post
   'post.backToList': '返回列表',

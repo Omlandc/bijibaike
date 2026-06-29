@@ -8,6 +8,7 @@ import type { Components } from 'react-markdown';
 import type { Element } from 'hast';
 import { remarkWikiLink } from '@/lib/remark-wikilink';
 import { remarkCallout } from '@/lib/remark-callout';
+import { rehypeHttpsOnly } from '@/lib/rehype-https-only';
 import { WikiLink } from './WikiLink';
 import { Callout } from './Callout';
 import { Link } from 'react-router';
@@ -179,7 +180,7 @@ export function MarkdownView({ body, className }: MarkdownViewProps) {
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkDirective, remarkCallout, remarkWikiLink]}
-        rehypePlugins={[rehypeRaw, rehypeSlug, [rehypeSanitize, schema]]}
+        rehypePlugins={[rehypeRaw, rehypeSlug, [rehypeSanitize, schema], rehypeHttpsOnly]}
         urlTransform={safeUrlTransform}
         components={components}
       >

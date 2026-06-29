@@ -327,13 +327,14 @@ function resolveCover(fm: PostFrontmatter, content: string): string | undefined 
 
 /**
  * Normalize a cover image target into a URL.
- *   - absolute http(s)  → kept as-is
+ *   - absolute http(s)  → upgraded to https if http (avoids mixed content)
  *   - starts with /     → kept as-is (already a public URL)
  *   - attachment path   → rewritten to /<publicAttachmentsPath>/<file>
  *   - anything else     → left to the browser (rare; usually a relative path)
  */
 function normalizeCoverUrl(target: string): string {
-  if (/^https?:\/\//i.test(target)) return target;
+  if (/^http:\/\//i.test(target)) return 'https://' + target.slice('http://'.length);
+  if (/^https:\/\//i.test(target)) return target;
   if (target.startsWith('/')) return target;
   if (isAttachmentPath(target)) {
     const base = vaultPublicConfig.publicAttachmentsPath.replace(/\/+$/, '');
@@ -584,4 +585,51 @@ export function getContentStats() {
     links: idx.posts.reduce((acc, p) => acc + p.links.length, 0),
     pillars: idx.pillars.length,
   };
+}
+
+/**
+ * All distinct `contentTheme` values across the vault, with the
+ * number of posts that declare each. Undefined themes (posts
+ * without a `contentTheme` frontmatter field) are listed under
+ * the literal key "(default)".
+ */
+export function getAllThemes(): { name: string; count: number }[] {
+  const map = new Map<string, number>();
+  for (const p of loadAll().posts) {
+    const v = typeof p.frontmatter?.contentTheme === 'string' && p.frontmatter.contentTheme.trim()
+      ? p.frontmatter.contentTheme.trim()
+      : '(default)';
+    map.set(v, (map.get(v) ?? 0) + 1);
+  }
+  return [...map.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/**
+ * All distinct years (createdAt) the vault has posts for, with
+ * per-year post count. Sorted newest-first.
+ */
+export function getPostYears(): { year: string; count: number }[] {
+  const map = new Map<string, number>();
+  for (const p of loadAll().posts) {
+    const iso = p.createdAt;
+    const y = iso && iso !== new Date(0).toISOString() ? new Date(iso).getFullYear().toString() : 'unknown';
+    map.set(y, (map.get(y) ?? 0) + 1);
+  }
+  return [...map.entries()]
+    .map(([year, count]) => ({ year, count }))
+    .sort((a, b) => Number(b.year) - Number(a.year));
+}
+
+/**
+ * Compute the in-degree of each post (how many other posts link
+ * TO this one). Returns a map keyed by slug.
+ */
+export function getBacklinkCounts(): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [slug, bls] of Object.entries(loadAll().backlinks)) {
+    out[slug] = bls.length;
+  }
+  return out;
 }

@@ -56,6 +56,28 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'blog.title': 'All posts',
   'blog.subtitle': 'Browse every Obsidian-style post',
   'blog.empty': 'No posts yet — add a .md file in your vault.',
+  'blog.noMatch': 'No posts match the current filters. Try clearing or adjusting them.',
+
+  // Filter bar
+  'filter.postsUnit': 'posts',
+  'filter.clearAll': 'Clear all',
+  'filter.activeLabel': 'Active:',
+  'filter.sortLabel': 'Sort',
+  'filter.sortNewest': 'Newest first',
+  'filter.sortOldest': 'Oldest first',
+  'filter.sortUpdated': 'Recently updated',
+  'filter.sortMostLinked': 'Most linked',
+  'filter.sortLongest': 'Longest read',
+  'filter.sortTitle': 'Title A–Z',
+  'filter.tagsLabel': 'Tags',
+  'filter.tagPlaceholder': 'Pick tags (multi = AND)',
+  'filter.yearLabel': 'Year',
+  'filter.yearPlaceholder': 'Pick years (multi = OR)',
+  'filter.themeLabel': 'Body theme',
+  'filter.themePlaceholder': 'Pick themes (multi = OR)',
+  'filter.themeDefault': '(default)',
+  'filter.pinnedOnly': 'Pinned only',
+  'filter.pinnedOnlyHint': 'Only show posts with frontmatter `pinned: true`',
 
   // Post
   'post.backToList': 'Back to list',
