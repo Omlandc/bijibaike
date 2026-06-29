@@ -102,11 +102,6 @@ export const siteConfig: SiteConfig = {
       "label": "更新日志",
       "to": "/changelog",
       "icon": "History"
-    },
-    {
-      "label": "授权定价",
-      "to": "/pricing",
-      "icon": "Scale"
     }
   ],
   "footer": {
