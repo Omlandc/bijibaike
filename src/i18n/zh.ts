@@ -15,6 +15,7 @@ export const zh = {
   'nav.tags': '标签',
   'nav.graph': '关系图',
   'nav.resources': '资源',
+  'nav.changelog': '更新日志',
 
   // Site meta
   'site.search': '搜索',
@@ -90,6 +91,10 @@ export const zh = {
 
   // Graph
   'graph.title': '关系图',
+  'graph.tagFilter': '标签筛选',
+  'graph.tagFilterAll': '全部标签',
+  'graph.tagFilterClear': '清除标签筛选',
+  'graph.tagMatched': '匹配 {n} 个节点',
   'graph.subtitle': '文章之间的 wiki-link 关系可视化',
   'graph.search': '搜索节点...',
   'graph.fullscreen': '全屏',
@@ -133,6 +138,18 @@ export const zh = {
   'notFound.title': '页面不存在',
   'notFound.goHome': '回到首页',
   'loading': '加载中...',
+
+  // Changelog
+  'changelog.title': '更新日志',
+  'changelog.subtitle': '记录本站的每一次更新与改进',
+  'changelog.empty': '还没有更新记录。',
+  'changelog.back': '返回首页',
+  'changelog.viewAll': '看全部更新',
+  'changelog.latest': '最新',
+  'changelog.typeFeature': '新功能',
+  'changelog.typeFix': '修复',
+  'changelog.typeImprovement': '改进',
+  'changelog.typeBreaking': '重要变更',
 
   // Footer
   'footer.poweredBy': '由 blog-system 的设计语言 + Obsidian 兼容层驱动',

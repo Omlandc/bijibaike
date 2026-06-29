@@ -91,6 +91,11 @@
       "label": "资源",
       "to": "/resources",
       "icon": "BookOpen"
+    },
+    {
+      "label": "更新日志",
+      "to": "/changelog",
+      "icon": "History"
     }
   ],
   "footer": {
@@ -161,6 +166,108 @@
             "title": "ai-dev-framework",
             "url": "https://github.com/Omlandc/ai-dev-framework",
             "description": "webapp-building 模板仓库"
+          }
+        ]
+      }
+    ]
+  },
+  "changelog": {
+    "entries": [
+      {
+        "date": "2026-06-29",
+        "version": "v0.6.0",
+        "title": "Graph 加标签筛选 + 关系图按文件夹锁定 + 更新日志页",
+        "description": "Graph 现在可以按标签筛选节点或锁定到某个 Pillar/Cluster,并新增 /changelog 时间线页面。",
+        "type": "feature",
+        "items": [
+          {
+            "text": "Graph 页面新加标签筛选 chip 行，点击只显示该标签的节点，再次点击清除"
+          },
+          {
+            "text": "URL 加 ?scope= 参数支持按文件夹（单 Pillar / Cluster）锁定图谱"
+          },
+          {
+            "text": "Pillar 与 Cluster 页面加上『看这个主题的关系图』入口"
+          },
+          {
+            "text": "新增 /changelog 页面，按时间倒序显示每次更新（含版本号、类型、详细条目）"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-28",
+        "version": "v0.5.0",
+        "title": "14 种文章内容主题 + 移动端适配",
+        "description": "文章页主题从 4 个扩到 14 个,移动端导航换成抽屉菜单。",
+        "type": "feature",
+        "items": [
+          {
+            "text": "导入 14 个 content-themes (default / academic / cyberpunk / receipt / sunset / aurora / bauhaus / knowledge / luxury / morandi / brutalism / github / terminal / magazine)"
+          },
+          {
+            "text": "站点默认主题写在 _config.md，可被读者 localStorage 覆盖"
+          },
+          {
+            "text": "移动端 hamburger 抽屉菜单"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-28",
+        "version": "v0.4.0",
+        "title": "中英双语 + 浏览器自动识别",
+        "type": "feature",
+        "items": [
+          {
+            "text": "所有 UI 字符串中英双语化，缺失的 en key 自动回退到中文"
+          },
+          {
+            "text": "language detection 优先级：localStorage → navigator.language → _config.md 默认"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-27",
+        "version": "v0.3.0",
+        "title": "Pillar / Cluster 主题架构 + Git-aware 日期",
+        "type": "feature",
+        "items": [
+          {
+            "text": "Pillar / Cluster 两层模型，pillar.md 可写自定义描述/封面"
+          },
+          {
+            "text": "文章 createdAt 优先取 frontmatter → 文件名 → git 首次提交 → 1970"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-26",
+        "version": "v0.2.1",
+        "title": "D3 力导向关系图重写",
+        "type": "improvement",
+        "items": [
+          {
+            "text": "forceLink + forceManyBody + forceCenter + forceCollide 四力联动"
+          },
+          {
+            "text": "节点颜色按主标签 hash，大小按引用度平方根"
+          }
+        ]
+      },
+      {
+        "date": "2026-06-25",
+        "version": "v0.2.0",
+        "title": "AdSense 合规接入 + Cookie consent",
+        "type": "feature",
+        "items": [
+          {
+            "text": "seo-kit/ads 模块：defineAds、generateAdsTxt、generateAutoAdsScript"
+          },
+          {
+            "text": "Cookie 横幅默认关闭，Privacy 页面可重新打开"
+          },
+          {
+            "text": "/about / /privacy / /contact 三页齐了"
           }
         ]
       }

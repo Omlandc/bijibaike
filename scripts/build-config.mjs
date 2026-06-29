@@ -214,6 +214,9 @@ const siteConfig = {
   resources: {
     sections: Array.isArray(resources.sections) ? resources.sections : [],
   },
+  changelog: {
+    entries: Array.isArray(merged.changelog?.entries) ? merged.changelog.entries : [],
+  },
 };
 
 // 简短的字段警告
@@ -241,4 +244,4 @@ writeFileSync(OUT_TS, ts, 'utf-8');
 writeFileSync(OUT_JSON, JSON.stringify(siteConfig, null, 2), 'utf-8');
 
 console.log(`✓ build-config: wrote ${OUT_TS.replace(ROOT + '/', '')} + ${OUT_JSON.replace(ROOT + '/', '')}`);
-console.log(`  site.name=${siteConfig.site.name} | nav=${siteConfig.nav.length} | pillars=${siteConfig.pillars.length} | resources.sections=${siteConfig.resources.sections.length}`);
+console.log(`  site.name=${siteConfig.site.name} | nav=${siteConfig.nav.length} | pillars=${siteConfig.pillars.length} | resources.sections=${siteConfig.resources.sections.length} | changelog.entries=${siteConfig.changelog.entries.length}`);

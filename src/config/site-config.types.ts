@@ -97,6 +97,30 @@ export interface ResourcesSection {
   sections: ResourceSection[];
 }
 
+export interface ChangelogItem {
+  /** Bullet point under the entry's description. */
+  text: string;
+}
+
+export interface ChangelogEntry {
+  /** ISO date — display label as-is. */
+  date: string;
+  /** Release label, e.g. v1.2.0 (free-form, used as a chip). */
+  version: string;
+  /** Short title for the entry. */
+  title: string;
+  /** Short description under the title. */
+  description?: string;
+  /** Optional bullet list. */
+  items?: ChangelogItem[];
+  /** Optional changelog type: feature | fix | improvement | breaking. */
+  type?: 'feature' | 'fix' | 'improvement' | 'breaking';
+}
+
+export interface ChangelogSection {
+  entries: ChangelogEntry[];
+}
+
 export interface SiteConfig {
   site: SiteSection;
   seo: SeoSection;
@@ -106,4 +130,5 @@ export interface SiteConfig {
   footer: FooterSection;
   pillars: PillarSection[];
   resources: ResourcesSection;
+  changelog: ChangelogSection;
 }

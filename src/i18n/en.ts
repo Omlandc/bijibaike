@@ -16,6 +16,7 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'nav.tags': 'Tags',
   'nav.graph': 'Graph',
   'nav.resources': 'Resources',
+  'nav.changelog': 'Changelog',
 
   // Site meta
   'site.search': 'Search',
@@ -91,6 +92,10 @@ export const en: Partial<Record<TranslationKey, string>> = {
 
   // Graph
   'graph.title': 'Graph',
+  'graph.tagFilter': 'Tag filter',
+  'graph.tagFilterAll': 'All tags',
+  'graph.tagFilterClear': 'Clear tag filter',
+  'graph.tagMatched': 'matched {n} nodes',
   'graph.subtitle': 'Visualize wiki-link relationships between posts',
   'graph.search': 'Search nodes...',
   'graph.fullscreen': 'Fullscreen',
@@ -134,6 +139,18 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'notFound.title': 'Page not found',
   'notFound.goHome': 'Go home',
   'loading': 'Loading...',
+
+  // Changelog
+  'changelog.title': 'Changelog',
+  'changelog.subtitle': 'Every update and improvement to this site',
+  'changelog.empty': 'No updates yet.',
+  'changelog.back': 'Back to home',
+  'changelog.viewAll': 'View all updates',
+  'changelog.latest': 'Latest',
+  'changelog.typeFeature': 'New',
+  'changelog.typeFix': 'Fix',
+  'changelog.typeImprovement': 'Improvement',
+  'changelog.typeBreaking': 'Breaking',
 
   // Footer
   'footer.poweredBy': 'Built on blog-system design + an Obsidian-compatible layer',

@@ -2,93 +2,94 @@
 User-agent: *
 Disallow: /admin
 Disallow: /login
+Disallow: /api/
 Allow: /
 
-# AI training crawlers — explicitly allowed
-# Helps with citation in ChatGPT / Perplexity / Claude etc.
+# AI training crawlers — blocked
+# Add new ones via https://github.com/ai-robots-txt/ai.robots.txt
 User-agent: GPTBot
-Allow: /
-# owner: OpenAI
+Disallow: /
+# docs: https://platform.openai.com/docs/gptbot
 
 User-agent: ChatGPT-User
-Allow: /
+Disallow: /
 
 User-agent: OAI-SearchBot
-Allow: /
+Disallow: /
 
 User-agent: ClaudeBot
-Allow: /
+Disallow: /
 
 User-agent: Claude-Web
-Allow: /
+Disallow: /
 
 User-agent: anthropic-ai
-Allow: /
+Disallow: /
 
 User-agent: Claude-SearchBot
-Allow: /
+Disallow: /
 
 User-agent: PerplexityBot
-Allow: /
+Disallow: /
 
 User-agent: Perplexity-User
-Allow: /
+Disallow: /
 
 User-agent: Google-Extended
-Allow: /
+Disallow: /
 
 User-agent: CCBot
-Allow: /
+Disallow: /
 
 User-agent: Applebot-Extended
-Allow: /
+Disallow: /
 
 User-agent: Bytespider
-Allow: /
+Disallow: /
 
 User-agent: Meta-ExternalAgent
-Allow: /
+Disallow: /
 
 User-agent: Meta-ExternalFetcher
-Allow: /
+Disallow: /
 
 User-agent: DeepSeekBot
-Allow: /
+Disallow: /
 
 User-agent: Diffbot
-Allow: /
+Disallow: /
 
 User-agent: DuckAssistBot
-Allow: /
+Disallow: /
 
 User-agent: cohere-ai
-Allow: /
+Disallow: /
 
 User-agent: cohere-training-data-crawler
-Allow: /
+Disallow: /
 
 User-agent: YouBot
-Allow: /
+Disallow: /
 
 User-agent: ImgBot
-Allow: /
+Disallow: /
 
 User-agent: Kangaroo Bot
-Allow: /
+Disallow: /
 
 User-agent: Webzio
-Allow: /
+Disallow: /
 
 User-agent: Amazonbot
-Allow: /
+Disallow: /
 
 User-agent: SemrushBot-OCOB
-Allow: /
+Disallow: /
 
 User-agent: SemrushBot-SI
-Allow: /
+Disallow: /
 
 User-agent: TurnitinBot
-Allow: /
+Disallow: /
 
 Sitemap: https://obsidian-blog-webapp.example.com/sitemap.xml

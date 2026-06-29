@@ -10,6 +10,7 @@ import {
   Layers,
   FolderTree,
   Tag as TagIcon,
+  History,
   type LucideIcon,
 } from 'lucide-react';
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -36,6 +37,7 @@ const ICONS: Record<string, LucideIcon> = {
   FileText,
   Layers,
   FolderTree,
+  History,
 };
 
 /**
@@ -49,6 +51,7 @@ const NAV_LABEL_KEYS: Record<string, TranslationKey> = {
   '/tags': 'nav.tags',
   '/graph': 'nav.graph',
   '/resources': 'nav.resources',
+  '/changelog': 'nav.changelog',
 };
 
 // Build the nav array from siteConfig.nav, resolving each icon string

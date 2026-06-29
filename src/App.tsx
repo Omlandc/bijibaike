@@ -11,6 +11,7 @@ import Contact from '@/pages/Contact';
 import Topics from '@/pages/Topics';
 import TopicDetail, { ClusterDetail } from '@/pages/TopicDetail';
 import Resources from '@/pages/Resources';
+import Changelog from '@/pages/Changelog';
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/topics/:slug/*" element={<ClusterDetail />} />
         <Route path="/graph" element={<Graph />} />
         <Route path="/resources" element={<Resources />} />
+        <Route path="/changelog" element={<Changelog />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />

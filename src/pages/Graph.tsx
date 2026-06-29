@@ -63,6 +63,7 @@ export default function Graph() {
   const [searchParams, setSearchParams] = useSearchParams();
   // scope = "中医" (pillar) or "中医/黄帝内经" (cluster) or absent (global)
   const scope = searchParams.get('scope') ?? '';
+  const tagFilter = searchParams.get('tag') ?? '';
   const allPosts = getAllPosts();
   const allTags = getAllTags();
 
@@ -70,13 +71,19 @@ export default function Graph() {
   // "中医/黄帝内经/素问遗篇.md" — we match by prefix on the
   // directory portion.
   const posts = useMemo(() => {
-    if (!scope) return allPosts;
-    const prefix = scope + '/';
-    return allPosts.filter((p) => {
-      const dir = p.sourcePath.split('/').slice(0, -1).join('/');
-      return dir === scope || dir.startsWith(prefix);
-    });
-  }, [allPosts, scope]);
+    let arr = allPosts;
+    if (scope) {
+      const prefix = scope + '/';
+      arr = arr.filter((p) => {
+        const dir = p.sourcePath.split('/').slice(0, -1).join('/');
+        return dir === scope || dir.startsWith(prefix);
+      });
+    }
+    if (tagFilter) {
+      arr = arr.filter((p) => p.tags.includes(tagFilter));
+    }
+    return arr;
+  }, [allPosts, scope, tagFilter]);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -585,6 +592,7 @@ export default function Graph() {
           <p className="mt-1 text-xs text-fg-subtle">
             {stats.nodes} 节点 · {stats.edges} 条 wikilink 引用 · 节点大小 = 引用度 · 颜色 = 主标签
             {scope ? ` · ${t('graph.scopeBreadcrumb')} ${scope}` : ''}
+            {tagFilter ? ` · ${t('graph.tagFilter')} #${tagFilter}` : ''}
             {(data as { crossBoundary?: number }).crossBoundary
               ? ` · ${t('graph.crossBoundary', { n: (data as { crossBoundary: number }).crossBoundary })}`
               : ''}
@@ -592,19 +600,54 @@ export default function Graph() {
         </div>
         {allTags.length > 0 ? (
           <div className="flex max-w-md flex-wrap items-center gap-1.5">
-            {allTags.slice(0, 8).map((t) => (
-              <span
-                key={t.name}
-                className="inline-flex items-center gap-1 text-xs"
-                title={`${t.count} 篇`}
+            {allTags.slice(0, 10).map((t) => {
+              const active = tagFilter === t.name;
+              return (
+                <button
+                  key={t.name}
+                  type="button"
+                  onClick={() => {
+                    const next = new URLSearchParams(searchParams);
+                    if (active) next.delete('tag');
+                    else next.set('tag', t.name);
+                    setSearchParams(next);
+                  }}
+                  className={cn(
+                    'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition-colors',
+                    active
+                      ? 'border-primary bg-primary text-primary-fg'
+                      : 'border-border bg-bg-elevated/60 text-fg-muted hover:border-primary/50 hover:text-fg',
+                  )}
+                  title={`${t.count} 篇`}
+                  aria-pressed={active}
+                >
+                  <span
+                    className="size-2 rounded-full"
+                    style={{
+                      background: active ? 'currentColor' : colorForTag(t.name, t.name),
+                      opacity: active ? 0.7 : 1,
+                    }}
+                  />
+                  #{t.name}
+                  <span className="ml-0.5 text-[10px] opacity-70">{t.count}</span>
+                </button>
+              );
+            })}
+            {tagFilter ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const next = new URLSearchParams(searchParams);
+                  next.delete('tag');
+                  setSearchParams(next);
+                }}
+                className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-fg-muted hover:border-primary/50 hover:text-fg"
+                title={t('graph.tagFilterClear')}
               >
-                <span
-                  className="size-2.5 rounded-full"
-                  style={{ background: colorForTag(t.name, t.name) }}
-                />
-                <span className="text-fg-muted">#{t.name}</span>
-              </span>
-            ))}
+                <X className="size-3" />
+                {t('graph.tagFilterClear')}
+              </button>
+            ) : null}
           </div>
         ) : null}
         {scope ? (
