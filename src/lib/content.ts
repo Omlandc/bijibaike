@@ -40,6 +40,7 @@ import { vaultPublicConfig } from '@/vault.public';
 import vaultMeta from '../../.vault-meta.json';
 
 const creationTimes: Record<string, string> = (vaultMeta as { creationTimes?: Record<string, string> }).creationTimes ?? {};
+const modificationTimes: Record<string, string> = (vaultMeta as { modificationTimes?: Record<string, string> }).modificationTimes ?? {};
 
 export interface Post {
   /** URL slug derived from filename or frontmatter id */
@@ -75,6 +76,17 @@ export interface Post {
    *   3. undefined — caller falls back to a deterministic gradient
    */
   cover?: string;
+  /**
+   * ISO timestamp when the post was first committed to the vault.
+   * Falls back to `date` if no git history is available.
+   */
+  createdAt: string;
+  /**
+   * ISO timestamp of the most recent commit touching the file. Useful
+   * for showing "last updated" on the post page. Falls back to
+   * `createdAt` then `date` if no git history is available.
+   */
+  updatedAt: string;
 }
 
 export interface Backlink {
@@ -180,6 +192,61 @@ function deriveDate(fm: PostFrontmatter, sourcePath: string): string {
   return new Date(0).toISOString();
 }
 
+/**
+ * Created-at timestamp. Priority:
+ *   - frontmatter `created` (string or Date)
+ *   - frontmatter `date` (string or Date)
+ *   - git first-commit time
+ *   - filename YYYY-MM-DD prefix
+ *   - 1970 (final fallback)
+ */
+function deriveCreatedAt(fm: PostFrontmatter, sourcePath: string): string {
+  return (
+    readDateField(fm.created) ??
+    readDateField(fm.date) ??
+    lookupGitTime(creationTimes, sourcePath) ??
+    readDateField(filenameDate(sourcePath)) ??
+    new Date(0).toISOString()
+  );
+}
+
+/**
+ * Updated-at timestamp. Priority:
+ *   - frontmatter `updated` (string or Date)
+ *   - frontmatter `modified` (string or Date)
+ *   - git last-commit time
+ *   - fall back to createdAt
+ */
+function deriveUpdatedAt(fm: PostFrontmatter, sourcePath: string): string {
+  return (
+    readDateField(fm.updated) ??
+    readDateField(fm.modified) ??
+    lookupGitTime(modificationTimes, sourcePath) ??
+    deriveCreatedAt(fm, sourcePath)
+  );
+}
+
+function readDateField(v: unknown): string | null {
+  if (v instanceof Date && !Number.isNaN(v.valueOf())) return v.toISOString();
+  if (typeof v === 'string') {
+    const d = new Date(v);
+    if (!Number.isNaN(d.valueOf())) return d.toISOString();
+  }
+  return null;
+}
+
+function lookupGitTime(map: Record<string, string>, sourcePath: string): string | null {
+  const raw = map[sourcePath] || map[sourcePath.replace(/^\//, '')];
+  if (!raw) return null;
+  const d = new Date(raw);
+  return Number.isNaN(d.valueOf()) ? null : d.toISOString();
+}
+
+function filenameDate(sourcePath: string): string | null {
+  const m = sourcePath.match(/(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+
 function makeExcerpt(body: string, max = 180): string {
   // strip headings, blockquotes, code fences, links
   const cleaned = body
@@ -235,6 +302,8 @@ function buildPost(sourcePath: string, raw: string): Post | null {
     date: deriveDate(data, sourcePath),
     title: deriveTitle(data, sourcePath),
     cover: resolveCover(data, content),
+    createdAt: deriveCreatedAt(data, sourcePath),
+    updatedAt: deriveUpdatedAt(data, sourcePath),
   };
 }
 

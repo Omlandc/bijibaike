@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { MarkdownView } from '@/components/MarkdownView';
 import { ReadingProgress } from '@/components/ReadingProgress';
 import { TableOfContents } from '@/components/TableOfContents';
+import { PostProperties } from '@/components/PostProperties';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -32,16 +33,43 @@ export default function Post() {
   const slug = slugSplat ? decodeURIComponent(slugSplat) : null;
   const post = slug ? getPostBySlug(slug) : undefined;
   const { t } = useTranslation();
-  // Active article-content theme for this post. localStorage override
-  // beats the site default so readers can pick their preferred style.
+  // Active article-content theme for this post. Resolution order:
+  //   1. Reader's localStorage override (they personally picked it)
+  //   2. Frontmatter `contentTheme` field on THIS post (author's choice)
+  //   3. Site-wide default in vault/_config.md
+  //   4. "default" fallback
   const [articleTheme, setArticleTheme] = useState<string>(
-    () => getStoredArticleTheme() ?? siteConfig.site.contentTheme ?? 'default',
+    () =>
+      getStoredArticleTheme() ??
+      (typeof post?.frontmatter?.contentTheme === 'string'
+        ? (post.frontmatter.contentTheme as string)
+        : null) ??
+      siteConfig.site.contentTheme ??
+      'default',
   );
 
   // Apply the active theme's CSS variables to <html> when it changes.
   useEffect(() => {
     applyContentTheme(articleTheme);
   }, [articleTheme]);
+
+  // When the slug changes (reader navigates between posts), the
+  // frontmatter contentTheme may be different. Refresh the local
+  // state unless the reader has explicitly chosen a theme during
+  // this session (localStorage already accounts for that case).
+  useEffect(() => {
+    if (!post) return;
+    const stored = getStoredArticleTheme();
+    if (stored) {
+      setArticleTheme(stored);
+      return;
+    }
+    const fm = post.frontmatter?.contentTheme;
+    if (typeof fm === 'string') {
+      setArticleTheme(fm);
+    }
+    // else: keep the current articleTheme (site default or previous)
+  }, [post?.slug]);
 
   function pickTheme(slug: string) {
     setArticleTheme(slug);
@@ -135,6 +163,12 @@ export default function Post() {
       <Separator />
 
       <MarkdownView body={post.body} />
+
+      {/* Post properties panel — mirrors Obsidian's "Properties" view
+          and exposes the full frontmatter so readers can see the
+          metadata behind a post (created / updated / theme / tags /
+          custom fields). */}
+      <PostProperties post={post} themes={CONTENT_THEMES} />
 
       <Separator />
 

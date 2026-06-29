@@ -113,6 +113,20 @@ export default function Graph() {
   const [stats, setStats] = useState({ nodes: 0, edges: 0, total: posts.length });
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // We deliberately don't call the browser's fullscreen API — see
+  // toggleFullscreen below. ESC inside a real fullscreen subtree
+  // would force-quit it without us being able to react in time, and
+  // the toolbar would be left stranded. Custom CSS fullscreen
+  // sidesteps both problems.
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullscreen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isFullscreen]);
+
   // Build the graph data from posts.
   const data = useMemo(() => {
     // When scope is set, only keep nodes/edges that stay INSIDE the
@@ -501,7 +515,7 @@ export default function Graph() {
       simRef.current = null;
       if (cleanup) cleanup();
     };
-  }, [data, showOrphans]);
+  }, [data, showOrphans, isFullscreen]);
 
   // Live search: focus a node + its neighbors
   useEffect(() => {
@@ -557,14 +571,13 @@ export default function Graph() {
   };
 
   const toggleFullscreen = () => {
-    if (!containerRef.current) return;
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    } else {
-      containerRef.current.requestFullscreen?.();
-      setIsFullscreen(true);
-    }
+    // Custom in-page fullscreen via CSS — we used to call the
+    // browser's requestFullscreen() on the SVG container, but the
+    // toolbar (a sibling of CardContent) was always left outside the
+    // fullscreen subtree, which made the Exit button unreachable.
+    // Fixed-position the whole Card instead so toolbar + svg are
+    // stacked in the same box, both clickable.
+    setIsFullscreen((v) => !v);
   };
 
   return (
@@ -666,8 +679,19 @@ export default function Graph() {
         ) : null}
       </header>
 
-      <Card className="overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-border bg-bg-elevated/50 px-3 py-2">
+      <Card
+        className={cn(
+          'overflow-hidden transition-all',
+          // Custom CSS fullscreen — push the WHOLE card to the
+          // viewport and let the toolbar + svg live in the same
+          // box. We don't use the browser fullscreen API; see
+          // toggleFullscreen for why. z-[60] beats the sticky
+          // SiteLayout header (z-30) even when an ancestor creates
+          // a stacking context that constrains the position.
+          isFullscreen && 'fixed inset-0 z-[60] !mt-0 h-screen rounded-none border-0',
+        )}
+      >
+        <div className="relative z-10 flex items-center gap-2 border-b border-border bg-bg-elevated/50 px-3 py-2">
           {/* Scope picker — shows all pillar/cluster paths in the vault.
               Picking one filters the graph to that folder. */}
           {availableScopes.length > 0 ? (
@@ -751,10 +775,7 @@ export default function Graph() {
 
         <CardContent
           ref={containerRef}
-          className={cn(
-            'graph-container relative h-[70vh] min-h-[420px] overflow-hidden p-0 text-fg-muted sm:h-[640px]',
-            isFullscreen && 'fixed inset-0 z-50 h-screen rounded-none border-0',
-          )}
+          className="graph-container relative h-[70vh] min-h-[420px] overflow-hidden p-0 text-fg-muted sm:h-[640px]"
         >
           <svg ref={svgRef} className="graph-svg absolute inset-0 h-full w-full" />
 

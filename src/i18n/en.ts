@@ -71,6 +71,19 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'contentTheme.pickerLabel': 'Reading theme',
   'contentTheme.toggleHint': 'Theme only affects your device; nothing is saved on the server',
 
+  // Post properties panel
+  'properties.title': 'Properties',
+  'properties.created': 'Created',
+  'properties.updated': 'Updated',
+  'properties.author': 'Author',
+  'properties.cover': 'Cover',
+  'properties.theme': 'Body theme',
+  'properties.themeHint': 'Read from frontmatter contentTheme; you can override it with the picker below',
+  'properties.tags': 'Tags',
+  'properties.custom': 'Custom',
+  'properties.pinned': 'Pinned',
+  'properties.draft': 'Draft',
+
   // Topics
   'topics.title': 'Topics',
   'topics.subtitle': 'An Obsidian-folder-shaped portal: each top-level directory is a {pillar}, broken down into {cluster}s.',

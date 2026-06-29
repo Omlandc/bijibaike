@@ -70,6 +70,19 @@ export const zh = {
   'contentTheme.pickerLabel': '正文排版主题',
   'contentTheme.toggleHint': '主题只影响你这台设备的阅读效果,不会保存到服务器',
 
+  // Post properties panel
+  'properties.title': '文章属性',
+  'properties.created': '创建时间',
+  'properties.updated': '最后修改',
+  'properties.author': '作者',
+  'properties.cover': '封面图',
+  'properties.theme': '正文主题',
+  'properties.themeHint': '从 frontmatter contentTheme 读取,你可以点下方主题切换器覆盖',
+  'properties.tags': '标签',
+  'properties.custom': '自定义属性',
+  'properties.pinned': '已置顶',
+  'properties.draft': '草稿',
+
   // Topics
   'topics.title': '主题簇',
   'topics.subtitle': '按 Obsidian 文件夹结构组织的{concepts}主题门户。',

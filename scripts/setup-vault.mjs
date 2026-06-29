@@ -229,15 +229,78 @@ async function extractCreationTimes({ localPath, branch }) {
   return map;
 }
 
-function writeMeta({ metaPath, creationTimes, posts, pillars }) {
+/**
+ * Extract the LAST commit date (modification timestamp) for every
+ * current .md file in the vault. Walks `git log` newest-first and
+ * records the first (most recent) date seen for each path that
+ * still exists in the working tree.
+ */
+async function extractModificationTimes({ localPath, branch }) {
+  if (!isGitRepo(localPath)) return {};
+  try {
+    await run('git', [
+      '-C', localPath,
+      'fetch', '--depth=1000', 'origin', branch,
+    ], { stdio: ['ignore', 'pipe', 'pipe'] });
+  } catch {
+    /* ignore — use what we have */
+  }
+  // List current files (working tree) so we only track things that
+  // still exist. Renames / deletes shouldn't show up here.
+  let currentFiles = [];
+  try {
+    const out = await runCapture('git', [
+      '-C', localPath,
+      '-c', 'core.quotePath=false',
+      'ls-files',
+      '--others', '--exclude-standard',
+    ]);
+    void out;
+    // combine tracked + untracked-but-committed via `ls-files`
+    const tracked = await runCapture('git', [
+      '-C', localPath,
+      '-c', 'core.quotePath=false',
+      'ls-files',
+    ]);
+    currentFiles = tracked.split('\n').map((s) => s.trim()).filter(Boolean);
+  } catch {
+    return {};
+  }
+  const set = new Set(currentFiles);
+  const out = await runCapture('git', [
+    '-C', localPath,
+    '-c', 'core.quotePath=false',
+    'log',
+    '--format=%aI',
+    '--name-only',
+    '--',
+  ]);
+  const lines = out.split('\n');
+  const map = {};
+  let pendingDate = null;
+  const ISO_DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (ISO_DATE.test(trimmed)) {
+      pendingDate = trimmed;
+    } else if (pendingDate && trimmed.endsWith('.md') && set.has(trimmed)) {
+      if (!map[trimmed]) map[trimmed] = pendingDate;
+    }
+  }
+  return map;
+}
+
+function writeMeta({ metaPath, creationTimes, modificationTimes, posts, pillars }) {
   const data = {
     generatedAt: new Date().toISOString(),
     creationTimes,
+    modificationTimes,
     // Pillars: list of {slug, name, posts, clusters: []}
     pillars,
   };
   writeFileSync(metaPath, JSON.stringify(data, null, 2), 'utf-8');
-  console.log(`[vault] wrote ${Object.keys(creationTimes).length} creation times → ${metaPath}`);
+  console.log(`[vault] wrote ${Object.keys(creationTimes).length} creation + ${Object.keys(modificationTimes).length} modification times → ${metaPath}`);
 }
 
 /**
@@ -338,13 +401,14 @@ async function main() {
     process.exit(1);
   }
 
-  // Extract creation times + topic structure from the vault.
+  // Extract creation + modification times + topic structure from the vault.
   const creationTimes = await extractCreationTimes(cfg);
+  const modificationTimes = await extractModificationTimes(cfg);
   const { pillars, clusters } = scanTopics(cfg.localPath);
   console.log(`[vault] topics: ${pillars.length} pillars, ${clusters.length} clusters`);
 
   const metaPath = resolve(root, '.vault-meta.json');
-  writeMeta({ metaPath, creationTimes, pillars, clusters });
+  writeMeta({ metaPath, creationTimes, modificationTimes, pillars, clusters });
 
   // Post-fetch: report what we ended up with.
   const files = existsSync(cfg.localPath)
