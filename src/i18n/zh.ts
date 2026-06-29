@@ -16,6 +16,7 @@ export const zh = {
   'nav.graph': '关系图',
   'nav.resources': '资源',
   'nav.changelog': '更新日志',
+  'nav.pricing': '授权定价',
 
   // Site meta
   'site.search': '搜索',
@@ -163,6 +164,10 @@ export const zh = {
   'changelog.typeFix': '修复',
   'changelog.typeImprovement': '改进',
   'changelog.typeBreaking': '重要变更',
+
+  // Pricing
+  'pricing.title': '商业授权',
+  'pricing.subtitle': '个人、学习、贡献完全免费。商业使用三档可选,谈得来最重要。',
 
   // Footer
   'footer.poweredBy': '由 blog-system 的设计语言 + Obsidian 兼容层驱动',

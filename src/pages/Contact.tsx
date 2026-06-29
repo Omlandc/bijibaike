@@ -112,6 +112,9 @@ export default function Contact() {
               我们会在 7 个工作日内处理。
             </li>
             <li>· 不接受商业推广 / SEO 外包 / 链接买卖类来信,会直接忽略。</li>
+            <li>· <strong>商业授权咨询</strong>(付费部署 / SaaS / 公司项目):
+              主题写「[LICENSE] 你的项目名」,发到上面邮箱,描述用途与预期规模即可。
+              看 <Link to="/pricing" className="text-primary hover:underline">定价页</Link> 先。</li>
           </ul>
         </CardContent>
       </Card>

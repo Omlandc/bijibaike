@@ -139,6 +139,10 @@ export default function About() {
         ·{' '}
         <Link to="/contact" className="text-fg-muted hover:text-fg">
           联系
+        </Link>{' '}
+        ·{' '}
+        <Link to="/pricing" className="text-fg-muted hover:text-fg">
+          商业授权
         </Link>
       </p>
     </div>

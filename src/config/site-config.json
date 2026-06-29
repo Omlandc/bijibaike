@@ -96,22 +96,31 @@
       "label": "更新日志",
       "to": "/changelog",
       "icon": "History"
+    },
+    {
+      "label": "授权定价",
+      "to": "/pricing",
+      "icon": "Scale"
     }
   ],
   "footer": {
-    "copyright": "© Omlandc · Obsidian-compatible blog",
+    "copyright": "© 2026 Omlandc · 本网站源码遵循源可用许可,商业使用需授权",
     "links": [
       {
         "label": "关于",
         "to": "/about"
       },
       {
-        "label": "隐私",
-        "to": "/privacy"
-      },
-      {
         "label": "联系",
         "to": "/contact"
+      },
+      {
+        "label": "授权定价",
+        "to": "/pricing"
+      },
+      {
+        "label": "隐私",
+        "to": "/privacy"
       }
     ]
   },

@@ -12,6 +12,7 @@ import Topics from '@/pages/Topics';
 import TopicDetail, { ClusterDetail } from '@/pages/TopicDetail';
 import Resources from '@/pages/Resources';
 import Changelog from '@/pages/Changelog';
+import Pricing from '@/pages/Pricing';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/graph" element={<Graph />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/changelog" element={<Changelog />} />
+        <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />

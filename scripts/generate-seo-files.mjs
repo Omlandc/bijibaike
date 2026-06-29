@@ -71,6 +71,7 @@ function buildSiteSEO(cfg) {
         { loc: '/graph', priority: 0.6, changefreq: 'monthly' },
         { loc: '/resources', priority: 0.6, changefreq: 'monthly' },
         { loc: '/changelog', priority: 0.5, changefreq: 'weekly' },
+        { loc: '/pricing', priority: 0.7, changefreq: 'monthly' },
         { loc: '/about', priority: 0.5, changefreq: 'monthly' },
         { loc: '/privacy', priority: 0.3, changefreq: 'yearly' },
         { loc: '/contact', priority: 0.5, changefreq: 'yearly' },

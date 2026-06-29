@@ -1,0 +1,157 @@
+Omlandc Obsidian Blog — Source-Available, Commercial License Required
+
+Copyright (c) 2026 Omlandc. All rights reserved.
+
+This software and associated documentation files (the "Software") are
+source-available but **not** open-source. The Software is made available
+under the terms of this License. By accessing, copying, or otherwise
+using the Software, you agree to be bound by the terms below.
+
+----------------------------------------------------------------------------
+1. PERMITTED USES (no license fee required)
+----------------------------------------------------------------------------
+
+You may use, copy, modify, and distribute the Software **free of charge**
+for any of the following purposes:
+
+  a) Personal use — running the Software on your own infrastructure for
+     your own personal site, blog, or notes system.
+  b) Educational use — using the Software in classroom settings, for
+     teaching, learning, or academic research.
+  c) Non-commercial evaluation — testing the Software, evaluating it
+     for a future commercial engagement, or contributing to the
+     project without compensation.
+  d) Open-source contribution — submitting patches, documentation, or
+     bug reports back to the project. Contributors retain copyright
+     on their own contributions but grant the project a perpetual
+     license to use them.
+
+You may **not** use the Software for any commercial purpose without
+first obtaining a commercial license from the copyright holder. See
+section 2 for the definition of "commercial purpose" and section 3 for
+how to obtain a license.
+
+----------------------------------------------------------------------------
+2. COMMERCIAL USE (license fee required)
+----------------------------------------------------------------------------
+
+A "Commercial Purpose" is any use of the Software that is primarily
+intended for or directed toward commercial advantage or monetary
+compensation. This includes, without limitation:
+
+  a) Running the Software on a website or service operated by a
+     business, corporation, partnership, sole proprietorship, or any
+     other commercial entity, regardless of whether the site itself
+     is monetized.
+  b) Deploying the Software as part of a SaaS product, hosted
+     service, or paid offering, even if the Software itself is only
+     a component of that offering.
+  c) Using the Software to produce content or output that is sold,
+     licensed, or otherwise monetized.
+  d) Using the Software in any internal business operation, including
+     intranets, internal tools, and employee-facing applications.
+  e) Bundling the Software with another product (commercial or
+     non-commercial) for distribution.
+  f) Providing consulting, implementation, customization, or training
+     services that involve the Software for compensation.
+
+The following are **not** Commercial Purposes and do **not** require a
+license:
+
+  - Running a personal blog with no commercial activity (no ads, no
+    affiliate links, no product sales, no sponsored content).
+  - Running a blog with non-intrusive ads (e.g. a small ad network
+    like Google AdSense) **as long as the blog has fewer than 10,000
+    monthly unique visitors and the ads are not the primary
+    monetization mechanism**. Beyond that threshold, treat as
+    Commercial Purpose.
+  - Running a non-profit organization's site with no paid offerings.
+
+If you are unsure whether your use case requires a commercial license,
+contact the copyright holder before deploying.
+
+----------------------------------------------------------------------------
+3. OBTAINING A COMMERCIAL LICENSE
+----------------------------------------------------------------------------
+
+Commercial licenses are sold on a per-deployment basis. The current
+pricing tiers and feature comparison are published at:
+
+    https://rk466g8vxdqc.space.minimaxi.com/#/pricing
+
+(or the equivalent page on the copyright holder's site)
+
+To request a license, contact:
+
+    omlandc [at] example [dot] com
+
+Include:
+  - Your organization / project name
+  - Brief description of intended use
+  - Expected traffic / scale
+  - Whether you need a multi-seat / team license
+
+License keys (when applicable) are issued at the copyright holder's
+discretion and are bound to the deployment domain.
+
+----------------------------------------------------------------------------
+4. REDISTRIBUTION
+----------------------------------------------------------------------------
+
+You may redistribute the Software verbatim, including this LICENSE
+file, provided that:
+
+  a) You do not modify or remove this LICENSE file.
+  b) You do not charge a fee for the Software itself (you may charge
+     for hosting, support, customization, or training that involves
+     the Software, but not for the source code).
+  c) You clearly mark any modifications you make.
+  d) The recipient agrees to be bound by the terms of this License.
+
+You may **not** redistribute the Software under a different license,
+nor sublicense it under terms more permissive than this License.
+
+----------------------------------------------------------------------------
+5. NO WARRANTY
+----------------------------------------------------------------------------
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR
+ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+----------------------------------------------------------------------------
+6. TERMINATION
+----------------------------------------------------------------------------
+
+This License is effective until terminated. Your rights under this
+License terminate automatically if you breach any of its terms. Upon
+termination you must cease all use of the Software and destroy any
+copies in your possession.
+
+For the avoidance of doubt: terminating a personal-use license does
+not affect any separately-purchased commercial license, and vice
+versa.
+
+----------------------------------------------------------------------------
+7. GOVERNING LAW
+----------------------------------------------------------------------------
+
+This License is governed by the laws of the jurisdiction in which the
+copyright holder resides, without regard to its conflict-of-laws
+provisions.
+
+----------------------------------------------------------------------------
+8. CONTACT
+----------------------------------------------------------------------------
+
+Questions about this License, commercial licensing, or anything else:
+
+    Repository: https://github.com/Omlandc/obsidian-blog-webapp
+    Issues:     https://github.com/Omlandc/obsidian-blog-webapp/issues
+    Author:     Omlandc (https://github.com/Omlandc)
+
+Last updated: 2026-06-29

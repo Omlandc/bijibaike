@@ -17,6 +17,7 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'nav.graph': 'Graph',
   'nav.resources': 'Resources',
   'nav.changelog': 'Changelog',
+  'nav.pricing': 'Pricing',
 
   // Site meta
   'site.search': 'Search',
@@ -164,6 +165,10 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'changelog.typeFix': 'Fix',
   'changelog.typeImprovement': 'Improvement',
   'changelog.typeBreaking': 'Breaking',
+
+  // Pricing
+  'pricing.title': 'Commercial license',
+  'pricing.subtitle': 'Personal, educational, and contributor use is free. Three paid tiers for commercial use — we just want to make it work for you.',
 
   // Footer
   'footer.poweredBy': 'Built on blog-system design + an Obsidian-compatible layer',

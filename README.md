@@ -1,5 +1,10 @@
 # Obsidian Blog
 
+> **License notice**: This is source-available software. Personal /
+> educational / non-commercial use is free. **Commercial use requires a
+> paid license** — see [LICENSE](./LICENSE) and the
+> [pricing page](https://rk466g8vxdqc.space.minimaxi.com/#/pricing).
+
 A static React blog that reads your **Obsidian vault** directly. Built on top
 of the [`webapp-building`](https://github.com/Omlandc/ai-dev-framework)
 `0-origin` template, with an added markdown-processing layer that handles
@@ -253,4 +258,12 @@ npm run build
 
 ## 📜 License
 
-MIT — use freely.
+**Source-available, not open-source.** Copyright (c) 2026 Omlandc.
+
+| 用法 | 是否需要付费 |
+|---|---|
+| 个人博客 / 笔记系统 / 学习 / 改自己用 | ✅ 免费 |
+| 贡献代码 / 文档 / 提 issue | ✅ 免费 |
+| 商业项目 / 付费产品 / SaaS / 公司内部 / 超过 10k 月活的广告 blog | 💬 需购买商业授权 |
+
+完整文本见 [LICENSE](./LICENSE) 文件。要做商业部署?看 [定价页](https://rk466g8vxdqc.space.minimaxi.com/#/pricing) 或邮件 omlandc [at] example.com。
