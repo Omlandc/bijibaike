@@ -99,6 +99,12 @@ export const zh = {
   'graph.showOrphans': '显示孤立节点',
   'graph.empty': 'vault 里的文章还没有任何 wiki-link,添加 [[双链]] 试试。',
   'graph.openPost': '打开文章 (双击节点)',
+  'graph.scopeAll': '全 vault',
+  'graph.scopeLabel': '按文件夹锁定',
+  'graph.scopeBreadcrumb': '作用域:',
+  'graph.scopeClear': '全部主题',
+  'graph.scopeBackHint': '返回全局图(清除作用域过滤)',
+  'graph.crossBoundary': '隐藏 {n} 条跨域引用',
 
   // Resources
   'resources.title': '资源',

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams, Link } from 'react-router';
 import * as d3 from 'd3';
-import { Network, Search, X, Eye, EyeOff, RotateCcw, Maximize2 } from 'lucide-react';
+import { Network, Search, X, Eye, EyeOff, RotateCcw, Maximize2, FolderTree, ArrowLeft } from 'lucide-react';
 import { getAllPosts, getAllTags } from '@/lib/content';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,9 +60,44 @@ function colorForTag(tag: string | undefined, title: string): string {
 
 export default function Graph() {
   const { t } = useTranslation();
-  const posts = getAllPosts();
+  const [searchParams, setSearchParams] = useSearchParams();
+  // scope = "中医" (pillar) or "中医/黄帝内经" (cluster) or absent (global)
+  const scope = searchParams.get('scope') ?? '';
+  const allPosts = getAllPosts();
   const allTags = getAllTags();
+
+  // Filter posts by scope. A post `sourcePath` looks like
+  // "中医/黄帝内经/素问遗篇.md" — we match by prefix on the
+  // directory portion.
+  const posts = useMemo(() => {
+    if (!scope) return allPosts;
+    const prefix = scope + '/';
+    return allPosts.filter((p) => {
+      const dir = p.sourcePath.split('/').slice(0, -1).join('/');
+      return dir === scope || dir.startsWith(prefix);
+    });
+  }, [allPosts, scope]);
+
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Build a list of every pillar + cluster path in the vault, with
+  // post counts, so the scope picker can offer them.
+  const { availableScopes, scopeCounts } = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of allPosts) {
+      const dir = p.sourcePath.split('/').slice(0, -1).join('/');
+      // count the post against the pillar (1st segment) and every
+      // ancestor cluster path
+      if (!dir) continue;
+      const segments = dir.split('/');
+      for (let i = 1; i <= segments.length; i++) {
+        const key = segments.slice(0, i).join('/');
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    }
+    const list = [...counts.keys()].sort();
+    return { availableScopes: list, scopeCounts: counts };
+  }, [allPosts]);
   const svgRef = useRef<SVGSVGElement>(null);
   const simRef = useRef<d3.Simulation<SimNode, SimEdge> | null>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
@@ -72,7 +108,11 @@ export default function Graph() {
 
   // Build the graph data from posts.
   const data = useMemo(() => {
-    const validSlugs = new Set(posts.map((p) => p.slug));
+    // When scope is set, only keep nodes/edges that stay INSIDE the
+    // scope. Edges crossing the boundary are dropped (with a count
+    // surfaced in the header so users know what's hidden).
+    const validSlugs = new Set(allPosts.map((p) => p.slug));
+    const inScopeSlugs = new Set(posts.map((p) => p.slug));
     const nodes: SimNode[] = posts.map((p) => {
       const tag = p.tags[0];
       return {
@@ -85,9 +125,15 @@ export default function Graph() {
     });
     const seen = new Set<string>();
     const edges: SimEdge[] = [];
+    let crossBoundary = 0;
     for (const p of posts) {
       for (const target of p.links) {
         if (!validSlugs.has(target) || target === p.slug) continue;
+        if (scope && !inScopeSlugs.has(target)) {
+          // Out-of-scope target. Record but don't draw.
+          crossBoundary++;
+          continue;
+        }
         const key = [p.slug, target].sort().join('::');
         if (seen.has(key)) continue;
         seen.add(key);
@@ -103,9 +149,9 @@ export default function Graph() {
       if (sn) sn.degree++;
       if (tn) tn.degree++;
     }
-    return { nodes, edges };
+    return { nodes, edges, crossBoundary };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts]);
+  }, [posts, allPosts, scope]);
 
   useEffect(() => {
     if (!svgRef.current || !containerRef.current) return;
@@ -523,9 +569,25 @@ export default function Graph() {
             <h1 className="text-3xl font-bold tracking-tight text-fg">{t('graph.title')}</h1>
           </div>
           <p className="text-fg-muted">
-            {stats.nodes} 节点 · {stats.edges} 条 wikilink 引用 · 节点大小 = 引用度 ·
-            颜色 = 主标签
-            {stats.total > stats.nodes ? ` · ${stats.total - stats.nodes} 个孤立节点已隐藏` : ''}
+            {scope ? (
+              <>
+                <Link to="/graph" className="text-primary hover:underline">
+                  {t('graph.scopeAll')}
+                </Link>
+                <span className="mx-1.5 text-fg-subtle">/</span>
+                <FolderTree className="mr-1 inline size-3.5" />
+                {scope}
+              </>
+            ) : (
+              <>{t('graph.subtitle')}</>
+            )}
+          </p>
+          <p className="mt-1 text-xs text-fg-subtle">
+            {stats.nodes} 节点 · {stats.edges} 条 wikilink 引用 · 节点大小 = 引用度 · 颜色 = 主标签
+            {scope ? ` · ${t('graph.scopeBreadcrumb')} ${scope}` : ''}
+            {(data as { crossBoundary?: number }).crossBoundary
+              ? ` · ${t('graph.crossBoundary', { n: (data as { crossBoundary: number }).crossBoundary })}`
+              : ''}
           </p>
         </div>
         {allTags.length > 0 ? (
@@ -545,10 +607,45 @@ export default function Graph() {
             ))}
           </div>
         ) : null}
+        {scope ? (
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            title={t('graph.scopeBackHint')}
+          >
+            <Link to="/graph">
+              <ArrowLeft className="size-3.5" />
+              {t('graph.scopeClear')}
+            </Link>
+          </Button>
+        ) : null}
       </header>
 
       <Card className="overflow-hidden">
         <div className="flex items-center gap-2 border-b border-border bg-bg-elevated/50 px-3 py-2">
+          {/* Scope picker — shows all pillar/cluster paths in the vault.
+              Picking one filters the graph to that folder. */}
+          {availableScopes.length > 0 ? (
+            <select
+              value={scope}
+              onChange={(e) => {
+                const next = e.target.value;
+                if (next) setSearchParams({ scope: next });
+                else setSearchParams({});
+              }}
+              className="h-8 rounded-md border border-border bg-bg px-2 text-xs text-fg focus:border-primary focus:outline-none"
+              title={t('graph.scopeLabel')}
+            >
+              <option value="">{t('graph.scopeAll')}</option>
+              {availableScopes.map((s) => (
+                <option key={s} value={s}>
+                  {s} ({scopeCounts.get(s) ?? 0})
+                </option>
+              ))}
+            </select>
+          ) : null}
           <div className="relative flex-1 max-w-sm">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-fg-muted" />
             <Input

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router';
-import { ArrowLeft, FolderTree, BookOpen, Clock, ChevronRight, Layers } from 'lucide-react';
+import { ArrowLeft, FolderTree, BookOpen, Clock, ChevronRight, Layers, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -43,17 +43,25 @@ export default function TopicDetail() {
         </Button>
 
         <header className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2 text-xs text-fg-muted">
-            <Badge variant="secondary" className="rounded-full">
-              <Layers className="mr-1 size-3" /> Pillar
-            </Badge>
-            {pillar.clusters.length > 0 ? (
-              <span>
-                {pillar.clusters.length} 个 Cluster · {pillar.postCount} 篇文章
-              </span>
-            ) : (
-              <span>{pillar.postCount} 篇文章</span>
-            )}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-fg-muted">
+              <Badge variant="secondary" className="rounded-full">
+                <Layers className="mr-1 size-3" /> Pillar
+              </Badge>
+              {pillar.clusters.length > 0 ? (
+                <span>
+                  {pillar.clusters.length} 个 Cluster · {pillar.postCount} 篇文章
+                </span>
+              ) : (
+                <span>{pillar.postCount} 篇文章</span>
+              )}
+            </div>
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link to={`/graph?scope=${encodeURIComponent(pillar.name)}`}>
+                <Network className="size-3.5" />
+                看这个主题的关系图
+              </Link>
+            </Button>
           </div>
           <h1 className="text-balance text-3xl font-bold tracking-tight text-fg md:text-4xl">
             {pillar.name}
@@ -162,14 +170,22 @@ export function ClusterDetail() {
         </Button>
 
         <header className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2 text-xs text-fg-muted">
-            <Badge variant="secondary" className="rounded-full">
-              <Layers className="mr-1 size-3" /> Pillar
-            </Badge>
-            <ChevronRight className="size-3" />
-            <Badge variant="secondary" className="rounded-full">
-              Cluster
-            </Badge>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-fg-muted">
+              <Badge variant="secondary" className="rounded-full">
+                <Layers className="mr-1 size-3" /> Pillar
+              </Badge>
+              <ChevronRight className="size-3" />
+              <Badge variant="secondary" className="rounded-full">
+                Cluster
+              </Badge>
+            </div>
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link to={`/graph?scope=${encodeURIComponent(cluster.pillarSlug + '/' + cluster.name)}`}>
+                <Network className="size-3.5" />
+                看这个 Cluster 的关系图
+              </Link>
+            </Button>
           </div>
           <h1 className="text-balance text-3xl font-bold tracking-tight text-fg md:text-4xl">
             {cluster.name}

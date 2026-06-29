@@ -31,6 +31,8 @@
 "site.locale": "zh_CN"
 "site.defaultLanguage": "zh"
 "site.languages": "zh, en"
+# 正文主题: default(简洁) | academic | cyberpunk | receipt | sunset | aurora | bauhaus | knowledge | luxury | morandi | brutalism | github | terminal | magazine
+"site.contentTheme": "default"
 
 # ---- 作者 / 社交 ----
 "site.author.name": "Omlandc"

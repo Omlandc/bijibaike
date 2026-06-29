@@ -100,6 +100,12 @@ export const en: Partial<Record<TranslationKey, string>> = {
   'graph.showOrphans': 'Show orphans',
   'graph.empty': 'No wiki-links yet — add [[double-bracket]] links to connect posts.',
   'graph.openPost': 'Open post (double-click)',
+  'graph.scopeAll': 'All vault',
+  'graph.scopeLabel': 'Lock to folder',
+  'graph.scopeBreadcrumb': 'Scope:',
+  'graph.scopeClear': 'All topics',
+  'graph.scopeBackHint': 'Back to global graph (clear scope filter)',
+  'graph.crossBoundary': '{n} cross-scope links hidden',
 
   // Resources
   'resources.title': 'Resources',
