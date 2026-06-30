@@ -81,6 +81,8 @@ export const en: Partial<Record<TranslationKey, string>> = {
 
   // Post
   'post.backToList': 'Back to list',
+  'post.created': 'Created',
+  'post.updated': 'Updated',
   'post.minutes': 'min',
   'post.tagsCount': '{count} tags',
   'post.toc': 'Outline',

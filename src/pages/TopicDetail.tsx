@@ -1,6 +1,16 @@
 import { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router';
-import { ArrowLeft, FolderTree, BookOpen, Clock, ChevronRight, Layers, Network } from 'lucide-react';
+import {
+  ArrowLeft,
+  FolderTree,
+  BookOpen,
+  Clock,
+  ChevronRight,
+  Layers,
+  Network,
+  Home as HomeIcon,
+  FolderOpen as FolderIcon,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,12 +45,27 @@ export default function TopicDetail() {
   return (
     <div className="space-y-10">
       <div>
-        <Button asChild variant="ghost" size="sm" className="-ml-2 mb-4">
-          <Link to="/topics">
-            <ArrowLeft className="mr-1 size-3.5" />
+        {/* Breadcrumb: 首页 / 主题 / <pillar> */}
+        <nav aria-label="breadcrumb" className="mb-4 flex flex-wrap items-center gap-1 text-xs text-fg-muted">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors hover:bg-bg-subtle hover:text-fg"
+          >
+            <HomeIcon className="size-3" />
+            首页
+          </Link>
+          <ChevronRight className="size-3" />
+          <Link
+            to="/topics"
+            className="rounded px-1.5 py-0.5 transition-colors hover:bg-bg-subtle hover:text-fg"
+          >
             全部主题
           </Link>
-        </Button>
+          <ChevronRight className="size-3" />
+          <span className="rounded bg-bg-subtle px-1.5 py-0.5 font-medium text-fg">
+            {pillar.name}
+          </span>
+        </nav>
 
         <header className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -157,17 +182,34 @@ export function ClusterDetail() {
   return (
     <div className="space-y-10">
       <div>
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="-ml-2 mb-4"
-        >
-          <Link to={`/topics/${encodeURIComponent(cluster.pillarSlug)}`}>
-            <ArrowLeft className="mr-1 size-3.5" />
-            {t('notFound.goHome')} {cluster.pillarSlug}
+        {/* Breadcrumb: 首页 / 主题 / <pillar> / <cluster> */}
+        <nav aria-label="breadcrumb" className="mb-4 flex flex-wrap items-center gap-1 text-xs text-fg-muted">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors hover:bg-bg-subtle hover:text-fg"
+          >
+            <HomeIcon className="size-3" />
+            首页
           </Link>
-        </Button>
+          <ChevronRight className="size-3" />
+          <Link
+            to="/topics"
+            className="rounded px-1.5 py-0.5 transition-colors hover:bg-bg-subtle hover:text-fg"
+          >
+            主题
+          </Link>
+          <ChevronRight className="size-3" />
+          <Link
+            to={`/topics/${encodeURIComponent(cluster.pillarSlug)}`}
+            className="rounded px-1.5 py-0.5 transition-colors hover:bg-bg-subtle hover:text-fg"
+          >
+            {cluster.pillarSlug}
+          </Link>
+          <ChevronRight className="size-3" />
+          <span className="rounded bg-bg-subtle px-1.5 py-0.5 font-medium text-fg">
+            {cluster.name}
+          </span>
+        </nav>
 
         <header className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">

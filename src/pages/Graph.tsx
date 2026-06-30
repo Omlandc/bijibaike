@@ -133,6 +133,12 @@ export default function Graph() {
     // scope. Edges crossing the boundary are dropped (with a count
     // surfaced in the header so users know what's hidden).
     const validSlugs = new Set(allPosts.map((p) => p.slug));
+    // Wiki-links use basename slugs but post.slug is the full
+    // vault-relative path, so we keep both lookups. The edge
+    // source/target stays the full slug so canvas-level highlight
+    // works.
+    const slugByBasename = new Map<string, string>();
+    for (const p of allPosts) slugByBasename.set(p.basename, p.slug);
     const inScopeSlugs = new Set(posts.map((p) => p.slug));
     const nodes: SimNode[] = posts.map((p) => {
       const tag = p.tags[0];
@@ -148,7 +154,9 @@ export default function Graph() {
     const edges: SimEdge[] = [];
     let crossBoundary = 0;
     for (const p of posts) {
-      for (const target of p.links) {
+      for (const rawTarget of p.links) {
+        // Resolve basename slug → full slug when possible
+        const target = slugByBasename.get(rawTarget) ?? rawTarget;
         if (!validSlugs.has(target) || target === p.slug) continue;
         if (scope && !inScopeSlugs.has(target)) {
           // Out-of-scope target. Record but don't draw.
@@ -251,11 +259,13 @@ export default function Graph() {
         })
         .on('zoom', (e) => {
           g.attr('transform', e.transform.toString());
-          // Show / hide labels based on zoom level. Below scale=1 the
-          // labels overlap on small screens; above 1.4 they fit.
+          // Show labels at all zoom levels — only hide them when
+          // extremely zoomed out (k < 0.4) to prevent text from
+          // piling up unreadably when the whole graph fits in a
+          // tiny thumbnail.
           const k = e.transform.k;
           g.selectAll('.graph-node text')
-            .attr('display', k >= 1.05 ? null : 'none');
+            .attr('display', k < 0.4 ? 'none' : null);
         });
       svg.call(zoom);
       // Disable the built-in dblclick-to-zoom — we use dblclick to
@@ -488,18 +498,18 @@ export default function Graph() {
         else if (!related.closest('.graph-node')) highlight(null);
       };
 
-      svgEl.addEventListener('mousedown', onMouseDown);
-      svgEl.addEventListener('mouseover', onMouseOver);
-      svgEl.addEventListener('mouseout', onMouseOut);
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
+      svgEl.addEventListener('pointerdown', onMouseDown);
+      svgEl.addEventListener('pointerover', onMouseOver);
+      svgEl.addEventListener('pointerout', onMouseOut);
+      document.addEventListener('pointermove', onMouseMove);
+      document.addEventListener('pointerup', onMouseUp);
 
       cleanup = () => {
-        svgEl.removeEventListener('mousedown', onMouseDown);
-        svgEl.removeEventListener('mouseover', onMouseOver);
-        svgEl.removeEventListener('mouseout', onMouseOut);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
+        svgEl.removeEventListener('pointerdown', onMouseDown);
+        svgEl.removeEventListener('pointerover', onMouseOver);
+        svgEl.removeEventListener('pointerout', onMouseOut);
+        document.removeEventListener('pointermove', onMouseMove);
+        document.removeEventListener('pointerup', onMouseUp);
         if (mdTimer) clearTimeout(mdTimer);
         isDragging = false;
         dragStart = null;

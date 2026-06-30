@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { getAllPosts, getAllTags } from '@/lib/content';
 import { useTranslation } from '@/i18n';
+import { siteConfig } from '@/config/site-config';
 
 type SortKey = 'latest' | 'hot';
 
@@ -47,18 +48,15 @@ export default function Home() {
   const featured = sorted.find((p) => p.frontmatter.pinned) ?? sorted[0];
   const rest = sorted.filter((p) => p !== featured);
   const { t } = useTranslation();
-  // Hero title is split on the first comma so the part after the
-  // comma can be highlighted with the primary color.
-  const heroHeading = t('home.heading');
-  const heroTitleLead = 'Obsidian 兼容';
-  const heroTitleAccent = heroHeading.includes(',')
-    ? heroHeading.split(',').pop()?.trim() ?? heroHeading
-    : heroHeading;
-  // Subtitle: explain what this site does. The Chinese copy is a
-  // hand-written blurb; for English we surface a shorter blurb.
-  const heroSubtitle = t('lang.zh') === '中文'
-    ? '基于 webapp-building (0-origin) + 一层 Obsidian 兼容层。把你的 vault 直接放进 content/ 目录,所有 `[[双链]]`、`> [!callout]`、frontmatter、inline #tag 都被正确渲染。'
-    : 'A static React blog that reads your Obsidian vault directly. Wiki-links, callouts, frontmatter, inline #tags, force-directed relationship graph, Pillar/Cluster topic pages — all rendered faithfully.';
+
+  const siteName = (siteConfig.site.name as string);
+  const tagline = (siteConfig.site.tagline as string);
+  const description = (siteConfig.site.description as string);
+
+  // Hero: split on first comma for accent highlight; fallback to full tagline
+  const heroTitleLead = t('lang.zh') === '中文' ? 'Obsidian 兼容' : 'Obsidian Compatible';
+  const heroParts = tagline.split(',');
+  const heroTitleAccent = heroParts.length > 1 ? heroParts[heroParts.length - 1].trim() : tagline;
 
   return (
     <div className="space-y-12">
@@ -70,12 +68,12 @@ export default function Home() {
             <span>{heroTitleLead}</span>
           </div>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-fg sm:text-4xl md:text-5xl">
-            {heroHeading.split(',')[0]},
+            {heroParts.length > 1 ? heroParts[0].trim() + ',' : siteName + ','}
             <br className="sm:hidden" />{' '}
             <span className="text-primary">{heroTitleAccent}</span>
           </h1>
           <p className="mt-3 max-w-2xl text-base text-fg-muted sm:text-lg">
-            {heroSubtitle}
+            {description}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild>

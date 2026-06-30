@@ -1,7 +1,5 @@
 import { Link } from 'react-router';
-import { BookOpen, ExternalLink, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { BookOpen, ExternalLink, ArrowLeft, Home as HomeIcon, ChevronRight } from 'lucide-react';
 import { siteConfig } from '@/config/site-config';
 import { useTranslation } from '@/i18n';
 
@@ -10,19 +8,26 @@ export default function Resources() {
   const { t } = useTranslation();
 
   return (
-    <div className="mx-auto max-w-3xl space-y-10">
-      <header className="space-y-3">
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/">
-            <ArrowLeft className="mr-1 size-3.5" />
-            {t('resources.backHome')}
-          </Link>
-        </Button>
+    <div className="mx-auto max-w-5xl space-y-8">
+      {/* Breadcrumb */}
+      <nav aria-label="breadcrumb" className="flex flex-wrap items-center gap-1 text-xs text-fg-muted">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors hover:bg-bg-subtle hover:text-fg"
+        >
+          <HomeIcon className="size-3" />
+          首页
+        </Link>
+        <ChevronRight className="size-3" />
+        <span className="rounded bg-bg-subtle px-1.5 py-0.5 font-medium text-fg">资源</span>
+      </nav>
+
+      <header className="space-y-1">
         <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-fg">
-          <BookOpen className="size-7 text-primary" />
+          <BookOpen className="size-6 text-primary" />
           {t('resources.title')}
         </h1>
-        <p className="text-fg-muted">
+        <p className="text-sm text-fg-muted">
           {t('resources.subtitle')} {t('resources.configNote')}{' '}
           <code className="rounded bg-bg-subtle px-1 text-fg">vault/_config.md</code>{' '}
           {t('resources.configNoteOf')}{' '}
@@ -51,18 +56,21 @@ export default function Resources() {
           </pre>
         </div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-8">
           {sections.map((section) => (
-            <section key={section.title} className="space-y-4">
-              <div className="space-y-1">
-                <h2 className="text-xl font-semibold tracking-tight text-fg">
+            <section key={section.title} className="space-y-3">
+              <div className="space-y-0.5">
+                <h2 className="text-base font-semibold tracking-tight text-fg">
                   {section.title}
+                  <span className="ml-2 text-xs font-normal text-fg-muted">
+                    ({section.items.length})
+                  </span>
                 </h2>
                 {section.description ? (
-                  <p className="text-sm text-fg-muted">{section.description}</p>
+                  <p className="text-xs text-fg-muted">{section.description}</p>
                 ) : null}
               </div>
-              <ul className="grid gap-3 sm:grid-cols-2">
+              <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {section.items.map((item) => {
                   const host = (() => {
                     try {
@@ -77,26 +85,23 @@ export default function Resources() {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex h-full flex-col rounded-lg border border-border bg-bg-elevated p-4 transition-all hover:border-primary/40 hover:bg-bg-subtle"
+                        className="group flex h-full flex-col rounded-md border border-border bg-bg-elevated p-2.5 transition-all hover:border-primary/40 hover:bg-bg-subtle"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="font-semibold text-fg group-hover:text-primary">
+                        <div className="flex items-start justify-between gap-1.5">
+                          <span className="line-clamp-1 text-sm font-medium text-fg group-hover:text-primary">
                             {item.title}
                           </span>
-                          <ExternalLink className="size-3.5 shrink-0 text-fg-muted group-hover:text-primary" />
+                          <ExternalLink className="size-3 shrink-0 text-fg-muted group-hover:text-primary" />
                         </div>
                         {item.description ? (
-                          <p className="mt-2 line-clamp-3 text-sm text-fg-muted">
+                          <p className="mt-1 line-clamp-1 text-xs text-fg-muted">
                             {item.description}
                           </p>
                         ) : null}
                         {host ? (
-                          <Badge
-                            variant="secondary"
-                            className="mt-3 w-fit rounded-full text-[10px] font-normal text-fg-muted"
-                          >
+                          <span className="mt-1.5 truncate text-[10px] text-fg-subtle">
                             {host}
-                          </Badge>
+                          </span>
                         ) : null}
                       </a>
                     </li>

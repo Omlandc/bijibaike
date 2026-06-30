@@ -80,6 +80,8 @@ export const zh = {
 
   // Post
   'post.backToList': '返回列表',
+  'post.created': '创建',
+  'post.updated': '修改',
   'post.minutes': '分钟',
   'post.tagsCount': '{count} 个标签',
   'post.toc': '目录',

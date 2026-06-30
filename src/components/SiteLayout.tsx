@@ -220,10 +220,9 @@ function RouteSeo() {
   // Per-route static meta
   const staticMeta: Record<string, { title: string; description: string }> = {
     '/': {
-      // Use translated hero as the home title; fall back to the
-      // configured tagline / short name when no translation exists.
-      title: t('home.heading') || siteConfig.site.tagline || siteConfig.site.shortName,
-      description: siteSEO.description ?? '',
+      // Read from vault _config.md (siteConfig) instead of hardcoded i18n
+      title: siteConfig.site.tagline || siteConfig.site.name || '笔记百科',
+      description: siteConfig.site.description || '',
     },
     '/blog': {
       title: t('blog.title'),

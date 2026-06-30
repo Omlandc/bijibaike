@@ -6,10 +6,10 @@ import type { SiteConfig } from './site-config.types';
 
 export const siteConfig: SiteConfig = {
   "site": {
-    "name": "Obsidian Blog",
-    "shortName": "Obsidian Blog",
-    "tagline": "写一次，在两个地方读",
-    "description": "把 Obsidian Vault 直接渲染成静态博客,支持 wiki-link、callout、自动封面、力导向关系图、Pillar/Cluster 主题架构与 AdSense 合规。",
+    "name": "笔记百科",
+    "shortName": "笔记百科",
+    "tagline": "融通东西方,笔记天下事",
+    "description": "公众号笔记百科和这个东西的官方博客与工具箱，不断进化的文化内容与五明之学承载地，一站式精心打造的系统性个人成长与修身平台",
     "defaultTheme": "light",
     "themes": [
       "light",
@@ -38,13 +38,13 @@ export const siteConfig: SiteConfig = {
     "siteUrl": "https://obsidian-blog-webapp.example.com",
     "ogImage": "/og-image.svg",
     "keywords": [
-      "Obsidian",
-      "blog",
-      "wiki-link",
-      "callout",
+      "文化",
+      "儒释道",
+      "栾巨庆",
+      "天文地理",
       "知识管理",
-      "Pillar",
-      "Cluster"
+      "个人成长",
+      "工具"
     ],
     "twitter": ""
   },
@@ -62,7 +62,7 @@ export const siteConfig: SiteConfig = {
     }
   },
   "vault": {
-    "repo": "Omlandc/obsidian-test-article",
+    "repo": "Omlandc/bijibaike-article",
     "branch": "main",
     "ref": "",
     "publicAttachmentsPath": "/attachments"
@@ -102,7 +102,7 @@ export const siteConfig: SiteConfig = {
     },
     {
       "label": {
-        "zh": "关系图",
+        "zh": "图谱",
         "en": "Graph"
       },
       "to": "/graph",
@@ -118,7 +118,7 @@ export const siteConfig: SiteConfig = {
     },
     {
       "label": {
-        "zh": "更新日志",
+        "zh": "更新",
         "en": "Changelog"
       },
       "to": "/changelog",
@@ -175,12 +175,12 @@ export const siteConfig: SiteConfig = {
     "sections": [
       {
         "title": "工具",
-        "description": "写这个博客用到的工具与库",
+        "description": "需要的工具",
         "items": [
           {
-            "title": "Obsidian",
-            "url": "https://obsidian.md",
-            "description": "知识管理的 Markdown 编辑器"
+            "title": "笔记百科cn",
+            "url": "https://bijibaike.cn",
+            "description": "笔记百科的备份地址，请收藏"
           },
           {
             "title": "D3.js",

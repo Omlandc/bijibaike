@@ -91,49 +91,79 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/explicit-cover</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/中医/黄帝内经素问遗篇-1</loc>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/test</loc>
     <lastmod>2026-06-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/使用说明</loc>
-    <lastmod>2026-06-29</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/其他/子文件夹/子文件夹测试</loc>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/关于我本人</loc>
     <lastmod>2026-06-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/其他/独家不再耗费几代人的时间用编程复现栾巨庆的长期天文灾害预测</loc>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/独家研究/现代身心性命学</loc>
     <lastmod>2026-06-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/顶层文件夹测试</loc>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/佛大先</loc>
     <lastmod>2026-06-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/topics/%E4%B8%AD%E5%8C%BB</loc>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/佛陀跋陀罗</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/菩提达摩</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/西天二十七祖般若多罗</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/经典探幽/修持必背</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/经典探幽/现观庄严论诸释注疏</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/经典探幽/达摩多罗禅经今释</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/topics/%E7%8B%AC%E5%AE%B6%E7%A0%94%E7%A9%B6</loc>
     <lastmod>2026-06-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/topics/%E5%85%B6%E4%BB%96</loc>
+    <loc>https://obsidian-blog-webapp.example.com/#/topics/%E7%A6%85%E5%AE%97%E8%B0%B1%E7%B3%BB</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/topics/%E7%BB%8F%E5%85%B8%E6%8E%A2%E5%B9%BD</loc>
     <lastmod>2026-06-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

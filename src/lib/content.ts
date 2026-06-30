@@ -338,7 +338,9 @@ function normalizeCoverUrl(target: string): string {
   if (target.startsWith('/')) return target;
   if (isAttachmentPath(target)) {
     const base = vaultPublicConfig.publicAttachmentsPath.replace(/\/+$/, '');
-    const cleaned = target.replace(/^attachments\//, '');
+    // Strip any attachments/ prefix and place under publicAttachmentsPath.
+    // This handles both vault/attachments/foo.png and vault-root pasted images.
+    const cleaned = target.replace(/^attachments\//i, '');
     return `/${base}/${cleaned}`.replace(/\/+/g, '/');
   }
   return target;
