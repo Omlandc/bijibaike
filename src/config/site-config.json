@@ -63,58 +63,94 @@
   },
   "nav": [
     {
-      "label": "首页",
+      "label": {
+        "zh": "首页",
+        "en": "Home"
+      },
       "to": "/",
       "icon": "Home"
     },
     {
-      "label": "文章",
+      "label": {
+        "zh": "文章",
+        "en": "Posts"
+      },
       "to": "/blog",
       "icon": "FileText"
     },
     {
-      "label": "主题",
+      "label": {
+        "zh": "主题",
+        "en": "Topics"
+      },
       "to": "/topics",
       "icon": "FolderTree"
     },
     {
-      "label": "标签",
+      "label": {
+        "zh": "标签",
+        "en": "Tags"
+      },
       "to": "/tags",
       "icon": "Tag"
     },
     {
-      "label": "关系图",
+      "label": {
+        "zh": "关系图",
+        "en": "Graph"
+      },
       "to": "/graph",
       "icon": "Network"
     },
     {
-      "label": "资源",
+      "label": {
+        "zh": "资源",
+        "en": "Resources"
+      },
       "to": "/resources",
       "icon": "BookOpen"
     },
     {
-      "label": "更新日志",
+      "label": {
+        "zh": "更新日志",
+        "en": "Changelog"
+      },
       "to": "/changelog",
       "icon": "History"
     }
   ],
   "footer": {
-    "copyright": "© 2026 Omlandc · 本网站源码遵循源可用许可,商业使用需授权",
+    "copyright": {
+      "zh": "© 2026 Omlandc · 本网站源码遵循源可用许可,商业使用需授权",
+      "en": "© 2026 Omlandc · Source-available, commercial use requires a license"
+    },
     "links": [
       {
-        "label": "关于",
+        "label": {
+          "zh": "关于",
+          "en": "About"
+        },
         "to": "/about"
       },
       {
-        "label": "联系",
+        "label": {
+          "zh": "联系",
+          "en": "Contact"
+        },
         "to": "/contact"
       },
       {
-        "label": "授权定价",
+        "label": {
+          "zh": "授权定价",
+          "en": "Pricing"
+        },
         "to": "/pricing"
       },
       {
-        "label": "隐私",
+        "label": {
+          "zh": "隐私",
+          "en": "Privacy"
+        },
         "to": "/privacy"
       }
     ]

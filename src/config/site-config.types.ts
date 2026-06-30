@@ -58,20 +58,30 @@ export interface VaultSection {
   publicAttachmentsPath: string;
 }
 
+/**
+ * A label that can be either a plain string (used for every
+ * language) or a per-language map (used when the site has
+ * multiple `site.languages` declared).
+ *
+ *   label: "Home"                  // simple — same text everywhere
+ *   label: { zh: "首页", en: "Home" }  // per-language
+ */
+export type LocalizedString = string | Partial<Record<string, string>>;
+
 export interface NavItem {
-  label: string;
+  label: LocalizedString;
   to: string;
   icon: string;
   end?: boolean;
 }
 
 export interface FooterLink {
-  label: string;
+  label: LocalizedString;
   to: string;
 }
 
 export interface FooterSection {
-  copyright: string;
+  copyright: LocalizedString;
   links: FooterLink[];
 }
 

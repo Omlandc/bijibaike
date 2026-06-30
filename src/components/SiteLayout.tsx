@@ -21,7 +21,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { useEffect, useMemo, useState } from 'react';
 import { getAllPosts, getAllTags, getPostsByTag, getPostsByPillar } from '@/lib/content';
-import { cn } from '@/lib/utils';
+import { cn, resolveLocalized } from '@/lib/utils';
 import { SEOHead, pageSEO, AdsHead } from 'seo-kit';
 import { siteSEO, SITE_FOOTER_COPYRIGHT, SITE_FOOTER_LINKS, SITE_SOCIAL } from '@/seo.config';
 import { siteAds } from '@/ads.config';
@@ -59,13 +59,31 @@ const NAV_LABEL_KEYS: Record<string, TranslationKey> = {
 
 // Build the nav array from siteConfig.nav, resolving each icon string
 // against the ICONS map. Defaults to FileText when icon is unknown.
-const NAV = siteConfig.nav.map((n) => ({
-  to: n.to,
-  labelKey: NAV_LABEL_KEYS[n.to],
-  fallbackLabel: n.label,
-  icon: ICONS[n.icon] ?? FileText,
-  end: n.to === '/',
-}));
+// The `configLabel` is the raw `label` from _config.md (string or
+// per-language object) — it takes priority over the i18n key so
+// users can override the visible menu text without touching the
+// source.
+const NAV = siteConfig.nav.map((n) => {
+  // `fallbackLabel` was historically the i18n fallback when the
+  // config didn't set a label. We keep it as a single string for
+  // accessibility (the <a title="…"> attribute), computed as the
+  // first available value of the per-language object if any.
+  const cfg = n.label;
+  const fallbackLabel =
+    typeof cfg === 'string'
+      ? cfg
+      : cfg
+        ? (Object.values(cfg).find((v) => typeof v === 'string' && v) ?? '')
+        : '';
+  return {
+    to: n.to,
+    labelKey: NAV_LABEL_KEYS[n.to],
+    fallbackLabel,
+    configLabel: n.label,
+    icon: ICONS[n.icon] ?? FileText,
+    end: n.to === '/',
+  };
+});
 
 /**
  * Per-route SEO meta. Reads the current location and produces the right
@@ -273,7 +291,7 @@ export function SiteLayout() {
   void useLoc.pathname;
   const [searchOpen, setSearchOpen] = useState(false);
   const consent = useConsent();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -302,7 +320,15 @@ export function SiteLayout() {
           <nav className="hidden items-center gap-0.5 lg:flex lg:gap-1">
             {NAV.map((n) => {
               const Icon = n.icon;
-              const label = n.labelKey ? t(n.labelKey) : n.fallbackLabel;
+              // Resolution chain:
+              //   1. Per-language label from _config.md  (string object)
+              //   2. Plain string from _config.md         (single label, every language)
+              //   3. i18n key match on the route          (built-in nav.*)
+              //   4. Empty string (the route renders but has no text)
+              const configLabel = resolveLocalized(n.configLabel, lang);
+              const label =
+                configLabel ||
+                (n.labelKey ? t(n.labelKey) : n.fallbackLabel);
               return (
                 <NavLink
                   key={n.to}
@@ -360,14 +386,15 @@ export function SiteLayout() {
       <footer className="mt-12 border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-fg-muted sm:flex-row">
           <span>
-            {SITE_FOOTER_COPYRIGHT || (
-              <>© {new Date().getFullYear()} · 静态部署</>
-            )}
+            {(() => {
+              const cr = resolveLocalized(SITE_FOOTER_COPYRIGHT, lang);
+              return cr || <>© {new Date().getFullYear()} · 静态部署</>;
+            })()}
           </span>
           <nav className="flex flex-wrap items-center gap-3">
             {SITE_FOOTER_LINKS.map((l) => (
               <Link key={l.to} to={l.to} className="hover:text-fg">
-                {l.label}
+                {resolveLocalized(l.label, lang)}
               </Link>
             ))}
             {SITE_SOCIAL.github ? (

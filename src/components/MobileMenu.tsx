@@ -29,7 +29,7 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useTranslation, type TranslationKey } from '@/i18n';
 import { siteConfig } from '@/config/site-config';
-import { cn } from '@/lib/utils';
+import { cn, resolveLocalized } from '@/lib/utils';
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Home: HomeIcon,
@@ -51,16 +51,27 @@ const NAV_LABEL_KEYS: Record<string, TranslationKey> = {
   '/resources': 'nav.resources',
 };
 
-const NAV = siteConfig.nav.map((n) => ({
-  to: n.to,
-  labelKey: NAV_LABEL_KEYS[n.to] ?? 'nav.home',
-  icon: ICON_MAP[n.icon] ?? HomeIcon,
-  end: n.to === '/',
-}));
+const NAV = siteConfig.nav.map((n) => {
+  const cfg = n.label;
+  const fallbackLabel =
+    typeof cfg === 'string'
+      ? cfg
+      : cfg
+        ? (Object.values(cfg).find((v) => typeof v === 'string' && v) ?? '')
+        : '';
+  return {
+    to: n.to,
+    labelKey: NAV_LABEL_KEYS[n.to] ?? 'nav.home',
+    fallbackLabel,
+    configLabel: n.label,
+    icon: ICON_MAP[n.icon] ?? HomeIcon,
+    end: n.to === '/',
+  };
+});
 
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const close = () => setOpen(false);
 
   // Lock body scroll when drawer is open
@@ -140,7 +151,8 @@ export function MobileMenu() {
               <ul className="space-y-1">
                 {NAV.map((n) => {
                   const Icon = n.icon;
-                  const label = t(n.labelKey);
+                  const configLabel = resolveLocalized(n.configLabel, lang);
+                  const label = configLabel || t(n.labelKey);
                   return (
                     <li key={n.to}>
                       <NavLink
