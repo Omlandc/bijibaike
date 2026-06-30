@@ -10,8 +10,8 @@
  *  - pages/Post.tsx (per-page overrides via pageSEO(...))
  *  - scripts/generate-seo-files.mjs (build-time sitemap.xml + robots.txt)
  */
-import { defineSEO, jsonld, pageSEO } from 'seo-kit';
-import type { SitemapConfig } from 'seo-kit';
+import { defineSEO, jsonld, pageSEO } from '@/lib/seo-kit';
+import type { SitemapConfig } from '@/lib/seo-kit';
 import { siteConfig } from '@/config/site-config';
 
 const { site: siteInfo, seo, footer } = siteConfig;

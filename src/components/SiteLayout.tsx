@@ -22,7 +22,7 @@ import { Input } from '@/components/ui/input';
 import { useEffect, useMemo, useState } from 'react';
 import { getAllPosts, getAllTags, getPostsByTag, getPostsByPillar } from '@/lib/content';
 import { cn, resolveLocalized } from '@/lib/utils';
-import { SEOHead, pageSEO, AdsHead } from 'seo-kit';
+import { SEOHead, pageSEO, AdsHead } from '@/lib/seo-kit';
 import { siteSEO, SITE_FOOTER_COPYRIGHT, SITE_FOOTER_LINKS, SITE_SOCIAL } from '@/seo.config';
 import { siteAds } from '@/ads.config';
 import { CookieConsent, useConsent } from './CookieConsent';

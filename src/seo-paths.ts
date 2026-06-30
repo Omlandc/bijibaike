@@ -13,7 +13,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import matter from 'gray-matter';
-import type { SitemapEntry } from 'seo-kit';
+import type { SitemapEntry } from '@/lib/seo-kit';
 
 async function loadVaultConfig(): Promise<{ localPath: string }> {
   // Load via strip-types so we don't need a TS toolchain.

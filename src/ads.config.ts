@@ -8,7 +8,7 @@
  *  - SiteLayout (mounts <AdsHead /> for verification meta + Auto Ads)
  *  - scripts/generate-seo-files.mjs (writes public/ads.txt at build time)
  */
-import { defineAds, googleAdsenseSeller } from 'seo-kit';
+import { defineAds, googleAdsenseSeller } from '@/lib/seo-kit';
 import { siteConfig } from '@/config/site-config';
 
 const { ads } = siteConfig;

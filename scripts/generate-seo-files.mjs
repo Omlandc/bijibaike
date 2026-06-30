@@ -129,16 +129,58 @@ async function main() {
   });
 
   // ── sitemap.xml ──────────────────────────────────────────────────
-  const { buildSitemapEntries, generateRobotsTxt, generateAdsTxt } = await import('seo-kit');
+  // seo-kit now lives inside the webapp at src/lib/seo-kit/. We
+  // load only the non-React submodules (sitemap / robots / ads)
+  // through a strip-types subprocess — Node can't parse .tsx but
+  // the React components aren't needed in a build script. To
+  // keep module-level constants (e.g. DEFAULT_DISALLOW) in scope,
+  // we do the FULL computation in the subprocess and return a
+  // plain JSON of { entries, robots, adsTxt }.
+  const computed = await new Promise((resolveP, rejectP) => {
+    const code = `
+      import { pathToFileURL } from 'node:url';
+      const sitemap = await import(${JSON.stringify(
+        pathToFileURL(resolve(root, 'src/lib/seo-kit/sitemap.ts')).href,
+      )});
+      const robots = await import(${JSON.stringify(
+        pathToFileURL(resolve(root, 'src/lib/seo-kit/robots.ts')).href,
+      )});
+      const ads = await import(${JSON.stringify(
+        pathToFileURL(resolve(root, 'src/lib/seo-kit/ads.ts')).href,
+      )});
+      const dynamicPaths = ${JSON.stringify(blogSitemapPaths)};
+      const staticPaths = ${JSON.stringify(siteSEO.sitemap?.staticPaths ?? [])};
+      const entries = sitemap.buildSitemapEntries(
+        [...staticPaths, ...dynamicPaths],
+        {
+          defaultChangefreq: ${JSON.stringify(siteSEO.sitemap?.defaultChangefreq ?? 'weekly')},
+          defaultPriority: ${JSON.stringify(siteSEO.sitemap?.defaultPriority ?? 0.5)},
+        },
+      );
+      const robotsTxt = robots.generateRobotsTxt({
+        siteUrl: ${JSON.stringify(siteSEO.siteUrl)},
+        robots: ${JSON.stringify(siteSEO.robots ?? { allow: ['/'], disallow: ['/admin', '/login'] })},
+      });
+      const adsTxt = ads.generateAdsTxt(${JSON.stringify(adsCfg.ads ?? null)});
+      process.stdout.write(JSON.stringify({ entries, robotsTxt, adsTxt }));
+    `;
+    const child = spawn(
+      process.execPath,
+      ['--experimental-strip-types', '--no-warnings', '--input-type=module', '-e', code],
+      { stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    let out = '';
+    let err = '';
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (err += d));
+    child.on('close', (code) => {
+      if (code === 0) {
+        try { resolveP(JSON.parse(out)); } catch (e) { rejectP(e); }
+      } else rejectP(new Error('seo-kit loader failed: ' + err));
+    });
+  });
+  const { entries, robotsTxt, adsTxt } = computed;
   const sitemapConfig = siteSEO.sitemap ?? {};
-  const staticEntries = sitemapConfig.staticPaths ?? [];
-  const entries = buildSitemapEntries(
-    [...staticEntries, ...blogSitemapPaths],
-    {
-      defaultChangefreq: sitemapConfig.defaultChangefreq ?? 'weekly',
-      defaultPriority: sitemapConfig.defaultPriority ?? 0.5,
-    },
-  );
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -160,26 +202,13 @@ ${entries
   console.log(`[generate-seo-files] wrote sitemap.xml (${xml.length} bytes, ${entries.length} urls)`);
 
   // ── robots.txt ───────────────────────────────────────────────────
-  const robots = generateRobotsTxt({
-    siteUrl: siteSEO.siteUrl,
-    robots: siteSEO.robots,
-  });
-  await writeFile(resolve(distDir, 'robots.txt'), robots, 'utf-8');
-  console.log(`[generate-seo-files] wrote robots.txt (${robots.length} bytes)`);
+  await writeFile(resolve(distDir, 'robots.txt'), robotsTxt, 'utf-8');
+  console.log(`[generate-seo-files] wrote robots.txt (${robotsTxt.length} bytes)`);
 
   // ── ads.txt (Google AdSense verification) ──────────────────────
-  if (adsCfg.ads.enabled) {
-    const { PUB_ID } = adsCfg.ads;
-    const adsTxt = generateAdsTxt({
-      google: {
-        publisherId: PUB_ID,
-        sellers: [`google.com, ${PUB_ID}, DIRECT, f08c47fec0942fa0`],
-      },
-    });
-    if (adsTxt) {
-      await writeFile(resolve(distDir, 'ads.txt'), adsTxt, 'utf-8');
-      console.log(`[generate-seo-files] wrote ads.txt (${adsTxt.length} bytes)`);
-    }
+  if (adsTxt) {
+    await writeFile(resolve(distDir, 'ads.txt'), adsTxt, 'utf-8');
+    console.log(`[generate-seo-files] wrote ads.txt (${adsTxt.length} bytes)`);
   }
 }
 
