@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { getAllPosts, getAllTags, getAllPillars } from '@/lib/content';
+import { siteConfig } from '@/config/site-config';
 import { useTranslation } from '@/i18n';
 
 interface SimNode {
@@ -445,10 +446,27 @@ export default function Home() {
             <span>Obsidian 兼容</span>
           </div>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-fg sm:text-4xl md:text-5xl">
-            <span className="text-primary">融通东西方，笔记天下事</span>
+            {(() => {
+              // Split tagline at the first comma so the head stays
+              // default-color and the tail gets the primary highlight.
+              // siteConfig.tagline uses a half-width comma (per the
+              // vault config convention); we tolerate the full-width
+              // one too in case the user typed it that way.
+              const raw = siteConfig.site.tagline ?? '';
+              const m = raw.match(/^(.+?)[,，]\s*(.+)$/);
+              if (m) {
+                return (
+                  <>
+                    {m[1]}
+                    <span className="text-primary">，{m[2]}</span>
+                  </>
+                );
+              }
+              return <span className="text-primary">{raw}</span>;
+            })()}
           </h1>
           <p className="mt-3 max-w-2xl text-base text-fg-muted sm:text-lg">
-            公众号笔记百科和这个东西的官方博客与工具箱，不断进化的文化内容与五明之学承载地，一站式精心打造的系统性个人成长与修身平台
+            {siteConfig.site.description}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild>
@@ -471,42 +489,47 @@ export default function Home() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-bg-elevated p-5">
-          <div className="mb-3 flex items-center justify-between">
+        <div className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated">
+          <div className="flex items-center justify-between border-b border-border bg-bg-subtle px-5 py-3">
             <div className="flex items-center gap-2 text-fg">
               <FolderTree className="size-4 text-primary" />
               <h2 className="text-base font-semibold">{t('topics.title')}</h2>
             </div>
-            <Link to="/topics" className="inline-flex items-center gap-0.5 text-xs text-fg-muted hover:text-primary">
+            <Link
+              to="/topics"
+              className="inline-flex items-center gap-0.5 text-xs text-fg-muted group-hover:text-primary"
+            >
               {t('topics.browse')}
               <ChevronRight className="size-3" />
             </Link>
           </div>
-          {getAllPillars().length === 0 ? (
-            <div className="rounded-md border border-dashed border-border bg-bg p-6 text-center text-xs text-fg-muted">
-              还没有主题簇 — 在 vault 里创建子目录
-            </div>
-          ) : (
-            <ul className="space-y-1.5">
-              {getAllPillars().map((pillar) => (
-                <li key={pillar.slug}>
-                  <Link
-                    to={`/topics/${encodeURIComponent(pillar.slug)}`}
-                    className="flex items-center justify-between gap-3 rounded-md border border-transparent px-3 py-2 text-sm transition-colors hover:border-border hover:bg-bg"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-fg">{pillar.name}</div>
-                      {pillar.description ? (
-                        <div className="line-clamp-1 text-xs text-fg-muted">{pillar.description}</div>
-                      ) : null}
-                    </div>
-                    <div className="shrink-0 text-xs text-fg-subtle">{pillar.postCount} 篇</div>
-                    <ChevronRight className="size-3.5 shrink-0 text-fg-muted" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="flex-1 p-5">
+            {getAllPillars().length === 0 ? (
+              <div className="rounded-md border border-dashed border-border bg-bg p-6 text-center text-xs text-fg-muted">
+                还没有主题簇 — 在 vault 里创建子目录
+              </div>
+            ) : (
+              <ul className="space-y-1.5">
+                {getAllPillars().map((pillar) => (
+                  <li key={pillar.slug}>
+                    <Link
+                      to={`/topics/${encodeURIComponent(pillar.slug)}`}
+                      className="flex items-center justify-between gap-3 rounded-md border border-transparent px-3 py-2 text-sm transition-colors hover:border-border hover:bg-bg"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-fg">{pillar.name}</div>
+                        {pillar.description ? (
+                          <div className="line-clamp-1 text-xs text-fg-muted">{pillar.description}</div>
+                        ) : null}
+                      </div>
+                      <div className="shrink-0 text-xs text-fg-subtle">{pillar.postCount} 篇</div>
+                      <ChevronRight className="size-3.5 shrink-0 text-fg-muted" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated">

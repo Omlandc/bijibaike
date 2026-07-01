@@ -21,6 +21,9 @@ import {
   Pin,
   ChevronDown,
   ListFilter,
+  LayoutGrid,
+  List as ListIcon,
+  FolderTree,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -57,6 +60,11 @@ interface FilterBarProps {
   onThemesChange: (themes: string[]) => void;
   onPinnedOnlyChange?: (v: boolean) => void;
   onClearAll: () => void;
+  /** Optional view-mode switcher (cards | list | tree). When
+   *  provided, a compact 3-button group is rendered in the top row
+   *  next to the sort dropdown. */
+  view?: 'cards' | 'list' | 'tree';
+  onViewChange?: (v: 'cards' | 'list' | 'tree') => void;
 }
 
 export function FilterBar({
@@ -77,6 +85,8 @@ export function FilterBar({
   onThemesChange,
   onPinnedOnlyChange,
   onClearAll,
+  view,
+  onViewChange,
 }: FilterBarProps) {
   const { t } = useTranslation();
   const hasActive = tags.length > 0 || years.length > 0 || themes.length > 0 || pinnedOnly;
@@ -111,7 +121,37 @@ export function FilterBar({
           ) : null}
         </div>
 
-        <SortDropdown sort={sort} onChange={onSortChange} />
+        <div className="flex items-center gap-2">
+          {view && onViewChange ? (
+            <div className="inline-flex items-center rounded-md border border-border bg-bg-elevated p-0.5">
+              {([
+                { key: 'cards', icon: LayoutGrid, label: '卡片' },
+                { key: 'list', icon: ListIcon, label: '列表' },
+                { key: 'tree', icon: FolderTree, label: '层级' },
+              ] as { key: 'cards' | 'list' | 'tree'; icon: typeof LayoutGrid; label: string }[]).map(
+                ({ key, icon: Icon, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => onViewChange(key)}
+                    aria-pressed={view === key}
+                    title={label}
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors',
+                      view === key
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-fg-muted hover:text-fg',
+                    )}
+                  >
+                    <Icon className="size-3.5" />
+                    <span className="hidden sm:inline">{label}</span>
+                  </button>
+                ),
+              )}
+            </div>
+          ) : null}
+          <SortDropdown sort={sort} onChange={onSortChange} />
+        </div>
       </div>
 
       {/* Filter groups — each is a chip with a dropdown trigger */}
@@ -208,7 +248,6 @@ function SortDropdown({ sort, onChange }: { sort: SortKey; onChange: (s: SortKey
     { value: 'longest', label: t('filter.sortLongest') },
     { value: 'title', label: t('filter.sortTitle') },
   ];
-  const current = options.find((o) => o.value === sort) ?? options[0];
   return (
     <div className="flex items-center gap-2">
       <ArrowUpDown className="size-3.5 text-fg-muted" />
@@ -227,7 +266,6 @@ function SortDropdown({ sort, onChange }: { sort: SortKey; onChange: (s: SortKey
         </select>
         <ChevronDown className="pointer-events-none absolute right-1.5 top-1/2 size-3.5 -translate-y-1/2 text-fg-muted" />
       </div>
-      <span className="hidden text-xs text-fg-muted sm:inline">· {current.label}</span>
     </div>
   );
 }

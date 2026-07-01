@@ -597,9 +597,6 @@ export default function Graph() {
           <div className="flex items-center gap-2">
             <Network className="size-6 text-primary" />
             <h1 className="text-3xl font-bold tracking-tight text-fg">{t('graph.title')}</h1>
-            <span className="hidden text-xs text-fg-subtle sm:inline">
-              · 拖动节点 · 背景平移 · 滚轮/双指缩放 · 单击高亮 · 双击打开
-            </span>
           </div>
           <p className="text-fg-muted">
             {scope ? (
@@ -784,6 +781,9 @@ export default function Graph() {
           >
             <Maximize2 className="size-4" />
           </Button>
+          <span className="ml-auto hidden text-xs text-fg-subtle lg:inline">
+            · 拖动节点 · 背景平移 · 滚轮/双指缩放 · 单击高亮 · 双击打开
+          </span>
         </div>
 
         <CardContent
