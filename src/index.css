@@ -360,3 +360,19 @@ mark[data-find-idx].find-active {
   --tw-prose-quotes: calc(var(--post-fs) * 1.25);
   --tw-prose-quote-borders: calc(var(--post-fs) * 0.1875);
 }
+
+
+/* ============================================================
+ * PostContext RelatedGraph — overrides for the smaller scale
+ * (the default .graph-svg rules target the full /graph page where
+ * nodes are bigger). Center node uses a primary fill so the focal
+ * post stands out.
+ * ============================================================ */
+.graph-svg .graph-node.active circle {
+  stroke-width: 1.6;
+}
+.graph-svg .graph-node.neighbor circle {
+  stroke-width: 1.2;
+}
+.graph-svg .graph-node.dim { opacity: 0.15; }
+.graph-svg .graph-link.dim { stroke-opacity: 0.04; }

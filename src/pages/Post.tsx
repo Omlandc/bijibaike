@@ -13,6 +13,7 @@ import { ReadingProgress } from '@/components/ReadingProgress';
 import { TableOfContents } from '@/components/TableOfContents';
 import { FindInPost } from '@/components/FindInPost';
 import { PostToolbar } from '@/components/PostToolbar';
+import { PostContextNav } from '@/components/PostContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -130,6 +131,8 @@ export default function Post() {
 
           <FindInPost articleRef={articleRef} sourceText={post.raw} />
           <MarkdownView body={post.body} />
+
+          <PostContextNav post={post} backlinks={backlinks} />
 
           {backlinks.length > 0 ? (
             <section className="space-y-3">
