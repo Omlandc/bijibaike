@@ -288,3 +288,30 @@ h1, h2, h3, h4, h5, h6 {
 .graph-svg .graph-node text {
   opacity: 0.85;
 }
+
+/* ============================================================
+ * Home graph preview — d3 mini (mirrors /graph interactions)
+ * Overrides for the existing .graph-svg rules so the same
+ * active/neighbor/dim states look right at mini scale.
+ * ============================================================ */
+.gpm-svg .graph-node.active circle {
+  stroke-width: 1.5;
+  stroke: var(--color-primary);
+  filter: url(#gpm-node-glow-merged);
+}
+.gpm-svg .graph-node.active text {
+  font-weight: 600;
+  opacity: 1;
+}
+.gpm-svg .graph-node.neighbor circle {
+  stroke: var(--color-primary);
+  stroke-width: 1.2;
+}
+.gpm-svg .graph-node.neighbor text {
+  opacity: 1;
+}
+.gpm-svg .graph-node.dim { opacity: 0.18; }
+.gpm-svg .graph-link.dim { stroke-opacity: 0.04; }
+.gpm-svg .graph-node text { opacity: 0.85; }
+.gpm-svg .graph-node { transition: opacity 0.18s ease; }
+.gpm-svg .graph-link { transition: stroke-opacity 0.18s ease; }

@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { BookOpen, ExternalLink, ArrowLeft, Home as HomeIcon, ChevronRight } from 'lucide-react';
+import { BookOpen, ExternalLink, Home as HomeIcon, ChevronRight } from 'lucide-react';
 import { siteConfig } from '@/config/site-config';
 import { useTranslation } from '@/i18n';
 

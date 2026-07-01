@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router';
 import {
-  ArrowLeft,
   FolderTree,
   BookOpen,
   Clock,
@@ -9,7 +8,6 @@ import {
   Layers,
   Network,
   Home as HomeIcon,
-  FolderOpen as FolderIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

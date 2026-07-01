@@ -121,6 +121,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/智严</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/菩提达摩</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>

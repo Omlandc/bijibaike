@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+import * as d3 from 'd3';
 import { ArrowRight, Sparkles, Search, Calendar, TrendingUp, Tag as TagIcon, Clock, Pin, FileText, FolderTree, Network, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,86 +8,393 @@ import { cn } from '@/lib/utils';
 import { getAllPosts, getAllTags, getAllPillars } from '@/lib/content';
 import { useTranslation } from '@/i18n';
 
-const PALETTE = [
+interface SimNode {
+  id: string;
+  title: string;
+  tags: string[];
+  level: string;
+  degree: number;
+  x?: number;
+  y?: number;
+  /** Depth in 3D space. Assigned once after sim converges; positive
+   *  is in front of the screen, negative behind. Used by the RAF
+   *  Y-axis rotation loop to project the node to 2D each frame. */
+  z?: number;
+}
+
+interface SimEdge {
+  source: SimNode | string;
+  target: SimNode | string;
+  weight: number;
+}
+
+const GRAPH_PALETTE = [
   '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316',
   '#eab308', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#a855f7',
 ];
 
-function hashIndex(tag: string): number {
+function colorForTag(tag: string | undefined, title: string): string {
+  if (tag) {
+    let h = 0;
+    for (let i = 0; i < tag.length; i++) h = (h * 31 + tag.charCodeAt(i)) >>> 0;
+    return GRAPH_PALETTE[h % GRAPH_PALETTE.length]!;
+  }
   let h = 0;
-  for (let i = 0; i < tag.length; i++) h = (h * 31 + tag.charCodeAt(i)) >>> 0;
-  return h % PALETTE.length;
+  for (let i = 0; i < title.length; i++) h = (h * 17 + title.charCodeAt(i)) >>> 0;
+  return GRAPH_PALETTE[h % GRAPH_PALETTE.length]!;
 }
-
 function GraphPreviewMini() {
+  const navigate = useNavigate();
   const posts = useMemo(() => getAllPosts().slice(0, 24), []);
-  const W = 360;
-  const H = 180;
-  const positions = useMemo(() => {
-    const n = posts.length;
-    return posts.map((_, i) => {
-      const angle = (i / Math.max(1, n)) * Math.PI * 2;
-      const rx = W / 2 - 30;
-      const ry = H / 2 - 20;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [stats, setStats] = useState({ nodes: 0, edges: 0, total: 0 });
+
+  // Build the graph data the same way the main /graph page does:
+  // resolve basename wiki-link targets against the full-slug map,
+  // and de-duplicate edges.
+  const data = useMemo(() => {
+    const validSlugs = new Set(posts.map((p) => p.slug));
+    const slugByBasename = new Map<string, string>();
+    for (const p of posts) slugByBasename.set(p.basename, p.slug);
+    const nodes: SimNode[] = posts.map((p) => {
+      const tag = p.tags[0];
       return {
-        cx: W / 2 + Math.cos(angle) * rx,
-        cy: H / 2 + Math.sin(angle) * ry * 0.8,
+        id: p.slug,
+        title: p.title,
+        tags: p.tags,
+        level: tag ?? 'untagged',
+        degree: 0,
       };
     });
-  }, [posts]);
-  const edges = useMemo(() => {
-    const out: { a: number; b: number }[] = [];
-    for (let i = 0; i < posts.length; i++) {
-      const a = posts[i]!;
-      for (const t of a.links) {
-        const j = posts.findIndex((p) => p.slug === t);
-        if (j > i) out.push({ a: i, b: j });
+    const seen = new Set<string>();
+    const edges: SimEdge[] = [];
+    for (const p of posts) {
+      for (const rawTarget of p.links) {
+        const target = slugByBasename.get(rawTarget) ?? rawTarget;
+        if (!validSlugs.has(target) || target === p.slug) continue;
+        const key = [p.slug, target].sort().join('::');
+        if (seen.has(key)) continue;
+        seen.add(key);
+        edges.push({ source: p.slug, target, weight: 1 });
       }
     }
-    return out;
+    for (const e of edges) {
+      const s = typeof e.source === 'string' ? e.source : (e.source as SimNode).id;
+      const t = typeof e.target === 'string' ? e.target : (e.target as SimNode).id;
+      const sn = nodes.find((n) => n.id === s);
+      const tn = nodes.find((n) => n.id === t);
+      if (sn) sn.degree++;
+      if (tn) tn.degree++;
+    }
+    return { nodes, edges };
   }, [posts]);
+
+  useEffect(() => {
+    if (!svgRef.current || !containerRef.current) return;
+    const container = containerRef.current;
+    const svgEl = svgRef.current;
+    let cancelled = false;
+    let cleanup: (() => void) | null = null;
+
+    function start() {
+      if (cancelled) return;
+      const rect = container.getBoundingClientRect();
+      if (rect.width < 10 || rect.height < 10) {
+        requestAnimationFrame(start);
+        return;
+      }
+      const width = rect.width;
+      const height = rect.height;
+
+      const svg = d3.select(svgEl);
+      svg.selectAll('*').remove();
+
+      // Glow filter for the active node (same trick as main /graph)
+      const defs = svg.append('defs');
+      const merge = defs
+        .append('filter')
+        .attr('id', 'gpm-node-glow-merged')
+        .attr('x', '-50%')
+        .attr('y', '-50%')
+        .attr('width', '200%')
+        .attr('height', '200%');
+      merge.append('feGaussianBlur').attr('stdDeviation', '1.6').attr('result', 'blur');
+      merge
+        .append('feMerge')
+        .selectAll('feMergeNode')
+        .data(['blur', 'SourceGraphic'])
+        .join('feMergeNode')
+        .attr('in', (d) => d as string);
+
+      const g = svg.append('g');
+
+      // Seed positions around the center so the first frame is
+      // already a recognizable cloud, not a single pile at (0,0).
+      const simNodes: SimNode[] = data.nodes.map((n) => {
+        const seedX = width / 2 + (Math.random() - 0.5) * 120;
+        const seedY = height / 2 + (Math.random() - 0.5) * 80;
+        return { ...n, x: seedX, y: seedY };
+      });
+      const simEdges: SimEdge[] = data.edges.map((e) => ({
+        source: e.source,
+        target: e.target,
+        weight: e.weight,
+      }));
+
+      const link = g
+        .append('g')
+        .attr('class', 'links')
+        .selectAll('line')
+        .data(simEdges)
+        .join('line')
+        .attr('class', 'graph-link')
+        .attr('stroke', 'currentColor')
+        .attr('stroke-width', 0.7)
+        .attr('stroke-opacity', 0.4);
+
+      const node = g
+        .append('g')
+        .attr('class', 'nodes')
+        .selectAll<SVGGElement, SimNode>('g')
+        .data(simNodes, (d) => d.id)
+        .join('g')
+        .attr('class', 'graph-node')
+        .attr('data-id', (d) => d.id)
+        .style('cursor', 'pointer');
+
+      // Mini sizing: smaller baseR, smaller maxR, tighter collide radius.
+      const baseR = 3;
+      const maxR = 8;
+      const labelMax = 56;
+
+      node
+        .append('circle')
+        .attr('r', (d) => baseR + Math.min(maxR, Math.sqrt(d.degree) * 1.6))
+        .attr('fill', (d) => colorForTag(d.level, d.title))
+        .attr('stroke', 'var(--color-bg-elevated)')
+        .attr('stroke-width', 1.2);
+
+      // Show labels for nodes that have at least one connection, so
+      // degree-0 nodes don't pile up text and crowd the mini view.
+      node
+        .filter((d) => d.degree >= 1)
+        .append('text')
+        .text((d) => {
+          const t = d.title;
+          return t.length > 6 ? t.slice(0, 6) + '…' : t;
+        })
+        .attr('x', 8)
+        .attr('y', 3)
+        .attr('font-size', 8)
+        .attr('fill', 'currentColor')
+        .attr('class', 'graph-label')
+        .attr('textLength', (d) => Math.min(labelMax, d.title.length * 6.5))
+        .attr('lengthAdjust', 'spacingAndGlyphs');
+
+      // Assign 3D depth to each node. We bias the depth so that
+      // higher-degree (hub) nodes sit slightly forward and the long
+      // tail recedes behind — gives a stronger sense of depth when
+      // the graph rotates. The z range [-80, 80] is tuned to look
+      // 3D without clipping the 360×180 viewport.
+      for (const n of simNodes) {
+        n.z = (Math.random() - 0.5) * 140 + Math.min(36, n.degree * 6);
+      }
+
+      // Projection + RAF state. theta goes 0..2π for one full turn
+      // (≈45s at the speed below). focal length controls how
+      // aggressive the perspective looks — smaller = more dramatic.
+      const cx = width / 2;
+      const cy = height / 2;
+      const focal = 220;
+      const zMax = 100; // for opacity normalization
+      let theta = 0;
+      let rafId: number | null = null;
+      const reduceMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Project a 3D point to 2D, with a perspective scale and an
+      // opacity that fades to 0.25 at the back. We rotate around the
+      // world Y axis (vertical) — the y screen coord stays put; the
+      // screen x and the depth both shift with cos/sin(theta).
+      function project(n: SimNode, t: number) {
+        const dx = (n.x ?? cx) - cx;
+        const z = n.z ?? 0;
+        const cos = Math.cos(t);
+        const sin = Math.sin(t);
+        // 3D point (dx, dy=0, z) rotated about Y by t, then we only
+        // keep the screen X and the (now-shifted) depth for opacity.
+        const xScreen = cx + dx * cos + z * sin;
+        const z3d = -dx * sin + z * cos;
+        // Perspective: scale = focal / (focal - z3d). When the point
+        // is closer than focal this explodes; clamp with a min.
+        const denom = Math.max(60, focal - z3d);
+        const scale = focal / denom;
+        // Map z3d ∈ [-zMax, zMax] → opacity ∈ [0.28, 1.0]. Points
+        // behind the screen fade; points in front stay bright.
+        const norm = Math.max(-1, Math.min(1, z3d / zMax));
+        const opacity = 0.28 + 0.72 * ((norm + 1) / 2);
+        return { x: xScreen, y: n.y ?? cy, scale, opacity, z3d };
+      }
+
+      const sim = d3
+        .forceSimulation<SimNode>(simNodes)
+        .force(
+          'link',
+          d3
+            .forceLink<SimNode, SimEdge>(simEdges)
+            .id((d) => d.id)
+            .distance(38)
+            .strength(0.7),
+        )
+        .force('charge', d3.forceManyBody().strength(-160))
+        .alpha(0.7)
+        .alphaDecay(0.04)
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collide', d3.forceCollide(16))
+        .on('tick', () => {
+          // While the sim is settling, paint a flat (no-rotation)
+          // projection. Once it converges, the 'end' handler below
+          // takes over with the rotating projection.
+          if (rafId == null) {
+            link
+              .attr('x1', (d) => (d.source as SimNode).x!)
+              .attr('y1', (d) => (d.source as SimNode).y!)
+              .attr('x2', (d) => (d.target as SimNode).x!)
+              .attr('y2', (d) => (d.target as SimNode).y!);
+            node.attr('transform', (d) => `translate(${d.x},${d.y})`);
+          }
+        })
+        .on('end', () => {
+          if (reduceMotion) return; // user opted out of motion
+          const tickMs = 1000 / 30; // 30fps is plenty for a slow spin
+          let last = performance.now();
+          const speed = (Math.PI * 2) / 45000; // 45s per full turn
+          const loop = (now: number) => {
+            if (now - last >= tickMs) {
+              last = now;
+              theta += speed * (now - last + tickMs);
+              if (theta > Math.PI * 2) theta -= Math.PI * 2;
+              // Update edges: redraw with projected endpoints.
+              // Stroke opacity uses the mean of the two endpoints'
+              // projected opacities so links fade into the back.
+              link.each(function (d: any) {
+                const a = project(d.source, theta);
+                const b = project(d.target, theta);
+                d3.select(this)
+                  .attr('x1', a.x)
+                  .attr('y1', a.y)
+                  .attr('x2', b.x)
+                  .attr('y2', b.y)
+                  .attr('stroke-opacity', Math.min(a.opacity, b.opacity) * 0.45);
+              });
+              // Update nodes: translate + scale (anchor at the
+              // node center via the inner <circle>).
+              node.each(function (d: any) {
+                const p = project(d, theta);
+                d3.select(this)
+                  .attr('transform', `translate(${p.x},${p.y}) scale(${p.scale})`)
+                  .attr('opacity', p.opacity);
+              });
+            }
+            rafId = requestAnimationFrame(loop);
+          };
+          rafId = requestAnimationFrame(loop);
+        });
+
+      setStats({ nodes: simNodes.length, edges: simEdges.length, total: data.nodes.length });
+
+      // Same highlight() as the main page: hover-id → active + neighbor
+      // classes, non-neighbors → dim, unrelated edges → dim.
+      function highlight(id: string | null) {
+        if (!id) {
+          node.classed('dim', false).classed('active', false).classed('neighbor', false);
+          link.classed('dim', false);
+          return;
+        }
+        const neighbors = new Set([id]);
+        simEdges.forEach((e) => {
+          const s = typeof e.source === 'string' ? e.source : (e.source as SimNode).id;
+          const t = typeof e.target === 'string' ? e.target : (e.target as SimNode).id;
+          if (s === id) neighbors.add(t);
+          if (t === id) neighbors.add(s);
+        });
+        node
+          .classed('dim', (d) => !neighbors.has(d.id))
+          .classed('active', (d) => d.id === id)
+          .classed('neighbor', (d) => d.id !== id && neighbors.has(d.id));
+        link.classed('dim', (d) => {
+          const s = typeof d.source === 'string' ? d.source : (d.source as SimNode).id;
+          const t = typeof d.target === 'string' ? d.target : (d.target as SimNode).id;
+          return s !== id && t !== id;
+        });
+      }
+
+      // Find the data-id of the .graph-node that owns this event
+      const findNodeId = (target: EventTarget | null): string | null => {
+        let el = target as Element | null;
+        while (el && el !== svgEl) {
+          if (el.classList && el.classList.contains('graph-node')) {
+            return (el as HTMLElement).getAttribute('data-id');
+          }
+          el = el.parentElement;
+        }
+        return null;
+      };
+
+      // Click a node → jump to the post. We stop propagation so the
+      // outer card's link-to-/graph (if any) doesn't fire too.
+      const onClick = (e: MouseEvent) => {
+        const id = findNodeId(e.target);
+        if (!id) return;
+        e.stopPropagation();
+        e.preventDefault();
+        window.location.hash = `#/blog/${encodeURIComponent(id)}`;
+        // Also call navigate for SPA-friendliness; the hash fallback
+        // ensures it works even if the router hasn't mounted.
+        navigate(`/blog/${encodeURIComponent(id)}`);
+      };
+
+      const onMouseOver = (e: MouseEvent) => {
+        const id = findNodeId(e.target);
+        if (id) highlight(id);
+      };
+
+      const onMouseOut = (e: MouseEvent) => {
+        const related = e.relatedTarget as Element | null;
+        if (!related || !svgEl.contains(related)) highlight(null);
+        else if (!related.closest('.graph-node')) highlight(null);
+      };
+
+      svgEl.addEventListener('click', onClick);
+      svgEl.addEventListener('pointerover', onMouseOver);
+      svgEl.addEventListener('pointerout', onMouseOut);
+
+      cleanup = () => {
+        svgEl.removeEventListener('click', onClick);
+        svgEl.removeEventListener('pointerover', onMouseOver);
+        svgEl.removeEventListener('pointerout', onMouseOut);
+        if (rafId != null) cancelAnimationFrame(rafId);
+        sim.stop();
+      };
+    }
+
+    requestAnimationFrame(start);
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
+  }, [data, navigate]);
+
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="block h-full w-full" aria-hidden="true">
-      <g stroke="currentColor" strokeOpacity={0.25}>
-        {edges.map((e, i) => {
-          const a = positions[e.a];
-          const b = positions[e.b];
-          if (!a || !b) return null;
-          return (
-            <line key={i} x1={a.cx} y1={a.cy} x2={b.cx} y2={b.cy} strokeWidth={0.6} />
-          );
-        })}
-      </g>
-      <g>
-        {posts.map((p, i) => {
-          const pos = positions[i];
-          if (!pos) return null;
-          const tag = p.tags[0];
-          return (
-            <circle
-              key={p.slug}
-              cx={pos.cx}
-              cy={pos.cy}
-              r={4 + Math.min(3, Math.sqrt(p.links.length))}
-              fill={tag ? PALETTE[hashIndex(tag)] : '#6366f1'}
-              fillOpacity={0.85}
-              stroke="var(--color-bg-elevated)"
-              strokeWidth={1}
-            />
-          );
-        })}
-      </g>
-      <text
-        x={W / 2}
-        y={H - 8}
-        textAnchor="middle"
-        fontSize={9}
-        fill="currentColor"
-        fillOpacity={0.4}
-      >
-        {posts.length} 个节点 · {edges.length} 条 wiki link
-      </text>
-    </svg>
+    <div ref={containerRef} className="graph-svg gpm-svg relative h-full w-full">
+      <svg ref={svgRef} className="block h-full w-full overflow-visible" />
+      <div className="pointer-events-none absolute bottom-1 left-0 right-0 text-center text-[9px] text-fg-muted/60">
+        {stats.nodes} 个节点 · {stats.edges} 条 wiki link
+      </div>
+    </div>
   );
 }
 
@@ -201,24 +509,24 @@ export default function Home() {
           )}
         </div>
 
-        <Link
-          to="/graph"
-          className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
-        >
+        <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated">
           <div className="flex items-center justify-between border-b border-border bg-bg-subtle px-5 py-3">
             <div className="flex items-center gap-2 text-fg">
               <Network className="size-4 text-primary" />
               <h2 className="text-base font-semibold">{t('graph.title')}</h2>
             </div>
-            <span className="inline-flex items-center gap-0.5 text-xs text-fg-muted group-hover:text-primary">
+            <Link
+              to="/graph"
+              className="inline-flex items-center gap-0.5 text-xs text-fg-muted group-hover:text-primary"
+            >
               {t('home.viewGraph')}
               <ArrowRight className="size-3" />
-            </span>
+            </Link>
           </div>
           <div className="relative flex-1 p-3" style={{ minHeight: '200px' }}>
             <GraphPreviewMini />
           </div>
-        </Link>
+        </div>
       </section>
 
       <div className="flex flex-wrap items-center gap-3">
