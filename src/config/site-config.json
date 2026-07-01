@@ -26,10 +26,16 @@
       "github": "https://github.com/Omlandc",
       "twitter": "",
       "email": ""
-    }
+    },
+    "features": [
+      {
+        "text": "Bijibaike 出品",
+        "icon": "Sparkles"
+      }
+    ]
   },
   "seo": {
-    "siteUrl": "https://obsidian-blog-webapp.example.com",
+    "siteUrl": "",
     "ogImage": "/og-image.svg",
     "keywords": [
       "文化",
@@ -44,7 +50,7 @@
   },
   "ads": {
     "enabled": false,
-    "publisherId": "ca-pub-0000000000000000",
+    "publisherId": "",
     "verification": true,
     "autoAds": true,
     "consent": {
@@ -213,6 +219,23 @@
   },
   "changelog": {
     "entries": [
+      {
+        "date": "2026-07-01",
+        "version": "v0.7.0",
+        "title": "配置驱动化：Home 描述读 config + index.html title 由 Vite 注入",
+        "type": "improvement",
+        "items": [
+          {
+            "text": "Home 首页的长描述从硬编码改成读 siteConfig.site.description"
+          },
+          {
+            "text": "index.html 静态 title / lang / description 在 build 时由 Vite 插件从 vault/_config.md 注入"
+          },
+          {
+            "text": "vault/_config.md 增加 site.social.email 字段（用于 Contact / Pricing 页面）"
+          }
+        ]
+      },
       {
         "date": "2026-06-29",
         "version": "v0.6.0",

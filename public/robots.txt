@@ -92,4 +92,4 @@ Disallow: /
 User-agent: TurnitinBot
 Disallow: /
 
-Sitemap: https://obsidian-blog-webapp.example.com/sitemap.xml
+Sitemap: /sitemap.xml

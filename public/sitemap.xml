@@ -1,175 +1,175 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/</loc>
+    <loc>/</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/blog</loc>
+    <loc>/blog</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/topics</loc>
+    <loc>/topics</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/tags</loc>
+    <loc>/tags</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/graph</loc>
+    <loc>/graph</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/resources</loc>
+    <loc>/resources</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/changelog</loc>
+    <loc>/changelog</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/pricing</loc>
+    <loc>/pricing</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/about</loc>
+    <loc>/about</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/privacy</loc>
+    <loc>/privacy</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/contact</loc>
+    <loc>/contact</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/topics/%E4%B8%AD%E5%8C%BB</loc>
+    <loc>/topics/%E4%B8%AD%E5%8C%BB</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/topics/%E5%85%B6%E4%BB%96</loc>
+    <loc>/topics/%E5%85%B6%E4%BB%96</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/config</loc>
+    <loc>/#/blog/config</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/cover-demo</loc>
+    <loc>/#/blog/cover-demo</loc>
     <lastmod>2026-06-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/test</loc>
+    <loc>/#/blog/test</loc>
     <lastmod>2026-06-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/关于我本人</loc>
+    <loc>/#/blog/关于我本人</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/独家研究/现代身心性命学</loc>
+    <loc>/#/blog/独家研究/现代身心性命学</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/佛大先</loc>
+    <loc>/#/blog/禅宗谱系/佛大先</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/佛陀跋陀罗</loc>
+    <loc>/#/blog/禅宗谱系/佛陀跋陀罗</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/智严</loc>
+    <loc>/#/blog/禅宗谱系/智严</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/菩提达摩</loc>
+    <loc>/#/blog/禅宗谱系/菩提达摩</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/禅宗谱系/西天二十七祖般若多罗</loc>
+    <loc>/#/blog/禅宗谱系/西天二十七祖般若多罗</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/经典探幽/修持必背</loc>
+    <loc>/#/blog/经典探幽/修持必背</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/经典探幽/现观庄严论诸释注疏</loc>
+    <loc>/#/blog/经典探幽/现观庄严论诸释注疏</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/blog/经典探幽/达摩多罗禅经今释</loc>
+    <loc>/#/blog/经典探幽/达摩多罗禅经今释</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/topics/%E7%8B%AC%E5%AE%B6%E7%A0%94%E7%A9%B6</loc>
+    <loc>/#/topics/%E7%8B%AC%E5%AE%B6%E7%A0%94%E7%A9%B6</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/topics/%E7%A6%85%E5%AE%97%E8%B0%B1%E7%B3%BB</loc>
+    <loc>/#/topics/%E7%A6%85%E5%AE%97%E8%B0%B1%E7%B3%BB</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://obsidian-blog-webapp.example.com/#/topics/%E7%BB%8F%E5%85%B8%E6%8E%A2%E5%B9%BD</loc>
+    <loc>/#/topics/%E7%BB%8F%E5%85%B8%E6%8E%A2%E5%B9%BD</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

@@ -156,6 +156,9 @@ const nav = Array.isArray(merged.nav) ? merged.nav : [];
 const footer = merged.footer ?? {};
 const pillars = Array.isArray(merged.pillars) ? merged.pillars : [];
 const resources = merged.resources ?? {};
+// `features` lives in a body yaml block (Obsidian Properties 面板
+// 不支持嵌套数组), same level as nav/footer. Hoist it under site.
+const featuresSource = Array.isArray(merged.features) ? merged.features : [];
 
 const siteConfig = {
   site: {
@@ -182,6 +185,9 @@ const siteConfig = {
       twitter: site.social?.twitter ?? '',
       email: site.social?.email ?? '',
     },
+    features: featuresSource
+      .filter((f) => f && typeof f.text === 'string' && f.text.trim())
+      .map((f) => ({ text: f.text.trim(), icon: typeof f.icon === 'string' ? f.icon.trim() : 'Sparkles' })),
   },
   seo: {
     siteUrl: seo.siteUrl ?? 'https://example.com',

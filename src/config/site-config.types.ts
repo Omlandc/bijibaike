@@ -10,6 +10,12 @@ export interface SiteAuthor {
   url: string;
 }
 
+export interface SiteFeature {
+  text: string;
+  /** lucide-react icon name. Falls back to Sparkles when unknown. */
+  icon?: string;
+}
+
 export interface SiteSocial {
   github?: string;
   twitter?: string;
@@ -31,6 +37,9 @@ export interface SiteSection {
   contentTheme: string;
   author: SiteAuthor;
   social: SiteSocial;
+  /** Pill badges shown next to the Home H1 ("Obsidian 兼容" etc.).
+   *  Empty array hides the badge row entirely. */
+  features?: SiteFeature[];
 }
 
 export interface SeoSection {

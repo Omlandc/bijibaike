@@ -30,6 +30,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { siteConfig } from '@/config/site-config';
 
 type TierId = 'personal' | 'indie' | 'team';
 
@@ -249,8 +250,8 @@ export default function Pricing() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <a href="mailto:omlandc@example.com">
-                omlandc@example.com
+              <a href={`mailto:${siteConfig.site.social?.email || ''}`}>
+                {siteConfig.site.social?.email || '通过联系页发送邮件'}
               </a>
             </Button>
           </div>

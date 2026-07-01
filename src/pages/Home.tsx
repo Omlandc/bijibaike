@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import * as d3 from 'd3';
-import { ArrowRight, Sparkles, Search, Calendar, TrendingUp, Tag as TagIcon, Clock, Pin, FileText, FolderTree, Network, ChevronRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Search, Calendar, TrendingUp, Tag as TagIcon, Clock, Pin, FileText, FolderTree, Network, ChevronRight, Lock, Globe, Heart, Star, Zap, Languages, BookOpen, Code2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -44,6 +44,29 @@ function colorForTag(tag: string | undefined, title: string): string {
   for (let i = 0; i < title.length; i++) h = (h * 17 + title.charCodeAt(i)) >>> 0;
   return GRAPH_PALETTE[h % GRAPH_PALETTE.length]!;
 }
+
+/** Map of feature-pill icon names → lucide-react components. Used by
+ *  the Home H1 badge row driven by `site.features` in vault config. */
+const FEATURE_ICON_MAP: Record<string, typeof Sparkles> = {
+  Sparkles,
+  Lock,
+  Globe,
+  Heart,
+  Star,
+  Zap,
+  Languages,
+  BookOpen,
+  Code2,
+  Search,
+  Clock,
+  Calendar,
+  Pin,
+  FolderTree,
+  Network,
+  ChevronRight,
+  ArrowRight,
+  Tag: TagIcon,
+};
 function GraphPreviewMini() {
   const navigate = useNavigate();
   const posts = useMemo(() => getAllPosts().slice(0, 24), []);
@@ -441,10 +464,26 @@ export default function Home() {
     <div className="space-y-12">
       <section className="bg-glow relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-bg-elevated to-bg p-8 sm:p-12">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-elevated px-3 py-1 text-xs text-fg-muted">
-            <Sparkles className="size-3 text-primary" />
-            <span>Obsidian 兼容</span>
-          </div>
+          {/* Optional config-driven feature pills (e.g. "Obsidian 兼容").
+              Each entry in vault/_config.md → site.features becomes one
+              pill, in order. lucide-react icon names are mapped by
+              FEATURE_ICON_MAP; anything unknown falls back to Sparkles. */}
+          {siteConfig.site.features && siteConfig.site.features.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2">
+              {siteConfig.site.features.map((f, i) => {
+                const Icon = FEATURE_ICON_MAP[f.icon ?? 'Sparkles'] ?? Sparkles;
+                return (
+                  <span
+                    key={`${f.text}-${i}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-elevated px-3 py-1 text-xs text-fg-muted"
+                  >
+                    <Icon className="size-3 text-primary" />
+                    {f.text}
+                  </span>
+                );
+              })}
+            </div>
+          ) : null}
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-fg sm:text-4xl md:text-5xl">
             {(() => {
               // Split tagline at the first comma so the head stays

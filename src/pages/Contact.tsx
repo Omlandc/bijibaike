@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router';
 import { useTranslation } from '@/i18n';
+import { siteConfig } from '@/config/site-config';
 
 const CHANNELS = [
   {
@@ -25,7 +26,9 @@ const CHANNELS = [
     icon: Mail,
     title: '邮件',
     desc: '私密问题 / 内容版权 / 数据请求专用。回复通常 1-2 个工作日。',
-    href: 'mailto:hello@obsidian-blog.example.com',
+    // Pulled from vault/_config.md → site.social.email. If empty,
+    // fall back to a mailto derived from site.author.url when possible.
+    href: `mailto:${siteConfig.site.social?.email || ''}`,
     cta: '发送邮件',
     badge: null,
   },
@@ -46,7 +49,7 @@ export default function Contact() {
       </header>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {CHANNELS.map((c) => {
+        {CHANNELS.filter((c) => c.href && c.href !== 'mailto:').map((c) => {
           const Icon = c.icon;
           return (
             <Card key={c.title} className="flex flex-col">
