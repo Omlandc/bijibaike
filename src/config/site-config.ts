@@ -63,7 +63,7 @@ export const siteConfig: SiteConfig = {
   },
   "vault": {
     "repo": "Omlandc/bijibaike-article",
-    "branch": "main",
+    "branch": "master",
     "ref": "",
     "publicAttachmentsPath": "/attachments"
   },

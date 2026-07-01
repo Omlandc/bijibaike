@@ -597,6 +597,9 @@ export default function Graph() {
           <div className="flex items-center gap-2">
             <Network className="size-6 text-primary" />
             <h1 className="text-3xl font-bold tracking-tight text-fg">{t('graph.title')}</h1>
+            <span className="hidden text-xs text-fg-subtle sm:inline">
+              · 拖动节点 · 背景平移 · 滚轮/双指缩放 · 单击高亮 · 双击打开
+            </span>
           </div>
           <p className="text-fg-muted">
             {scope ? (
@@ -788,32 +791,6 @@ export default function Graph() {
           className="graph-container relative h-[70vh] min-h-[420px] overflow-hidden p-0 text-fg-muted sm:h-[640px]"
         >
           <svg ref={svgRef} className="graph-svg absolute inset-0 h-full w-full" />
-
-          <div className="pointer-events-none absolute bottom-3 left-1/2 max-w-[90%] -translate-x-1/2 rounded-md border border-border bg-bg-elevated/85 px-3 py-1.5 text-center text-xs text-fg-muted backdrop-blur">
-            <span className="hidden sm:inline">
-              拖动节点 · 背景平移 · 滚轮/双指缩放 · 单击高亮 · 双击打开
-            </span>
-            <span className="sm:hidden">
-              拖动平移 · 双指缩放 · 单击高亮 · 双击打开
-            </span>
-          </div>
-
-          <div className="pointer-events-none absolute right-3 bottom-3 hidden rounded-md border border-border bg-bg-elevated/85 px-2 py-1 text-[10px] text-fg-muted backdrop-blur sm:block">
-            <kbd className="rounded border border-border bg-bg px-1 font-mono text-[10px]">D3.js</kbd>{' '}
-            force-directed
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="hidden sm:block">
-        <CardContent className="space-y-2 p-4 text-sm text-fg-muted">
-          <p>
-            💡 在文章中用 <code className="rounded bg-bg-subtle px-1 text-fg">[[双链]]</code>{' '}
-            引用其他文章,它们就会出现在这张图上。
-          </p>
-          <p className="text-xs">
-            每个节点的主标签决定颜色;节点大小按引用度(出度+入度)的平方根缩放;图会根据物理模拟自动布局,可以拖动来固定某个节点。
-          </p>
         </CardContent>
       </Card>
     </div>
