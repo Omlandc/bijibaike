@@ -315,3 +315,48 @@ h1, h2, h3, h4, h5, h6 {
 .gpm-svg .graph-node text { opacity: 0.85; }
 .gpm-svg .graph-node { transition: opacity 0.18s ease; }
 .gpm-svg .graph-link { transition: stroke-opacity 0.18s ease; }
+
+
+/* ============================================================
+ * Find-in-post highlights + flash
+ * Used by the FindInPost component. Marks are created at runtime;
+ * .find-active is added briefly to the currently-scrolled mark
+ * so the user can see which one the prev/next landed on.
+ * ============================================================ */
+mark[data-find-idx] {
+  background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-primary) 45%, transparent);
+}
+mark[data-find-idx].find-active {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-primary) 60%, transparent);
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* ============================================================
+ * Post reading toolbar — font size stepper
+ * PostToolbar writes --post-fs to :root, and we feed it into the
+ * tailwind-typography size token so the whole prose body scales
+ * consistently (headings, paragraphs, lists, blockquotes, code).
+ * ============================================================ */
+:root {
+  --post-fs: 16px;
+}
+.prose {
+  font-size: var(--post-fs);
+  --tw-prose-body: var(--post-fs);
+  --tw-prose-lead: calc(var(--post-fs) * 1.125);
+  --tw-prose-headings: calc(var(--post-fs) * 1.4);
+  --tw-prose-h1: calc(var(--post-fs) * 1.875);
+  --tw-prose-h2: calc(var(--post-fs) * 1.5);
+  --tw-prose-h3: calc(var(--post-fs) * 1.25);
+  --tw-prose-h4: calc(var(--post-fs) * 1.125);
+  --tw-prose-code: calc(var(--post-fs) * 0.875);
+  --tw-prose-pre: calc(var(--post-fs) * 0.875);
+  --tw-prose-quotes: calc(var(--post-fs) * 1.25);
+  --tw-prose-quote-borders: calc(var(--post-fs) * 0.1875);
+}

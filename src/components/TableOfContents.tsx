@@ -11,6 +11,7 @@
  *   so it doesn't steal horizontal space from the reading column.
  */
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import { BookText, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/i18n';
@@ -51,8 +52,16 @@ export function TableOfContents({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useTranslation();
+  const location = useLocation();
+  // Re-scan whenever the route changes (prev/next navigation, direct
+  // link, etc.). Without this, the TOC instance survives a same-route-
+  // shape article swap and keeps showing the *previous* post's headings
+  // because nothing in its deps changed.
 
   useEffect(() => {
+    // Reset before re-scanning so we don't briefly show the old list.
+    setItems([]);
+    setActiveId(null);
     const id = window.requestAnimationFrame(() => {
       const root = document.querySelector(scope);
       if (!root) {
@@ -79,7 +88,7 @@ export function TableOfContents({
       if (list.length > 0 && list[0]) setActiveId(list[0].id);
     });
     return () => cancelAnimationFrame(id);
-  }, [scope]);
+  }, [scope, location.pathname]);
 
   useEffect(() => {
     if (items.length === 0) return;

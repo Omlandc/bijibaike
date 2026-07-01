@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { Input } from '@/components/ui/input';
 import {
@@ -38,6 +38,46 @@ function parseListParam(v: string | null): string[] {
 
 function joinListParam(arr: string[]): string {
   return arr.join(',');
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Wrap every case-insensitive match of `query` in <mark> so users can
+ * see *where* in a card the hit landed. Returns the original string
+ * (no React nodes) when query is empty so we don't pay the cost.
+ */
+function highlightText(text: string, query: string): ReactNode {
+  if (!query) return text;
+  const re = new RegExp(escapeRegExp(query), 'gi');
+  const out: React.ReactNode[] = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let i = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push(
+      <mark
+        key={i++}
+        className="rounded-sm bg-primary/25 px-0.5 text-fg"
+      >
+        {m[0]}
+      </mark>,
+    );
+    last = m.index + m[0].length;
+    if (m[0].length === 0) re.lastIndex++;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+/** Build /blog/<slug> + optional ?q= so the post page opens its
+ *  find-in-post panel when the user came from a search. */
+function postHref(slug: string, query: string): string {
+  const base = `/blog/${encodeURIComponent(slug)}`;
+  return query ? `${base}?q=${encodeURIComponent(query)}` : base;
 }
 
 export default function BlogList() {
@@ -226,6 +266,14 @@ export default function BlogList() {
           </button>
         ) : null}
       </div>
+      {query.trim() ? (
+        <p className="text-xs text-fg-muted">
+          匹配 <span className="text-fg">{sorted.length}</span> 篇
+          {sorted.length > 0 ? (
+            <span className="ml-2 text-fg-subtle">点卡片跳到原文并定位匹配</span>
+          ) : null}
+        </p>
+      ) : null}
 
       {/* Filter + sort bar — drives everything from URL params */}
       <FilterBar
@@ -265,7 +313,7 @@ export default function BlogList() {
               return (
                 <Link
                   key={p.slug}
-                  to={`/blog/${encodeURIComponent(p.slug)}`}
+                  to={postHref(p.slug, query)}
                   className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
                 >
                   {isPinned ? (
@@ -291,12 +339,15 @@ export default function BlogList() {
                       </span>
                     ) : null}
                     <h3 className="line-clamp-2 text-base font-semibold text-fg group-hover:text-primary">
-                      {p.title}
+                      {highlightText(p.title, query)}
                     </h3>
                     <p className="line-clamp-2 text-sm text-fg-muted">
-                      {p.frontmatter.description
-                        ? String(p.frontmatter.description)
-                        : p.excerpt}
+                      {highlightText(
+                        p.frontmatter.description
+                          ? String(p.frontmatter.description)
+                          : p.excerpt,
+                        query,
+                      )}
                     </p>
                     <div className="mt-auto flex items-center justify-between pt-2 text-xs text-fg-subtle">
                       <span className="inline-flex items-center gap-1">
@@ -332,7 +383,7 @@ export default function BlogList() {
               return (
                 <li key={p.slug}>
                   <Link
-                    to={`/blog/${encodeURIComponent(p.slug)}`}
+                    to={postHref(p.slug, query)}
                     className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-bg-subtle"
                   >
                     {isPinned ? (
@@ -341,7 +392,7 @@ export default function BlogList() {
                       <span className="size-3.5 shrink-0" />
                     )}
                     <span className="line-clamp-1 min-w-0 flex-1 text-sm font-medium text-fg group-hover:text-primary">
-                      {p.title}
+                      {highlightText(p.title, query)}
                     </span>
                     {p.tags[0] ? (
                       <span className="hidden shrink-0 rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[10px] text-fg-muted md:inline">
@@ -384,7 +435,9 @@ export default function BlogList() {
                             className="group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-bg-subtle"
                           >
                             {isPinned ? <Pin className="size-3 shrink-0 text-primary" /> : <span className="size-3 shrink-0" />}
-                            <span className="flex-1 truncate text-fg group-hover:text-primary">{p.title}</span>
+                            <span className="flex-1 truncate text-fg group-hover:text-primary">
+                              {highlightText(p.title, query)}
+                            </span>
                             <span className="hidden text-xs text-fg-subtle sm:inline">{dateLabel}</span>
                             <ChevronRight className="size-3.5 shrink-0 text-fg-muted group-hover:text-primary" />
                           </Link>
@@ -408,7 +461,9 @@ export default function BlogList() {
                                   className="group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-bg-subtle"
                                 >
                                   {isPinned ? <Pin className="size-3 shrink-0 text-primary" /> : <span className="size-3 shrink-0" />}
-                                  <span className="flex-1 truncate text-fg group-hover:text-primary">{p.title}</span>
+                                  <span className="flex-1 truncate text-fg group-hover:text-primary">
+                              {highlightText(p.title, query)}
+                            </span>
                                   <span className="hidden text-xs text-fg-subtle sm:inline">{dateLabel}</span>
                                   <ChevronRight className="size-3.5 shrink-0 text-fg-muted group-hover:text-primary" />
                                 </Link>

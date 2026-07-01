@@ -421,15 +421,35 @@ function SearchBar({ onClose }: { onClose: () => void }) {
   const posts = getAllPosts();
   const results = useMemo(() => {
     const query = q.trim().toLowerCase();
-    if (!query) return posts.slice(0, 6);
+    if (!query) return posts.slice(0, 6).map((p) => ({ post: p, snippet: p.excerpt, query: '' }));
+    // Match against title / excerpt / tags / BODY. We lowercase once
+    // here and reuse `bodyLC` for snippet extraction, so a 500KB post
+    // doesn't pay the toLowerCase cost for every match.
     return posts
-      .filter(
-        (p) =>
-          p.title.toLowerCase().includes(query) ||
-          p.excerpt.toLowerCase().includes(query) ||
-          p.tags.some((tag) => tag.toLowerCase().includes(query)),
-      )
-      .slice(0, 8);
+      .map((p) => {
+        const titleHit = p.title.toLowerCase().includes(query);
+        const excerptHit = p.excerpt.toLowerCase().includes(query);
+        const tagHit = p.tags.some((t) => t.toLowerCase().includes(query));
+        const bodyLC = p.body.toLowerCase();
+        const bodyIdx = bodyLC.indexOf(query);
+        if (!titleHit && !excerptHit && !tagHit && bodyIdx < 0) return null;
+        // Prefer body snippet when the match is there; otherwise fall
+        // back to the excerpt (which is already a clean preview).
+        let snippet: string;
+        if (bodyIdx >= 0) {
+          const start = Math.max(0, bodyIdx - 30);
+          const end = Math.min(p.body.length, bodyIdx + query.length + 50);
+          const head = start > 0 ? '…' : '';
+          const tail = end < p.body.length ? '…' : '';
+          snippet =
+            head + p.body.slice(start, end).replace(/\s+/g, ' ').trim() + tail;
+        } else {
+          snippet = p.excerpt;
+        }
+        return { post: p, snippet, query };
+      })
+      .filter((x): x is { post: typeof posts[number]; snippet: string; query: string } => x !== null)
+      .slice(0, 12);
   }, [q, posts]);
   return (
     <div className="mx-auto max-w-6xl">
@@ -455,28 +475,68 @@ function SearchBar({ onClose }: { onClose: () => void }) {
         </button>
       </div>
       {results.length > 0 ? (
-        <ul className="mt-2 max-h-72 divide-y divide-border overflow-y-auto rounded-md border border-border bg-bg-elevated">
-          {results.map((p) => (
-            <li key={p.slug}>
-              <Link
-                to={`/blog/${encodeURIComponent(p.slug)}`}
-                onClick={onClose}
-                className="flex items-center justify-between gap-4 px-3 py-2 transition-colors hover:bg-bg-subtle"
-              >
-                <div className="min-w-0">
-                  <div className="truncate text-sm text-fg">{p.title}</div>
-                  <div className="truncate text-xs text-fg-muted">
-                    {p.excerpt}
+        <ul className="mt-2 max-h-80 divide-y divide-border overflow-y-auto rounded-md border border-border bg-bg-elevated">
+          {results.map((r) => {
+            const p = r.post;
+            const snippet = r.snippet;
+            const qQuery = r.query;
+            const link = qQuery
+              ? `/blog/${encodeURIComponent(p.slug)}?q=${encodeURIComponent(qQuery)}`
+              : `/blog/${encodeURIComponent(p.slug)}`;
+            // Highlight the match in the title and snippet so the
+            // preview reads as "this is where the hit is".
+            const renderHL = (s: string) => {
+              if (!qQuery) return s;
+              const re = new RegExp(
+                qQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+                'gi',
+              );
+              const out: React.ReactNode[] = [];
+              let last = 0;
+              let m: RegExpExecArray | null;
+              let i = 0;
+              while ((m = re.exec(s)) !== null) {
+                if (m.index > last) out.push(s.slice(last, m.index));
+                out.push(
+                  <mark
+                    key={i++}
+                    className="rounded-sm bg-primary/25 px-0.5 text-fg"
+                  >
+                    {m[0]}
+                  </mark>,
+                );
+                last = m.index + m[0].length;
+                if (m[0].length === 0) re.lastIndex++;
+              }
+              if (last < s.length) out.push(s.slice(last));
+              return out;
+            };
+            return (
+              <li key={p.slug}>
+                <Link
+                  to={link}
+                  onClick={onClose}
+                  className="flex items-center justify-between gap-4 px-3 py-2 transition-colors hover:bg-bg-subtle"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm text-fg">
+                      {renderHL(p.title)}
+                    </div>
+                    {snippet ? (
+                      <div className="line-clamp-2 text-xs text-fg-muted">
+                        {renderHL(snippet)}
+                      </div>
+                    ) : null}
                   </div>
-                </div>
-                {p.tags.length > 0 ? (
-                  <span className="shrink-0 text-xs text-fg-subtle">
-                    #{p.tags[0]}
-                  </span>
-                ) : null}
-              </Link>
-            </li>
-          ))}
+                  {p.tags.length > 0 ? (
+                    <span className="shrink-0 text-xs text-fg-subtle">
+                      #{p.tags[0]}
+                    </span>
+                  ) : null}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       ) : null}
     </div>

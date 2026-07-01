@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router';
 import * as d3 from 'd3';
 import { ArrowRight, Sparkles, Search, Calendar, TrendingUp, Tag as TagIcon, Clock, Pin, FileText, FolderTree, Network, ChevronRight, Lock, Globe, Heart, Star, Zap, Languages, BookOpen, Code2 } from 'lucide-react';
@@ -67,6 +67,43 @@ const FEATURE_ICON_MAP: Record<string, typeof Sparkles> = {
   ArrowRight,
   Tag: TagIcon,
 };
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** Wrap every match of `query` in <mark> so users see *where* the hit
+ *  landed in a card title / description. */
+function highlightText(text: string, query: string): ReactNode {
+  if (!query) return text;
+  const re = new RegExp(escapeRegExp(query), 'gi');
+  const out: ReactNode[] = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let i = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push(
+      <mark
+        key={i++}
+        className="rounded-sm bg-primary/25 px-0.5 text-fg"
+      >
+        {m[0]}
+      </mark>,
+    );
+    last = m.index + m[0].length;
+    if (m[0].length === 0) re.lastIndex++;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+/** /blog/<slug> + ?q=<query> so the post page auto-opens its
+ *  find-in-post panel when arriving from a search. */
+function postHref(slug: string, query: string): string {
+  const base = `/blog/${encodeURIComponent(slug)}`;
+  return query ? `${base}?q=${encodeURIComponent(query)}` : base;
+}
+
 function GraphPreviewMini() {
   const navigate = useNavigate();
   const posts = useMemo(() => getAllPosts().slice(0, 24), []);
@@ -434,7 +471,18 @@ export default function Home() {
     return allPosts.filter((p) => {
       if (activeTag && !p.tags.includes(activeTag)) return false;
       if (q) {
-        const hay = `${p.title} ${p.excerpt}`.toLowerCase();
+        // Match against title / excerpt / tags / description / body
+        // — same scope as the global search so behaviour is consistent
+        // across the home search box, the BlogList filter, and ⌘K.
+        const hay = [
+          p.title,
+          p.excerpt,
+          String(p.frontmatter?.description ?? ''),
+          p.tags.join(' '),
+          p.body,
+        ]
+          .join(' ')
+          .toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -600,6 +648,11 @@ export default function Home() {
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
+          {search.trim() ? (
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-fg-muted">
+              <span className="text-fg">{filtered.length}</span> 篇
+            </span>
+          ) : null}
         </div>
         <div className="flex items-center gap-1 rounded-md border border-border bg-bg-elevated p-0.5">
           <button
@@ -646,7 +699,7 @@ export default function Home() {
 
       {featured ? (
         <Link
-          to={`/blog/${encodeURIComponent(featured.slug)}`}
+          to={postHref(featured.slug, search)}
           className="group block overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
         >
           <div className="grid gap-6 p-6 sm:grid-cols-[1fr_2fr] sm:p-8">
@@ -668,12 +721,12 @@ export default function Home() {
                   </span>
                 </div>
                 <h2 className="text-balance text-2xl font-bold tracking-tight text-fg group-hover:text-primary sm:text-3xl">
-                  {featured.title}
+                  {highlightText(featured.title, search)}
                 </h2>
                 {featured.frontmatter.description ? (
-                  <p className="mt-3 text-fg-muted">{String(featured.frontmatter.description)}</p>
+                  <p className="mt-3 text-fg-muted">{highlightText(String(featured.frontmatter.description), search)}</p>
                 ) : (
-                  <p className="mt-3 line-clamp-3 text-fg-muted">{featured.excerpt}</p>
+                  <p className="mt-3 line-clamp-3 text-fg-muted">{highlightText(featured.excerpt, search)}</p>
                 )}
               </div>
               <div className="mt-4 flex items-center justify-between text-xs text-fg-muted">
@@ -692,7 +745,7 @@ export default function Home() {
       {rest.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {rest.map((p) => (
-            <PostGridCard key={p.slug} post={p} />
+            <PostGridCard key={p.slug} post={p} query={search} />
           ))}
         </div>
       ) : !featured ? (
@@ -723,13 +776,13 @@ function FeaturedCover({ post }: { post: ReturnType<typeof getAllPosts>[number] 
   );
 }
 
-function PostGridCard({ post }: { post: ReturnType<typeof getAllPosts>[number] }) {
+function PostGridCard({ post, query }: { post: ReturnType<typeof getAllPosts>[number]; query: string }) {
   const cover = post.cover;
   const readingMinutes = Math.max(1, Math.round(post.raw.length / 600));
   const description = typeof post.frontmatter.description === 'string' ? post.frontmatter.description : post.excerpt;
   return (
     <Link
-      to={`/blog/${encodeURIComponent(post.slug)}`}
+      to={postHref(post.slug, query)}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
     >
       {cover ? (
@@ -741,8 +794,8 @@ function PostGridCard({ post }: { post: ReturnType<typeof getAllPosts>[number] }
         {post.tags[0] ? (
           <span className="inline-flex w-fit items-center rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[10px] font-medium text-fg-muted">{post.tags[0]}</span>
         ) : null}
-        <h3 className="line-clamp-2 text-base font-semibold text-fg group-hover:text-primary">{post.title}</h3>
-        {description ? <p className="line-clamp-2 text-sm text-fg-muted">{description}</p> : null}
+        <h3 className="line-clamp-2 text-base font-semibold text-fg group-hover:text-primary">{highlightText(post.title, query)}</h3>
+        {description ? <p className="line-clamp-2 text-sm text-fg-muted">{highlightText(description, query)}</p> : null}
         <div className="mt-auto flex items-center justify-between pt-2 text-xs text-fg-subtle">
           <span className="inline-flex items-center gap-1"><Clock className="size-3" />{readingMinutes} 分钟</span>
           <span>{new Date(post.date).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</span>

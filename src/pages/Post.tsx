@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useParams, Link, Navigate } from 'react-router';
 import {
   getPostBySlug,
@@ -10,6 +11,8 @@ import { slugify } from '@/lib/obsidian';
 import { MarkdownView } from '@/components/MarkdownView';
 import { ReadingProgress } from '@/components/ReadingProgress';
 import { TableOfContents } from '@/components/TableOfContents';
+import { FindInPost } from '@/components/FindInPost';
+import { PostToolbar } from '@/components/PostToolbar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -30,6 +33,7 @@ export default function Post() {
   const slug = slugSplat ? decodeURIComponent(slugSplat) : null;
   const post = slug ? getPostBySlug(slug) : undefined;
   const { t } = useTranslation();
+  const articleRef = useRef<HTMLElement>(null);
 
   if (!post) {
     return <Navigate to="/blog" replace />;
@@ -46,7 +50,11 @@ export default function Post() {
     <>
       <ReadingProgress />
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 lg:flex-row lg:gap-8">
-        <article className="order-2 w-full min-w-0 flex-1 space-y-8 lg:order-1">
+        <article
+          ref={articleRef}
+          data-md-root
+          className="order-2 w-full min-w-0 flex-1 space-y-8 lg:order-1"
+        >
           {/* Mobile TOC */}
           <div className="lg:hidden">
             <TableOfContents scope="[data-md-root]" />
@@ -120,6 +128,7 @@ export default function Post() {
 
           <Separator />
 
+          <FindInPost articleRef={articleRef} sourceText={post.raw} />
           <MarkdownView body={post.body} />
 
           {backlinks.length > 0 ? (
@@ -184,6 +193,7 @@ export default function Post() {
           <TableOfContents scope="[data-md-root]" />
         </div>
       </div>
+      <PostToolbar prev={prev} next={next} />
     </>
   );
 }
