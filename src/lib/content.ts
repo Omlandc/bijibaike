@@ -253,6 +253,11 @@ function makeExcerpt(body: string, max = 180): string {
     .replace(/```[\s\S]*?```/g, '')
     .replace(/^>.*$/gm, '')
     .replace(/^#+\s+.*$/gm, '')
+    // Obsidian wiki-link embeds (images): ![[photo.png|300]] — drop
+    // the whole construct, including any size suffix. Must run before
+    // the plain [[…]] pass below so a `![[x]]` doesn't get partially
+    // turned into `!x`.
+    .replace(/!\[\[[^\]]+\]\]/g, '')
     .replace(/\[\[([^\]]+)\]\]/g, (_, inner) => {
       const pipe = inner.indexOf('|');
       return pipe >= 0 ? inner.slice(pipe + 1) : inner;
@@ -408,6 +413,12 @@ function buildIndex(posts: Post[]): ContentIndex {
     // detect index file
     if (parts.length === 2 && /^(pillar|_index)\.md$/i.test(parts[1]!)) {
       pEntry.indexPost = p;
+    } else if (parts.length === 2 && parts[1] === `${pillarName}.md`) {
+      // A note whose filename matches the folder name is treated as
+      // the pillar's index page. This lets users write a free-form
+      // markdown intro for each pillar (cover = first image,
+      // description = first paragraph) without renaming to pillar.md.
+      if (!pEntry.indexPost) pEntry.indexPost = p;
     }
   }
 
@@ -418,9 +429,13 @@ function buildIndex(posts: Post[]): ContentIndex {
     const clusters: Cluster[] = [];
     for (const [clusterName, cposts] of entry.clusterMap) {
       cposts.sort((a, b) => b.date.localeCompare(a.date));
-      const indexCluster = cposts.find(
-        (p) => /^(cluster|_index)\.md$/i.test(p.sourcePath.split('/').pop() ?? ''),
-      );
+      const indexCluster =
+        cposts.find(
+          (p) => /^(cluster|_index)\.md$/i.test(p.sourcePath.split('/').pop() ?? ''),
+        ) ??
+        // A note whose filename matches the cluster folder name acts
+        // as the cluster's index page (same convention as pillars).
+        cposts.find((p) => p.sourcePath.split('/').pop() === `${clusterName}.md`);
       const c = indexCluster ?? cposts[0];
       clusters.push({
         // Slug is just the cluster folder name (basename). The route

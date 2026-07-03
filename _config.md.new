@@ -1,0 +1,291 @@
+---
+# ============================================================
+# 站点基础信息
+# ============================================================
+site.name: 笔记百科
+site.shortName: 笔记百科
+site.tagline: 融通东西方,笔记天下事
+site.description: 公众号笔记百科和这个东西的官方博客与工具箱，不断进化的文化内容与五明之学承载地，一站式精心打造的系统性个人成长与修身平台
+
+# ============================================================
+# 主题 & 语言
+# ============================================================
+site.defaultTheme: light
+site.themes: light, dark, sepia, cyberpunk
+site.locale: zh_CN
+site.defaultLanguage: zh
+site.languages: zh, en
+site.contentTheme: default
+
+# ============================================================
+# 作者 & 社交
+# ============================================================
+site.author.name: 笔记百科
+site.author.url: https://bijibaike.com
+site.social.github: https://bijibaike.com
+# Feature pills shown next to the Home H1. Each entry renders a small
+# rounded badge (icon + text). Drop or comment lines to hide them.
+# Supported icons (lucide-react): Sparkles | Lock | Globe | Heart |
+# Star | Zap | Languages | BookOpen | Code2 | Search | Clock | Calendar
+# | Pin | FolderTree | Network | ArrowRight | Tag. Unknown → Sparkles.
+site.features:
+  - { text: "Bijibaike 出品", icon: "Sparkles" }
+#   - { text: "中英双语", icon: "Languages" }
+# TODO: 填你常用的真邮箱（Contact / Pricing 页面会用），留空就显示占位
+site.social.email: ""
+# TODO: Twitter handle（不带 @），用于 og:twitter:site
+site.social.twitter: ""
+
+# ============================================================
+# SEO
+# ============================================================
+# TODO: 换成你的生产域名。sitemap / robots / canonical / og:url 全靠这个。
+#  本地预览时留空也行（build 出来的 sitemap 会用空串，但 dist 仍可部署）。
+seo.siteUrl: ""
+seo.ogImage: /og-image.svg
+seo.twitter: ""
+seo.keywords: 文化, 儒释道, 栾巨庆, 天文地理, 知识管理, 个人成长, 工具
+
+# ============================================================
+# AdSense
+# ============================================================
+ads.enabled: "false"
+# TODO: 真要接 AdSense 时填你 Google 后台拿到的 publisher id
+ads.publisherId: ""
+ads.verification: "true"
+ads.autoAds: "true"
+ads.consent.required: "true"
+ads.consent.categories: necessary, marketing
+
+# ============================================================
+# Vault 仓库
+# ============================================================
+vault.repo: Omlandc/bijibaike-article
+vault.branch: main
+vault.publicAttachmentsPath: /attachments
+---
+
+# 📝 站点总配置
+
+> 这个文件控制你的整个博客。**只改这一个文件** 就能调节站点名称、主题、SEO、广告、导航、页脚、主题簇、资源页 —— 不需要去翻 `src/` 目录。
+
+## ✏️ 怎么编辑
+
+| 想改的东西 | 在哪儿编辑 |
+|---|---|
+| 站点名 / 主题 / SEO / AdSense / Vault / 社交 | 上方 YAML frontmatter (Properties 面板) |
+| 导航菜单 / 页脚 / Pillar 顺序 | 下方 "导航 / 页脚 / Pillar" 代码块 |
+| Resources 资源页内容 | 下方 "Resources 资源页" 代码块 |
+| 更新日志 | 下方 "更新日志" 代码块 |
+
+**Obsidian Properties 面板**:打开文件时顶部会自动显示,每一行点击就能改。
+**代码块**:按 `Ctrl+E` (Mac: `Cmd+E`) 切到 **Source mode**,点击代码块即可编辑 —— 有 YAML 语法高亮 + 自动缩进。
+
+---
+
+## 导航菜单 / 页脚 / Pillar 顺序 / Feature 徽章
+
+```yaml
+# Home 大标题旁边的小徽章。每个 entry 是 { text, icon }。
+# text 是会显示的文案;icon 是 lucide-react 名字 (列表见上)。
+# 留空 [] 或删了整段就不显示徽章。
+#
+# 例子：
+#   features: []
+#   features:
+#     - { text: "Obsidian 兼容", icon: "Sparkles" }
+#     - { text: "中英双语", icon: "Languages" }
+features:
+  - { text: "Bijibaike 出品", icon: "Sparkles" }
+
+nav:
+  # 顶部导航的每一项,按出现顺序排列。
+  # icon 可选值: Home | BookOpen | FileText | Layers | FolderTree | Tags | Tag | Network | History | Scale
+  #
+  # label 可以是:
+  #   1. 一个字符串  —— 所有语言都用这个文字
+  #   2. 一个对象  —— { zh: "首页", en: "Home" }  按当前语言切换
+  # 不写 label 则使用内置 i18n key (nav.home / nav.posts / ...)
+  #
+  # hidden: true  从渲染的顶部导航 + 移动抽屉里隐藏这条
+  - { label: { zh: "首页", en: "Home" }, to: "/", icon: "Home" }
+  - { label: { zh: "文章", en: "Posts" }, to: "/blog", icon: "FileText" }
+  - { label: { zh: "主题", en: "Topics" }, to: "/topics", icon: "FolderTree" }
+  - { label: { zh: "标签", en: "Tags" }, to: "/tags", icon: "Tag" }
+  - { label: { zh: "图谱", en: "Graph" }, to: "/graph", icon: "Network" }
+  - { label: { zh: "资源", en: "Resources" }, to: "/resources", icon: "BookOpen" }
+  - { label: { zh: "更新", en: "Changelog" }, to: "/changelog", icon: "History" }
+  # 授权定价示例: hidden: true 从顶部导航 + 移动抽屉隐藏
+  # - { label: { zh: "授权定价", en: "Pricing" }, to: "/pricing", icon: "Scale", hidden: true }
+
+footer:
+  copyright: { zh: "© 2026 笔记百科 · 本网站源码遵循源可用许可,商业使用需授权", en: "© 2026 Bijibaike · Source-available, commercial use requires a license" }
+  links:
+    # 页脚链接 —— 留空数组 [] 就不显示
+    # label 同样可以是字符串或 { zh, en } 对象
+    # hidden: true 从页脚里隐藏这条 (不需删除整行)
+    - { label: { zh: "关于", en: "About" }, to: "/about" }
+    - { label: { zh: "联系", en: "Contact" }, to: "/contact" }
+    - { label: { zh: "授权定价", en: "Pricing" }, to: "/pricing", hidden: true }
+    - { label: { zh: "隐私", en: "Privacy" }, to: "/privacy" }
+
+pillars:
+  # Pillar 顺序。留空 [] 就从 vault 目录结构自动发现。
+  # 填了之后按这里写的顺序显示,没填的 pillar 排在后面。
+  - { name: "中医", description: "中医养生、经典与临床实践" }
+  - { name: "其他", description: "其他主题笔记" }
+```
+
+---
+
+## Resources 资源页 (`/resources`)
+
+```yaml
+resources:
+  sections:
+    # 按分组显示在 /resources 页面。每组下面的 items 是卡片。
+    - title: "工具"
+      description: "需要的工具"
+      items:
+        - { title: "笔记百科cn", url: "https://bijibaike.cn", description: "笔记百科的备份地址，请收藏" }
+        - { title: "D3.js", url: "https://d3js.org", description: "关系图所用的力导向图库" }
+        - { title: "React", url: "https://react.dev", description: "UI 框架" }
+    - title: "参考"
+      description: "设计 / 实现参考"
+      items:
+        - { title: "blog-system", url: "https://github.com/Omlandc/blog-system", description: "同作者的早期博客系统" }
+        - { title: "seo-kit", url: "https://github.com/Omlandc/seo-kit", description: "本仓库配套的 SEO 工具包" }
+        - { title: "ai-dev-framework", url: "https://github.com/Omlandc/ai-dev-framework", description: "webapp-building 模板仓库" }
+```
+
+---
+
+## 更新日志 (`/changelog`)
+
+```yaml
+changelog:
+  # 按时间倒序（最新的在最上面）。只有 `date` 必填。
+  # 字段：date (YYYY-MM-DD) | version | title | description
+  #       type: feature | fix | improvement | breaking
+  #       items: 详细条目列表
+  entries:
+    - date: "2026-07-03"
+      version: "v0.8.0"
+      title: "nav / footer 支持 hidden 字段 + 封面 fallback 彩色渐变"
+      type: "feature"
+      items:
+        - text: "顶部导航 / 页脚链接加 `hidden: true` 字段,设为 true 时不渲染（不删行可恢复）"
+        - text: "没配 cover 的文章卡片现在用每篇专属的彩色渐变兜底 (light/dark/sepia/cyberpunk 主题自适应)"
+        - text: "site.author.name + site.author.url + site.social.github 改成 bijibaike.com 系列"
+        - text: "页脚 copyright 同步成 '© 2026 笔记百科 / Bijibaike'"
+
+    - date: "2026-07-01"
+      version: "v0.7.0"
+      title: "配置驱动化：Home 描述读 config + index.html title 由 Vite 注入"
+      type: "improvement"
+      items:
+        - text: "Home 首页的长描述从硬编码改成读 siteConfig.site.description"
+        - text: "index.html 静态 title / lang / description 在 build 时由 Vite 插件从 vault/_config.md 注入"
+        - text: "vault/_config.md 增加 site.social.email 字段（用于 Contact / Pricing 页面）"
+
+    - date: "2026-06-29"
+      version: "v0.6.0"
+      title: "Graph 加标签筛选 + 关系图按文件夹锁定 + 更新日志页"
+      description: "Graph 现在可以按标签筛选节点或锁定到某个 Pillar/Cluster,并新增 /changelog 时间线页面。"
+      type: "feature"
+      items:
+        - text: "Graph 页面新加标签筛选 chip 行，点击只显示该标签的节点，再次点击清除"
+        - text: "URL 加 ?scope= 参数支持按文件夹（单 Pillar / Cluster）锁定图谱"
+        - text: "Pillar 与 Cluster 页面加上『看这个主题的关系图』入口"
+        - text: "新增 /changelog 页面，按时间倒序显示每次更新（含版本号、类型、详细条目）"
+
+    - date: "2026-06-28"
+      version: "v0.5.0"
+      title: "14 种文章内容主题 + 移动端适配"
+      description: "文章页主题从 4 个扩到 14 个,移动端导航换成抽屉菜单。"
+      type: "feature"
+      items:
+        - text: "导入 14 个 content-themes (default / academic / cyberpunk / receipt / sunset / aurora / bauhaus / knowledge / luxury / morandi / brutalism / github / terminal / magazine)"
+        - text: "站点默认主题写在 _config.md，可被读者 localStorage 覆盖"
+        - text: "移动端 hamburger 抽屉菜单"
+
+    - date: "2026-06-28"
+      version: "v0.4.0"
+      title: "中英双语 + 浏览器自动识别"
+      type: "feature"
+      items:
+        - text: "所有 UI 字符串中英双语化，缺失的 en key 自动回退到中文"
+        - text: "language detection 优先级：localStorage → navigator.language → _config.md 默认"
+
+    - date: "2026-06-27"
+      version: "v0.3.0"
+      title: "Pillar / Cluster 主题架构 + Git-aware 日期"
+      type: "feature"
+      items:
+        - text: "Pillar / Cluster 两层模型，pillar.md 可写自定义描述/封面"
+        - text: "文章 createdAt 优先取 frontmatter → 文件名 → git 首次提交 → 1970"
+
+    - date: "2026-06-26"
+      version: "v0.2.1"
+      title: "D3 力导向关系图重写"
+      type: "improvement"
+      items:
+        - text: "forceLink + forceManyBody + forceCenter + forceCollide 四力联动"
+        - text: "节点颜色按主标签 hash，大小按引用度平方根"
+
+    - date: "2026-06-25"
+      version: "v0.2.0"
+      title: "AdSense 合规接入 + Cookie consent"
+      type: "feature"
+      items:
+        - text: "seo-kit/ads 模块：defineAds、generateAdsTxt、generateAutoAdsScript"
+        - text: "Cookie 横幅默认关闭，Privacy 页面可重新打开"
+        - text: "/about / /privacy / /contact 三页齐了"
+```
+
+---
+
+## 字段一览
+
+### 上方 frontmatter (Properties 面板里直接编辑)
+
+| 字段 | 控制什么 |
+|---|---|
+| `site.name` | 站点完整名(SEO / OG / index.html `<title>` 用) |
+| `site.shortName` | header 里显示的简称 |
+| `site.tagline` | 一句话标语(Home 大标题用) |
+| `site.description` | 站点描述(SEO meta description / Home 副标题用) |
+| `site.defaultTheme` | 默认主题:`light` / `dark` / `sepia` / `cyberpunk` |
+| `site.themes` | 可用主题列表,逗号分隔 |
+| `site.locale` | 站点语言(`zh_CN` / `en_US`) |
+| `site.defaultLanguage` | 默认语言(`zh` / `en`),浏览器没偏好时用这个；同步写到 `<html lang>` |
+| `site.languages` | 支持的语言列表,逗号分隔 |
+| `site.author.name` | 作者名(SEO article:author 用) |
+| `site.author.url` | 作者主页 |
+| `site.social.github` | GitHub 链接(页脚会渲染) |
+| `site.social.twitter` | Twitter handle(不带 @) |
+| `site.social.email` | 联系邮箱(Contact / Pricing 页面 mailto 会用) |
+| `seo.siteUrl` | 站点完整 URL,canonical / sitemap / og:url 用 |
+| `seo.ogImage` | OG image 路径 |
+| `seo.twitter` | Twitter handle(不带 @) |
+| `seo.keywords` | 站点级 keywords,逗号分隔 |
+| `ads.enabled` | AdSense 总开关 `true` / `false` |
+| `ads.publisherId` | Google AdSense 发布商 ID (`ca-pub-XXX`) |
+| `ads.verification` | 是否写入 `<meta name="google-adsense-account">` |
+| `ads.autoAds` | 是否启用 Auto Ads |
+| `ads.consent.required` | 是否需要 cookie consent banner (GDPR) |
+| `ads.consent.categories` | cookie categories,逗号分隔 |
+| `vault.repo` | Vault git 仓库 (`org/name`) |
+| `vault.branch` | Vault 分支 |
+| `vault.publicAttachmentsPath` | 附件公开 URL 前缀 |
+
+### 下方代码块 (Source mode 编辑)
+
+| 段落 | 控制什么 |
+|---|---|
+| `nav` | 顶部导航菜单,按数组顺序显示,`hidden: true` 隐藏该条 |
+| `footer` | 页脚版权 + 链接,`links` 项支持 `hidden: true` |
+| `pillars` | Pillar 显示顺序(留空自动从 vault 目录发现) |
+| `resources` | `/resources` 页面的分组与条目 |
+| `changelog` | `/changelog` 页面的更新日志条目 |
+| `features` | 首页大标题旁边的小徽章列表(支持 `text` + `icon`,留空 `[]` 就不显示) |

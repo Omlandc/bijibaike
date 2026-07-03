@@ -8,6 +8,7 @@ import { MarkdownView } from '@/components/MarkdownView';
 import { cn } from '@/lib/utils';
 import { getAllPosts, getAllTags, getAllPillars } from '@/lib/content';
 import { siteConfig } from '@/config/site-config';
+import { PostCoverFallback } from '@/components/PostCoverFallback';
 import { useTranslation } from '@/i18n';
 
 /** Take the first `paraCount` paragraphs of a markdown body. We
@@ -814,6 +815,7 @@ function PostGridCard({ post, query }: { post: ReturnType<typeof getAllPosts>[nu
   const cover = post.cover;
   const readingMinutes = Math.max(1, Math.round(post.raw.length / 600));
   const description = typeof post.frontmatter.description === 'string' ? post.frontmatter.description : post.excerpt;
+  const { t } = useTranslation();
   return (
     <Link
       to={postHref(post.slug, query)}
@@ -823,16 +825,28 @@ function PostGridCard({ post, query }: { post: ReturnType<typeof getAllPosts>[nu
         <div className="relative aspect-[16/9] w-full overflow-hidden">
           <img src={cover} alt="" loading="lazy" className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105" />
         </div>
-      ) : null}
+      ) : (
+        <PostCoverFallback post={post} aspect="aspect-[16/9]" showTag={false} />
+      )}
       <div className="flex flex-1 flex-col gap-2 p-4">
-        {post.tags[0] ? (
-          <span className="inline-flex w-fit items-center rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[10px] font-medium text-fg-muted">{post.tags[0]}</span>
-        ) : null}
         <h3 className="line-clamp-2 text-base font-semibold text-fg group-hover:text-primary">{highlightText(post.title, query)}</h3>
         {description ? <p className="line-clamp-2 text-sm text-fg-muted">{highlightText(description, query)}</p> : null}
-        <div className="mt-auto flex items-center justify-between pt-2 text-xs text-fg-subtle">
-          <span className="inline-flex items-center gap-1"><Clock className="size-3" />{readingMinutes} 分钟</span>
-          <span>{new Date(post.date).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</span>
+        <div className="mt-auto flex min-h-[24px] flex-wrap items-center justify-between gap-2 pt-2 text-xs text-fg-subtle">
+          <div className="flex flex-wrap items-center gap-1">
+            {post.frontmatter.pinned ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                <Pin className="size-3" />
+                {t('properties.pinned')}
+              </span>
+            ) : null}
+            {post.tags[0] ? (
+              <span className="inline-flex items-center rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[10px] font-medium text-fg-muted">{post.tags[0]}</span>
+            ) : null}
+          </div>
+          <span className="inline-flex items-center gap-2">
+            <span className="inline-flex items-center gap-1"><Clock className="size-3" />{readingMinutes} 分钟</span>
+            <span>{new Date(post.date).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</span>
+          </span>
         </div>
       </div>
     </Link>

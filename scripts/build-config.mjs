@@ -215,6 +215,11 @@ const siteConfig = {
   footer: {
     copyright: footer.copyright ?? '',
     links: Array.isArray(footer.links) ? footer.links : [],
+    // Pass the GitHub-visibility switch through verbatim. Anything
+    // that isn't the literal `false` (including `undefined`) means
+    // "show the GitHub link" — keeping the previous behavior the
+    // default so existing vaults without this field still work.
+    showGithub: footer.showGithub === false ? false : true,
   },
   pillars,
   resources: {

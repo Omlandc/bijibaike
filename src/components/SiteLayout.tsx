@@ -63,7 +63,7 @@ const NAV_LABEL_KEYS: Record<string, TranslationKey> = {
 // per-language object) — it takes priority over the i18n key so
 // users can override the visible menu text without touching the
 // source.
-const NAV = siteConfig.nav.map((n) => {
+const NAV = siteConfig.nav.filter((n) => !n.hidden).map((n) => {
   // `fallbackLabel` was historically the i18n fallback when the
   // config didn't set a label. We keep it as a single string for
   // accessibility (the <a title="…"> attribute), computed as the
@@ -391,12 +391,12 @@ export function SiteLayout() {
             })()}
           </span>
           <nav className="flex flex-wrap items-center gap-3">
-            {SITE_FOOTER_LINKS.map((l) => (
+            {SITE_FOOTER_LINKS.filter((l) => !('hidden' in l) || !l.hidden).map((l) => (
               <Link key={l.to} to={l.to} className="hover:text-fg">
                 {resolveLocalized(l.label, lang)}
               </Link>
             ))}
-            {SITE_SOCIAL.github ? (
+            {SITE_SOCIAL.github && siteConfig.footer.showGithub !== false ? (
               <a
                 href={SITE_SOCIAL.github}
                 target="_blank"

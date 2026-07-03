@@ -137,12 +137,61 @@ async function pull({ localPath, branch, repo }) {
   // .git/config so the token isn't stored on disk.
   const auth = maybeAuthUrl(repo);
   const override = auth === repo ? [] : [`-c`, `url.${auth}.insteadOf=${repo}`];
-  await run('git', [
-    '-C', localPath,
-    ...override,
-    'fetch', '--depth=1', 'origin', branch,
-  ]);
-  await run('git', ['-C', localPath, 'reset', '--hard', `origin/${branch}`]);
+  // Try the configured branch first; if the remote doesn't have it
+  // (e.g. the user renamed master → main on GitHub but `_config.md`
+  // still says main when the upstream only has main, or vice versa),
+  // fall back to the other common default. This keeps the build
+  // resilient against single-branch renames.
+  const candidates = [branch, branch === 'main' ? 'master' : 'main']
+    .filter((b, i, arr) => arr.indexOf(b) === i);
+  let resolved = null;
+  for (const candidate of candidates) {
+    try {
+      console.log(`[vault] trying branch '${candidate}'…`);
+      await run('git', [
+        '-C', localPath,
+        ...override,
+        'fetch', '--depth=1', 'origin', candidate,
+      ], { allowFail: true });
+      // Re-point HEAD at the freshly-fetched branch so the reset
+      // below resolves even when the local repo's tracking config
+      // is stale (e.g. user just renamed master → main on GitHub).
+      await run('git', ['-C', localPath, 'update-ref', `refs/remotes/origin/${candidate}`, 'FETCH_HEAD'], {
+        allowFail: true, silent: true,
+      });
+      await run('git', ['-C', localPath, 'symbolic-ref', 'refs/remotes/origin/HEAD', `refs/remotes/origin/${candidate}`], {
+        allowFail: true, silent: true,
+      });
+      // Probe: the remote-tracking ref must now exist.
+      let probeOk = false;
+      try {
+        await run('git', [
+          '-C', localPath, 'show-ref', '--verify', '--quiet',
+          `refs/remotes/origin/${candidate}`,
+        ], { allowFail: true, silent: true });
+        probeOk = true;
+      } catch {
+        probeOk = false;
+      }
+      if (probeOk) {
+        resolved = candidate;
+        break;
+      }
+      console.log(`[vault] branch '${candidate}' not available on origin.`);
+    } catch (e) {
+      console.log(`[vault] branch '${candidate}' fetch failed: ${e.message}`);
+    }
+  }
+  if (!resolved) {
+    throw new Error(
+      `[vault] none of the candidate branches (${candidates.join(', ')}) exist on origin. ` +
+      `Set vault.branch in _config.md to an existing branch name.`,
+    );
+  }
+  if (resolved !== branch) {
+    console.warn(`[vault] configured branch '${branch}' missing on origin — using '${resolved}' instead.`);
+  }
+  await run('git', ['-C', localPath, 'reset', '--hard', `origin/${resolved}`]);
 }
 
 async function status({ localPath }) {

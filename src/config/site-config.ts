@@ -9,7 +9,7 @@ export const siteConfig: SiteConfig = {
     "name": "笔记百科",
     "shortName": "笔记百科",
     "tagline": "融通东西方,笔记天下事",
-    "description": "公众号笔记百科和这个东西的官方博客与工具箱，不断进化的文化内容与五明之学承载地，一站式精心打造的系统性个人成长与修身平台；本网站为纯静态部署，无服务器成本，有意向者请联系作者。",
+    "description": "公众号笔记百科和这个东西的官方博客与工具箱，不断进化的文化内容与五明之学承载地，一站式精心打造的系统性个人成长与修身平台；本网站为纯静态部署，无服务器成本，有意向者请联系，微信号：rurufengxing。",
     "defaultTheme": "light",
     "themes": [
       "light",
@@ -25,11 +25,11 @@ export const siteConfig: SiteConfig = {
     ],
     "contentTheme": "default",
     "author": {
-      "name": "Omlandc",
-      "url": "https://github.com/Omlandc"
+      "name": "笔记百科",
+      "url": "https://bijibaike.com"
     },
     "social": {
-      "github": "https://github.com/Omlandc",
+      "github": "https://bijibaike.com",
       "twitter": "",
       "email": ""
     },
@@ -133,8 +133,8 @@ export const siteConfig: SiteConfig = {
   ],
   "footer": {
     "copyright": {
-      "zh": "© 2026 Omlandc · 本网站源码遵循源可用许可,商业使用需授权",
-      "en": "© 2026 Omlandc · Source-available, commercial use requires a license"
+      "zh": "© 2026 笔记百科 · 本网站源码遵循源可用许可,商业使用需授权",
+      "en": "© 2026 Bijibaike · Source-available, commercial use requires a license"
     },
     "links": [
       {
@@ -156,7 +156,8 @@ export const siteConfig: SiteConfig = {
           "zh": "授权定价",
           "en": "Pricing"
         },
-        "to": "/pricing"
+        "to": "/pricing",
+        "hidden": true
       },
       {
         "label": {
@@ -165,7 +166,8 @@ export const siteConfig: SiteConfig = {
         },
         "to": "/privacy"
       }
-    ]
+    ],
+    "showGithub": false
   },
   "pillars": [
     {
@@ -187,37 +189,22 @@ export const siteConfig: SiteConfig = {
             "title": "笔记百科cn",
             "url": "https://bijibaike.cn",
             "description": "笔记百科的备份地址，请收藏"
-          },
-          {
-            "title": "D3.js",
-            "url": "https://d3js.org",
-            "description": "关系图所用的力导向图库"
-          },
-          {
-            "title": "React",
-            "url": "https://react.dev",
-            "description": "UI 框架"
           }
         ]
       },
       {
-        "title": "参考",
-        "description": "设计 / 实现参考",
+        "title": "文献",
+        "description": "文化类电子文献参考网站",
         "items": [
           {
-            "title": "blog-system",
-            "url": "https://github.com/Omlandc/blog-system",
-            "description": "同作者的早期博客系统"
+            "title": "中国哲学书电子化计划",
+            "url": "https://ctext.org/instructions/library/zh",
+            "description": "一个线上古籍文献检索系统，是线上古典文献最丰富且最可靠的来源之一"
           },
           {
-            "title": "seo-kit",
-            "url": "https://github.com/Omlandc/seo-kit",
-            "description": "本仓库配套的 SEO 工具包"
-          },
-          {
-            "title": "ai-dev-framework",
-            "url": "https://github.com/Omlandc/ai-dev-framework",
-            "description": "webapp-building 模板仓库"
+            "title": "CBETA Online",
+            "url": "https://cbetaonline.cn/zh/",
+            "description": "CBETA（中华电子佛典协会）是一个致力于汉文佛教经典数字化、整理与传播的非营利组织，现已成为全球最重要的汉文电子佛典资源平台之一。"
           }
         ]
       }
@@ -225,6 +212,26 @@ export const siteConfig: SiteConfig = {
   },
   "changelog": {
     "entries": [
+      {
+        "date": "2026-07-03",
+        "version": "v0.8.0",
+        "title": "nav / footer 支持 hidden 字段 + 封面 fallback 彩色渐变",
+        "type": "feature",
+        "items": [
+          {
+            "text": "顶部导航 / 页脚链接加 `hidden: true` 字段,设为 true 时不渲染（不删行可恢复）"
+          },
+          {
+            "text": "没配 cover 的文章卡片现在用每篇专属的彩色渐变兜底 (light/dark/sepia/cyberpunk 主题自适应)"
+          },
+          {
+            "text": "site.author.name + site.author.url + site.social.github 改成 bijibaike.com 系列"
+          },
+          {
+            "text": "页脚 copyright 同步成 '© 2026 笔记百科 / Bijibaike'"
+          }
+        ]
+      },
       {
         "date": "2026-07-01",
         "version": "v0.7.0",

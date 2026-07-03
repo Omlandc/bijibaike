@@ -82,16 +82,23 @@ export interface NavItem {
   to: string;
   icon: string;
   end?: boolean;
+  /** Set true to hide this entry from the rendered top nav. */
+  hidden?: boolean;
 }
 
 export interface FooterLink {
   label: LocalizedString;
   to: string;
+  /** Set true to hide this entry from the rendered footer link list. */
+  hidden?: boolean;
 }
 
 export interface FooterSection {
   copyright: LocalizedString;
   links: FooterLink[];
+  /** Set false to hide the GitHub entry in the footer
+   *  (even if site.social.github is non-empty). Defaults to true. */
+  showGithub?: boolean;
 }
 
 export interface PillarSection {

@@ -18,6 +18,7 @@ import {
   getBacklinkCounts,
   getAllPillars,
 } from '@/lib/content';
+import { PostCoverFallback } from '@/components/PostCoverFallback';
 import { useTranslation } from '@/i18n';
 import { FilterBar, type SortKey } from '@/components/FilterBar';
 
@@ -166,33 +167,35 @@ export default function BlogList() {
     });
   }, [posts, tags, years, themes, pinnedOnly, query]);
 
-  // Sort pass
+  // Sort pass — pinned is the primary key, then the chosen secondary
+  // sort. Pinned posts always sit at the top regardless of which
+  // sort the user picked (newest / oldest / most-linked / etc.).
   const sorted = useMemo(() => {
     const out = [...filtered];
-    const pinnedFirst = (a: (typeof out)[number], b: (typeof out)[number]) => {
+    const pinnedRank = (a: (typeof out)[number], b: (typeof out)[number]) => {
       const ap = a.frontmatter?.pinned === true ? 1 : 0;
       const bp = b.frontmatter?.pinned === true ? 1 : 0;
       return bp - ap;
     };
-    switch (sort) {
-      case 'oldest':
-        return out.sort((a, b) => a.createdAt.localeCompare(b.createdAt) || pinnedFirst(a, b));
-      case 'updated':
-        return out.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || pinnedFirst(a, b));
-      case 'most-linked':
-        return out.sort(
-          (a, b) =>
-            (backlinkCounts[b.slug] ?? 0) + b.links.length -
-              ((backlinkCounts[a.slug] ?? 0) + a.links.length) || pinnedFirst(a, b),
-        );
-      case 'longest':
-        return out.sort((a, b) => b.raw.length - a.raw.length || pinnedFirst(a, b));
-      case 'title':
-        return out.sort((a, b) => a.title.localeCompare(b.title) || pinnedFirst(a, b));
-      case 'newest':
-      default:
-        return out.sort((a, b) => b.createdAt.localeCompare(a.createdAt) || pinnedFirst(a, b));
-    }
+    const bySecondary = (a: (typeof out)[number], b: (typeof out)[number]) => {
+      switch (sort) {
+        case 'oldest':
+          return a.createdAt.localeCompare(b.createdAt);
+        case 'updated':
+          return b.updatedAt.localeCompare(a.updatedAt);
+        case 'most-linked':
+          return (backlinkCounts[b.slug] ?? 0) + b.links.length -
+            ((backlinkCounts[a.slug] ?? 0) + a.links.length);
+        case 'longest':
+          return b.raw.length - a.raw.length;
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'newest':
+        default:
+          return b.createdAt.localeCompare(a.createdAt);
+      }
+    };
+    return out.sort((a, b) => pinnedRank(a, b) || bySecondary(a, b));
   }, [filtered, sort, backlinkCounts]);
 
   // Group filtered posts by pillar / cluster for the tree view.
@@ -316,12 +319,6 @@ export default function BlogList() {
                   to={postHref(p.slug, query)}
                   className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-bg-elevated transition-all hover:border-primary/40 hover:shadow-elevated"
                 >
-                  {isPinned ? (
-                    <span className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-bg/90 px-2 py-0.5 text-[10px] font-medium text-primary backdrop-blur">
-                      <Pin className="size-3" />
-                      {t('properties.pinned')}
-                    </span>
-                  ) : null}
                   {p.cover ? (
                     <div className="relative aspect-[16/9] w-full overflow-hidden">
                       <img
@@ -331,13 +328,10 @@ export default function BlogList() {
                         className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
-                  ) : null}
+                  ) : (
+                    <PostCoverFallback post={p} aspect="aspect-[16/9]" showTag={false} />
+                  )}
                   <div className="flex flex-1 flex-col gap-2 p-4">
-                    {p.tags[0] ? (
-                      <span className="inline-flex w-fit items-center rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[10px] font-medium text-fg-muted">
-                        {p.tags[0]}
-                      </span>
-                    ) : null}
                     <h3 className="line-clamp-2 text-base font-semibold text-fg group-hover:text-primary">
                       {highlightText(p.title, query)}
                     </h3>
@@ -349,14 +343,29 @@ export default function BlogList() {
                         query,
                       )}
                     </p>
-                    <div className="mt-auto flex items-center justify-between pt-2 text-xs text-fg-subtle">
-                      <span className="inline-flex items-center gap-1">
-                        <Calendar className="size-3" />
-                        {dateLabel}
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Clock className="size-3" />
-                        {readingMinutes} 分钟
+                    <div className="mt-auto flex min-h-[24px] flex-wrap items-center justify-between gap-2 pt-2 text-xs text-fg-subtle">
+                      <div className="flex flex-wrap items-center gap-1">
+                        {isPinned ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                            <Pin className="size-3" />
+                            {t('properties.pinned')}
+                          </span>
+                        ) : null}
+                        {p.tags[0] ? (
+                          <span className="inline-flex items-center rounded-full border border-border bg-bg-subtle px-2 py-0.5 text-[10px] font-medium text-fg-muted">
+                            {p.tags[0]}
+                          </span>
+                        ) : null}
+                      </div>
+                      <span className="inline-flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="size-3" />
+                          {dateLabel}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="size-3" />
+                          {readingMinutes} 分钟
+                        </span>
                       </span>
                     </div>
                     {p.tags.length > 1 ? (

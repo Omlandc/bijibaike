@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Pin } from 'lucide-react';
 import type { Post } from '@/lib/content';
 import { cn } from '@/lib/utils';
+import { PostCoverFallback } from '@/components/PostCoverFallback';
 
 interface PostCardProps {
   post: Post;
@@ -15,11 +16,23 @@ export function PostCard({ post, featured, className }: PostCardProps) {
   return (
     <Card
       className={cn(
-        'group h-full transition-all hover:border-primary/40 hover:shadow-md',
+        'group h-full overflow-hidden transition-all hover:border-primary/40 hover:shadow-md',
         featured && 'border-primary/30 bg-primary/5',
         className,
       )}
     >
+      {post.cover ? (
+        <div className="relative aspect-[16/9] w-full overflow-hidden">
+          <img
+            src={post.cover}
+            alt=""
+            loading="lazy"
+            className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+      ) : (
+        <PostCoverFallback post={post} aspect="aspect-[16/9]" showTag={false} />
+      )}
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="line-clamp-2 text-lg group-hover:text-primary">
@@ -41,6 +54,12 @@ export function PostCard({ post, featured, className }: PostCardProps) {
         <p className="line-clamp-3 text-sm text-muted-foreground">{post.excerpt}</p>
       </CardContent>
       <CardFooter className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        {post.frontmatter.pinned ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+            <Pin className="size-3" />
+            <span>已置顶</span>
+          </span>
+        ) : null}
         <span className="inline-flex items-center gap-1">
           <CalendarDays className="size-3.5" />
           {new Date(post.date).toLocaleDateString('zh-CN', {
