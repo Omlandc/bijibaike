@@ -9,7 +9,7 @@ export const siteConfig: SiteConfig = {
     "name": "笔记百科",
     "shortName": "笔记百科",
     "tagline": "融通东西方,笔记天下事",
-    "description": "公众号笔记百科和这个东西的官方博客与工具箱，不断进化的文化内容与五明之学承载地，一站式精心打造的系统性个人成长与修身平台",
+    "description": "公众号笔记百科和这个东西的官方博客与工具箱，不断进化的文化内容与五明之学承载地，一站式精心打造的系统性个人成长与修身平台；本网站为纯静态部署，无服务器成本，有意向者请联系作者。",
     "defaultTheme": "light",
     "themes": [
       "light",

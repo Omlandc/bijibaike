@@ -4,10 +4,34 @@ import * as d3 from 'd3';
 import { ArrowRight, Sparkles, Search, Calendar, TrendingUp, Tag as TagIcon, Clock, Pin, FileText, FolderTree, Network, ChevronRight, Lock, Globe, Heart, Star, Zap, Languages, BookOpen, Code2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { MarkdownView } from '@/components/MarkdownView';
 import { cn } from '@/lib/utils';
 import { getAllPosts, getAllTags, getAllPillars } from '@/lib/content';
 import { siteConfig } from '@/config/site-config';
 import { useTranslation } from '@/i18n';
+
+/** Take the first `paraCount` paragraphs of a markdown body. We
+ *  split on blank lines (which separate paragraphs in CommonMark)
+ *  and drop image-only paragraphs (![[foo.jpg]] / ![alt](url)) so
+ *  the featured-card preview doesn't duplicate the cover image or
+ *  re-show every figure in the article body. */
+function firstParagraphs(body: string, paraCount = 2): string {
+  const noFences = body.replace(/```[\s\S]*?```/g, '');
+  const strip = noFences
+    // Drop Obsidian embeds ![[file|width]] and standard md images
+    .replace(/!\[\[[^\]]*\]\]/g, '')
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, '');
+  const paras = strip
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter((p) => {
+      if (p.length === 0) return false;
+      // Skip paragraphs that were nothing but an image (now empty
+      // after our strip pass above).
+      return true;
+    });
+  return paras.slice(0, paraCount).join('\n\n');
+}
 
 interface SimNode {
   id: string;
@@ -728,6 +752,16 @@ export default function Home() {
                 ) : (
                   <p className="mt-3 line-clamp-3 text-fg-muted">{highlightText(featured.excerpt, search)}</p>
                 )}
+                {/* Render the first couple of paragraphs of the body so
+                    the card has substance, not just a 1-line summary. */}
+                {featured.body ? (
+                  <div className="relative mt-3 max-h-44 overflow-hidden rounded-md text-sm leading-relaxed">
+                    <div className="prose prose-sm max-w-none text-fg-muted prose-headings:hidden prose-h1:hidden prose-h2:hidden prose-h3:hidden prose-p:my-1.5 prose-p:first:mt-0 prose-img:my-2 prose-img:rounded-md prose-ul:my-2 prose-li:my-0.5 prose-blockquote:my-2">
+                      <MarkdownView body={firstParagraphs(featured.body)} />
+                    </div>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-bg-elevated to-transparent" />
+                  </div>
+                ) : null}
               </div>
               <div className="mt-4 flex items-center justify-between text-xs text-fg-muted">
                 <span>
