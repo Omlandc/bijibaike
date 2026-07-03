@@ -65,6 +65,13 @@ function transformText(node: Text): PhrasingContent[] | null {
       const label = parsed.alias ?? parsed.file.split('/').pop() ?? parsed.file;
       if (isEmbed) {
         // ![[logo.svg]] → <img>
+        // Obsidian-style size hint from the pipe (e.g.
+        // ![[photo.png|300]] or ![[photo.png|300x200]]) is forwarded
+        // as width / height attributes so the rendered <img> matches
+        // what the user saw in Obsidian.
+        const sizeProps: Record<string, string> = {};
+        if (parsed.width != null) sizeProps.width = String(parsed.width);
+        if (parsed.height != null) sizeProps.height = String(parsed.height);
         const img: Image = {
           type: 'image',
           url,
@@ -75,6 +82,7 @@ function transformText(node: Text): PhrasingContent[] | null {
               'data-wiki-embed': 'attachment',
               'data-wiki-target': parsed.file,
               className: 'wiki-embed wiki-embed--attachment',
+              ...sizeProps,
             },
           },
         };

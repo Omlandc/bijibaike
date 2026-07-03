@@ -249,6 +249,11 @@ export default function Graph() {
       const zoom = (zoomRef.current = d3
         .zoom<SVGSVGElement, unknown>())
         .scaleExtent([0.2, 5])
+        // Finer-grained wheel zoom — d3 default is 1.1 per wheel-tick
+        // which feels jumpy on a touchpad. 0.002 yields ~12% per
+        // tick (deltaY=100) — half as coarse as default and matches
+        // the trackpad's natural slow-zoom intuition.
+        .wheelDelta((event) => -event.deltaY * 0.002)
         // Allow wheel + two-finger pinch; the zoom filter only blocks
         // button-clicks on nodes (mousedown). Touch is handled by d3
         // natively: single finger = pan, two fingers = pinch.

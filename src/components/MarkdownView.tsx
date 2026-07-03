@@ -59,6 +59,8 @@ const schema: typeof defaultSchema = {
       ['className', 'wiki-embed', 'wiki-embed--attachment'],
       'data-wiki-embed',
       'data-wiki-target',
+      'width',
+      'height',
     ],
     p: [
       ...(defaultSchema.attributes?.p ?? []),
@@ -159,9 +161,37 @@ function renderBlockquote(props: BlockquoteProps) {
   return <blockquote {...rest}>{children}</blockquote>;
 }
 
+function renderImg(props: React.ImgHTMLAttributes<HTMLImageElement> & { node?: Element }) {
+  const { src, alt, title, width, height, ...rest } = props;
+  // Obsidian-style size hint: `![alt](path =WxH)` — the `=WxH` lives
+  // at the end of the URL and is stripped by react-markdown but only
+  // if it follows the closing paren. We re-parse to be safe.
+  let realSrc = typeof src === 'string' ? src : '';
+  let w = typeof width === 'number' || typeof width === 'string' ? width : undefined;
+  let h = typeof height === 'number' || typeof height === 'string' ? height : undefined;
+  const sizeMatch = realSrc.match(/^(.*?)\s+=(\d+)(?:x(\d+))?\s*$/);
+  if (sizeMatch) {
+    realSrc = sizeMatch[1];
+    w = w ?? Number(sizeMatch[2]);
+    h = h ?? (sizeMatch[3] ? Number(sizeMatch[3]) : undefined);
+  }
+  return (
+    <img
+      src={realSrc}
+      alt={alt ?? ''}
+      title={title ?? undefined}
+      width={w}
+      height={h}
+      loading="lazy"
+      {...rest}
+    />
+  );
+}
+
 const components: Components = {
   a: renderAnchor,
   blockquote: renderBlockquote,
+  img: renderImg,
 };
 
 export function MarkdownView({ body, className }: MarkdownViewProps) {

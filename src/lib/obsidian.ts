@@ -53,12 +53,20 @@ export interface ParsedWikiLink {
   file: string;
   /** optional #heading anchor */
   heading: string | null;
-  /** optional |alias text */
+  /** optional |alias text (after stripping any size suffix) */
   alias: string | null;
   /** is this an embed ![[...]] */
   embed: boolean;
   /** slug for routing */
   slug: string;
+  /**
+   * Obsidian image-size hint from the embed pipe:
+   *   ![[photo.png|300]]    → width = 300
+   *   ![[photo.png|300x200]]→ width 300, height 200
+   * Only set when the alias itself is a bare number / WxH token.
+   */
+  width?: number | null;
+  height?: number | null;
 }
 
 export interface ParsedCallout {
@@ -110,12 +118,26 @@ export function parseWikiLink(raw: string, embed = false): ParsedWikiLink | null
     heading = body.slice(hashIdx + 1).trim() || null;
   }
 
+  // Obsidian image-size hint: the pipe-alias on a bare number / WxH
+  // token is treated as a dimension (e.g. `![[photo.png|300x200]]`).
+  // Anything else is left in `alias` for caption use.
+  let width: number | null = null;
+  let height: number | null = null;
+  if (alias && /^\d+(x\d+)?$/i.test(alias)) {
+    const [w, h] = alias.toLowerCase().split('x');
+    width = Number(w);
+    height = h ? Number(h) : null;
+    alias = null;
+  }
+
   return {
     target: body,
     file,
     heading,
     alias,
     embed,
+    width,
+    height,
     // Use basename only so [[notes/getting-started]] and
     // [[getting-started]] both resolve to `getting-started`. This
     // matches remark-wikilink.ts and how content.ts derives slugs.

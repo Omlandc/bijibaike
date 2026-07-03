@@ -376,3 +376,14 @@ mark[data-find-idx].find-active {
 }
 .graph-svg .graph-node.dim { opacity: 0.15; }
 .graph-svg .graph-link.dim { stroke-opacity: 0.04; }
+
+/* ============================================================
+ * Wiki-embedded images: respect the inline width / height that
+ * comes from the Obsidian `![[image.png|300]]` or
+ * `![[image.png|300x200]]` syntax, but cap the rendered size to
+ * the article column so a 1200px source still fits the viewport.
+ * ============================================================ */
+img.wiki-embed {
+  max-width: 100%;
+  height: auto;
+}
