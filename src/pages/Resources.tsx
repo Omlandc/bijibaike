@@ -4,13 +4,10 @@ import { siteConfig } from '@/config/site-config';
 import { useTranslation } from '@/i18n';
 
 export default function Resources() {
-  const { sections, subtitle, configNote } = siteConfig.resources;
+  const { sections, subtitle } = siteConfig.resources;
   const { t, lang } = useTranslation();
   const resolvedSubtitle = subtitle
     ? (typeof subtitle === 'string' ? subtitle : subtitle[lang] ?? subtitle.zh ?? subtitle.en ?? '')
-    : null;
-  const resolvedConfigNote = configNote
-    ? (typeof configNote === 'string' ? configNote : configNote[lang] ?? configNote.zh ?? configNote.en ?? '')
     : null;
 
   return (
@@ -34,7 +31,7 @@ export default function Resources() {
           {t('resources.title')}
         </h1>
         <p className="text-sm text-fg-muted">
-          {resolvedSubtitle ?? t('resources.subtitle')} {resolvedConfigNote ?? t('resources.configNote')}{' '}
+          {resolvedSubtitle ?? t('resources.subtitle')} {t('resources.configNote')}{' '}
           <code className="rounded bg-bg-subtle px-1 text-fg">vault/_config.md</code>{' '}
           {t('resources.configNoteOf')}{' '}
           <code className="rounded bg-bg-subtle px-1 text-fg">resources</code>{' '}

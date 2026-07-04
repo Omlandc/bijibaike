@@ -224,11 +224,10 @@ const siteConfig = {
   pillars,
   resources: {
     sections: Array.isArray(resources.sections) ? resources.sections : [],
-    // Pass optional page-header overrides through verbatim. If the
-    // user doesn't set them, Resources.tsx falls back to the built-in
-    // i18n strings.
+    // Pass optional page-header subtitle through verbatim. If the
+    // user doesn't set it, Resources.tsx falls back to the built-in
+    // i18n string `resources.subtitle`.
     subtitle: resources.subtitle,
-    configNote: resources.configNote,
   },
   changelog: {
     entries: Array.isArray(merged.changelog?.entries) ? merged.changelog.entries : [],
