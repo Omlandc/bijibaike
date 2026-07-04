@@ -121,6 +121,13 @@ export interface ResourceSection {
 
 export interface ResourcesSection {
   sections: ResourceSection[];
+  /** Optional override for the page header subtitle (replaces the
+   *  built-in i18n string `resources.subtitle`). Strings or
+   *  `{ zh, en }` per-language. */
+  subtitle?: LocalizedString;
+  /** Optional override for the trailing config-hint paragraph
+   *  (the bit that says where the data lives). */
+  configNote?: LocalizedString;
 }
 
 export interface ChangelogItem {

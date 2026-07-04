@@ -4,8 +4,14 @@ import { siteConfig } from '@/config/site-config';
 import { useTranslation } from '@/i18n';
 
 export default function Resources() {
-  const { sections } = siteConfig.resources;
-  const { t } = useTranslation();
+  const { sections, subtitle, configNote } = siteConfig.resources;
+  const { t, lang } = useTranslation();
+  const resolvedSubtitle = subtitle
+    ? (typeof subtitle === 'string' ? subtitle : subtitle[lang] ?? subtitle.zh ?? subtitle.en ?? '')
+    : null;
+  const resolvedConfigNote = configNote
+    ? (typeof configNote === 'string' ? configNote : configNote[lang] ?? configNote.zh ?? configNote.en ?? '')
+    : null;
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -28,7 +34,7 @@ export default function Resources() {
           {t('resources.title')}
         </h1>
         <p className="text-sm text-fg-muted">
-          {t('resources.subtitle')} {t('resources.configNote')}{' '}
+          {resolvedSubtitle ?? t('resources.subtitle')} {resolvedConfigNote ?? t('resources.configNote')}{' '}
           <code className="rounded bg-bg-subtle px-1 text-fg">vault/_config.md</code>{' '}
           {t('resources.configNoteOf')}{' '}
           <code className="rounded bg-bg-subtle px-1 text-fg">resources</code>{' '}
